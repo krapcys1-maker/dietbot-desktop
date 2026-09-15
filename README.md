@@ -5,8 +5,21 @@ Model językowy (DeepSeek) wybiera dania tak, żeby tydzień był smaczny i prak
 deterministyczny silnik** (OR-Tools CP-SAT) i sprawdza je **niezależny weryfikator**. Wszystko po polsku, z listą
 zakupów podpowiadającą produkty z półek Lidla (i Kauflandu) w Rumunii.
 
-> **Status projektu:** działająca aplikacja lokalna w wersji 0.1.0. Nie jest wyrobem medycznym ani zamiennikiem
+> **Status projektu:** działająca aplikacja lokalna w wersji 0.1.0 dla Windows. Nie jest wyrobem medycznym ani zamiennikiem
 > porady lekarza lub dietetyka. Przed użyciem sprawdź cele żywieniowe i wygenerowany plan pod kątem swoich potrzeb.
+
+## Instalator Windows
+
+Pobierz `DietBot-Setup-0.1.0.exe` z [najnowszego wydania](https://github.com/krapcys1-maker/dietbot-desktop/releases/latest),
+uruchom instalator i otwórz DietBota ze skrótu w menu Start. Instalacja nie wymaga uprawnień administratora.
+
+Po pierwszym uruchomieniu przejdź do **Ustawienia → Model językowy**, wklej swój klucz API DeepSeek i kliknij
+**Zapisz klucz**. Klucz, konfiguracja, plany i wygenerowane dania są przechowywane wyłącznie na komputerze
+użytkownika w `%LOCALAPPDATA%\DietBot`.
+
+Instalator nie jest jeszcze podpisany certyfikatem, dlatego Windows SmartScreen może przy pierwszym uruchomieniu
+wyświetlić ostrzeżenie. W takim przypadku wybierz **Więcej informacji → Uruchom mimo to**. Kod źródłowy instalatora
+znajduje się w `packaging/DietBot.iss`.
 
 ## Szybki start ze źródeł (Windows)
 
@@ -25,18 +38,19 @@ Copy-Item .env.example .env
 .\.venv\Scripts\dietbot.exe aplikacja
 ```
 
-Gotowy instalator Windows nie jest jeszcze publikowany. Lokalną paczkę aplikacji można zbudować poleceniem:
+Lokalną paczkę i instalator można zbudować poleceniem:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File packaging\zbuduj.ps1
+powershell -ExecutionPolicy Bypass -File packaging\zbuduj_instalator.ps1
 ```
 
-Wynikiem jest **cały folder** `dist\DietBot`. Nie kopiuj samego `DietBot.exe` — potrzebuje on plików z
-`dist\DietBot\_internal` oraz katalogów `dane` i `konfiguracja`.
+Skrypt wymaga Inno Setup 6. Wynikiem jest `release\DietBot-Setup-0.1.0.exe` oraz folder `dist\DietBot`.
+Nie kopiuj samego `DietBot.exe` — potrzebuje on plików z `dist\DietBot\_internal`.
 
 ## Własny klucz API DeepSeek
 
-Każdy użytkownik korzysta ze swojego klucza. Po skopiowaniu `.env.example` do `.env` wpisz:
+Każdy użytkownik korzysta ze swojego klucza. W wersji instalowanej wklej go w zakładce **Ustawienia**. Przy
+uruchamianiu aplikacji ze źródeł można także skopiować `.env.example` do `.env` i wpisać:
 
 ```dotenv
 DEEPSEEK_API_KEY=tu_wpisz_wlasny_klucz
@@ -51,6 +65,7 @@ rozumienie życzeń i wymyślanie nowych dań są wyłączone. Klucz można utwo
 
 | Sposób | Jak |
 |---|---|
+| **Po instalacji** | skrót **DietBot** w menu Start |
 | **Okno aplikacji** (zalecane) | `.venv\Scripts\dietbot aplikacja` albo, po zbudowaniu paczki, `dist\DietBot\DietBot.exe` |
 | Z terminala, w oknie | `.venv\Scripts\dietbot aplikacja` |
 | W przeglądarce | `.venv\Scripts\dietbot serwer` → otwiera `http://127.0.0.1:8765` |
@@ -148,6 +163,9 @@ Bot odpowiada tylko osobom z listy.
 | `dane/sklepy/` | produkty z półek w Rumunii (Lidl RO, Kaufland RO), opakowania |
 | `konfiguracja/` | `zalozenia.yaml` (cele i zasady), `llm.yaml` (model, budżet) |
 | `wyniki/` | plany (SQLite), eksporty, koszty LLM, dzienniki — poza gitem; `wyniki/cache/` to pamięć podręczna sparsowanych plików YAML (start w 0,3 s zamiast 3 s; można ją usunąć) |
+
+W instalacji Windows zapisywalne kopie tych katalogów znajdują się w `%LOCALAPPDATA%\DietBot`; pliki programu
+w katalogu instalacyjnym pozostają tylko do odczytu.
 
 Więcej: [docs/ARCHITEKTURA.md](docs/ARCHITEKTURA.md) i [docs/RESEARCH.md](docs/RESEARCH.md).
 

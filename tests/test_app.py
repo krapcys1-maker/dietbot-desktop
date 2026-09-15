@@ -12,7 +12,8 @@ from dietbot.app.api import create_app
 from dietbot.app.jobs import JobStatus, UserError
 from dietbot.app.service import DietService, default_week_start, merge_yaml, week_title
 from dietbot.domain.assumptions import Weekday
-from dietbot.storage.paths import Paths
+from dietbot.llm.client import LLMSettings
+from dietbot.storage.paths import Paths, prepare_user_root
 from dietbot.storage.yamlio import load_yaml, to_plain
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -205,3 +206,40 @@ def test_api_validation_errors_are_polish(service):
     detail = r.json()["detail"]
     assert r.status_code == 400 and "tak albo nie" in detail and "RRRR-MM-DD" in detail
     assert "should" not in detail and "Input" not in detail
+
+
+def test_api_key_is_saved_locally_and_never_returned(service, monkeypatch):
+    settings = LLMSettings.load(service.paths)
+    monkeypatch.delenv(settings.api_key_env, raising=False)
+    previous_use_llm = service.use_llm
+    client = TestClient(create_app(service))
+    key = "sk-" + "a1b2c3d4" * 4
+    try:
+        too_short = client.put("/api/ustawienia/deepseek", json={"key": "sk-short"})
+        assert too_short.status_code == 400
+        saved = client.put("/api/ustawienia/deepseek", json={"key": key})
+        assert saved.status_code == 200 and saved.json()["llm"]["key_present"] is True
+        assert key not in saved.text
+        assert f"{settings.api_key_env}={key}" in (service.paths.root / ".env").read_text("utf-8")
+        removed = client.delete("/api/ustawienia/deepseek")
+        assert removed.status_code == 200 and removed.json()["llm"]["key_present"] is False
+        assert key not in (service.paths.root / ".env").read_text("utf-8")
+    finally:
+        service.use_llm = previous_use_llm
+        service._llm = None  # noqa: SLF001
+
+
+def test_prepare_user_root_copies_defaults_without_overwriting(tmp_path):
+    defaults = tmp_path / "defaults"
+    target = tmp_path / "user"
+    (defaults / "dane" / "produkty").mkdir(parents=True)
+    (defaults / "dane" / "produkty" / "produkty.yaml").write_text("- id: test\n", encoding="utf-8")
+    (defaults / "konfiguracja").mkdir()
+    (defaults / "konfiguracja" / "llm.yaml").write_text("model: domyslny\n", encoding="utf-8")
+    (target / "konfiguracja").mkdir(parents=True)
+    (target / "konfiguracja" / "llm.yaml").write_text("model: uzytkownika\n", encoding="utf-8")
+
+    assert prepare_user_root(defaults, target) == target
+    assert (target / "dane" / "produkty" / "produkty.yaml").exists()
+    assert (target / "konfiguracja" / "llm.yaml").read_text("utf-8") == "model: uzytkownika\n"
+    assert (target / "wyniki").is_dir()

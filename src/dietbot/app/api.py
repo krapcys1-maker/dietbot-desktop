@@ -67,6 +67,10 @@ class ConfirmIn(BaseModel):
     proposal_id: str
 
 
+class ApiKeyIn(BaseModel):
+    key: str = Field(min_length=20, max_length=256)
+
+
 def web_dist_dir() -> Path | None:
     candidates = []
     if getattr(sys, "frozen", False):  # PyInstaller
@@ -253,6 +257,14 @@ def create_app(service: DietService) -> FastAPI:
     @app.get("/api/koszty")
     def costs() -> dict:
         return s.costs()
+
+    @app.put("/api/ustawienia/deepseek")
+    def save_deepseek_key(body: ApiKeyIn) -> dict:
+        return s.save_api_key(body.key)
+
+    @app.delete("/api/ustawienia/deepseek")
+    def delete_deepseek_key() -> dict:
+        return s.delete_api_key()
 
     @app.post("/api/system/otworz-wyniki")
     def open_results() -> dict:

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { api } from "../api";
 import { ErrorBox, Loading, useToast } from "../components/ui";
 import type { Costs, Status } from "../types";
@@ -8,9 +9,42 @@ const TASK_NAMES: Record<string, string> = {
   generowanie_dan: "generowanie dań", poprawa_dan: "poprawianie dań", rozstrzyganie_produktow: "rozpoznawanie produktów",
 };
 
-export default function SettingsPage({ status }: { status: Status | null }) {
+export default function SettingsPage({ status, onStatusChange }: {
+  status: Status | null;
+  onStatusChange: (status: Status) => void;
+}) {
   const toast = useToast();
   const costs = useAsync<Costs>(() => api.costs(), []);
+  const [apiKey, setApiKey] = useState("");
+  const [savingKey, setSavingKey] = useState(false);
+
+  const saveKey = async () => {
+    setSavingKey(true);
+    try {
+      const next = await api.saveDeepSeekKey(apiKey.trim());
+      onStatusChange(next);
+      setApiKey("");
+      toast("Klucz DeepSeek zapisany lokalnie.");
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Nie udało się zapisać klucza.", "error");
+    } finally {
+      setSavingKey(false);
+    }
+  };
+
+  const deleteKey = async () => {
+    setSavingKey(true);
+    try {
+      const next = await api.deleteDeepSeekKey();
+      onStatusChange(next);
+      setApiKey("");
+      toast("Klucz DeepSeek usunięty z tego komputera.");
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Nie udało się usunąć klucza.", "error");
+    } finally {
+      setSavingKey(false);
+    }
+  };
 
   if (!status) return <div className="page"><Loading /></div>;
   const pct = Math.min(100, (status.llm.spent_usd / Math.max(status.llm.budget_usd, 0.0001)) * 100);
@@ -42,8 +76,29 @@ export default function SettingsPage({ status }: { status: Status | null }) {
           <div className="meter-track"><div className="meter-band" style={{ left: 0, width: `${pct}%`, borderRight: "none" }} /></div>
           <span className="meter-val">{usd(status.llm.spent_usd)} z {usd(status.llm.budget_usd)}</span>
         </div>
+        <div className="row">
+          <label className="field grow">
+            <span>Własny klucz API DeepSeek</span>
+            <input
+              type="password"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter" && apiKey.trim()) void saveKey(); }}
+              placeholder={status.llm.key_present ? "Wpisz nowy klucz, aby zastąpić obecny" : "sk-…"}
+              autoComplete="off"
+              spellCheck={false}
+            />
+          </label>
+          <button className="btn primary" disabled={savingKey || apiKey.trim().length < 20} onClick={() => void saveKey()}>
+            {savingKey ? "Zapisywanie…" : "Zapisz klucz"}
+          </button>
+          {status.llm.key_present && (
+            <button className="btn danger" disabled={savingKey} onClick={() => void deleteKey()}>Usuń klucz</button>
+          )}
+        </div>
         <div className="muted small">
-          Klucz trzymamy wyłącznie w pliku <code>.env</code> (DEEPSEEK_API_KEY) — aplikacja go nie wyświetla. Model, ceny i budżet: <code>konfiguracja/llm.yaml</code>.
+          Klucz jest zapisywany wyłącznie lokalnie dla bieżącego użytkownika i aplikacja nigdy go nie wyświetla.
+          Możesz wkleić klucz utworzony w panelu DeepSeek. Model, ceny i budżet: <code>konfiguracja/llm.yaml</code>.
           Gdy budżet się skończy, plan układa algorytm, a czat jest wyłączony.
         </div>
         {costs.error && <ErrorBox error={costs.error} />}

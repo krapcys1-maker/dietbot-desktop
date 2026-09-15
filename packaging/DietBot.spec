@@ -4,7 +4,11 @@
 from PyInstaller.utils.hooks import collect_all, collect_data_files, collect_submodules
 
 ROOT = SPECPATH + r"\.."
-datas = [(ROOT + r"\web\dist", r"web\dist")]
+datas = [
+    (ROOT + r"\web\dist", r"web\dist"),
+    (ROOT + r"\dane", r"defaults\dane"),
+    (ROOT + r"\konfiguracja", r"defaults\konfiguracja"),
+]
 binaries = []
 hiddenimports = []
 for pkg in ("ortools", "webview", "uvicorn", "simplemma", "rapidfuzz", "aiogram", "clr_loader", "pythonnet"):

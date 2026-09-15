@@ -2,9 +2,9 @@
 $ErrorActionPreference = "Stop"
 Set-Location (Split-Path $PSScriptRoot -Parent)
 Push-Location web
-npm install
+npm ci
 npm run build
 Pop-Location
 .\.venv\Scripts\python.exe packaging\make_icon.py
 .\.venv\Scripts\python.exe -m PyInstaller packaging\DietBot.spec --noconfirm --distpath dist --workpath build
-Write-Host "Gotowe: dist\DietBot\DietBot.exe (uruchamiaj z folderu projektu — dane i konfiguracja są obok)."
+Write-Host "Gotowe: dist\DietBot\DietBot.exe (dane startowe są dołączone do paczki)."

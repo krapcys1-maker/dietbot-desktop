@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import random
+import re
 import threading
 from collections.abc import Callable
 from datetime import date, datetime, timedelta
@@ -20,7 +21,7 @@ from ..domain.product import CATEGORY_LABELS_PL, Category, Product, State, Store
 from ..engine import BlockStatus, EngineRequest, solve_week
 from ..engine.settings import EngineSettings
 from ..food.matcher import ProductMatcher
-from ..llm.client import CostLedger, LLMClient, LLMError, LLMSettings, load_dotenv_file
+from ..llm.client import CostLedger, LLMClient, LLMError, LLMSettings, load_dotenv_file, save_dotenv_value
 from ..planner.compose import Composition, SlotPlan, validate_composition
 from ..planner.pipeline import LiveLog, WeekPlanner
 from ..planner.pools import Pools, build_pools
@@ -40,6 +41,7 @@ from .views import assumptions_hash, dish_view, persons_view, plan_view, product
 MONTHS_GEN = ["stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca", "lipca", "sierpnia", "września",
               "października", "listopada", "grudnia"]
 OWN_PRODUCTS_FILE = "wlasne.yaml"
+API_KEY_PATTERN = re.compile(r"^[A-Za-z0-9._-]{20,256}$")
 
 
 def default_week_start(today: date | None = None) -> date:
@@ -205,6 +207,27 @@ class DietService:
             "persons": persons_view(repo.assumptions),
             "default_week_start": default_week_start().isoformat(),
         }
+
+    def save_api_key(self, key: str) -> dict:
+        """Zapisuje własny klucz użytkownika; nigdy nie zwraca jego wartości."""
+        key = key.strip()
+        if not API_KEY_PATTERN.fullmatch(key):
+            raise UserError("Klucz API powinien mieć 20–256 znaków i nie może zawierać spacji.")
+        settings = LLMSettings.load(self.paths)
+        save_dotenv_value(self.paths, settings.api_key_env, key)
+        os.environ[settings.api_key_env] = key
+        self._llm = None
+        self._llm_error = None
+        self.use_llm = True
+        return self.status()
+
+    def delete_api_key(self) -> dict:
+        settings = LLMSettings.load(self.paths)
+        save_dotenv_value(self.paths, settings.api_key_env, None)
+        os.environ.pop(settings.api_key_env, None)
+        self._llm = None
+        self._llm_error = "brak klucza API"
+        return self.status()
 
     # ------------------------------------------------------------------ plany
     def _invent(self, llm: LLMClient, request: str, max_total: int, progress: Callable[[str], None]) -> list:

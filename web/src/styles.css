@@ -147,7 +147,7 @@ table { border-collapse: collapse; }
 .badge.warn { background: var(--warn-soft); border-color: transparent; color: var(--warn); }
 .badge.error { background: var(--error-soft); border-color: transparent; color: var(--error); }
 
-input[type="text"], input[type="number"], input[type="date"], input[type="search"], select, textarea {
+input[type="text"], input[type="password"], input[type="number"], input[type="date"], input[type="search"], select, textarea {
   border: 1px solid var(--border); background: var(--surface); border-radius: 8px; padding: 7px 10px;
   outline: none; min-width: 0;
 }

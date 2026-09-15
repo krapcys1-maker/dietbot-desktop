@@ -71,6 +71,33 @@ def load_dotenv_file(paths: Paths) -> None:
         os.environ.setdefault(k, v)
 
 
+def save_dotenv_value(paths: Paths, key: str, value: str | None) -> None:
+    """Zapisuje albo usuwa pojedynczą wartość `.env`, zachowując pozostałe ustawienia."""
+    env = paths.root / ".env"
+    lines = env.read_text(encoding="utf-8-sig").splitlines() if env.exists() else []
+    prefix = key + "="
+    replacement = f"{key}={value}" if value is not None else None
+    output: list[str] = []
+    replaced = False
+    for line in lines:
+        stripped = line.strip().removeprefix("export ").lstrip()
+        if stripped.startswith(prefix):
+            if replacement is not None and not replaced:
+                output.append(replacement)
+                replaced = True
+            continue
+        output.append(line)
+    if replacement is not None and not replaced:
+        if output and output[-1].strip():
+            output.append("")
+        output.append(replacement)
+    text = "\n".join(output).rstrip() + ("\n" if output else "")
+    env.parent.mkdir(parents=True, exist_ok=True)
+    temporary = env.with_name(".env.tmp")
+    temporary.write_text(text, encoding="utf-8")
+    temporary.replace(env)
+
+
 class CostLedger:
     """Rejestr kosztów w JSONL — przeżywa restart aplikacji, więc limit budżetu jest globalny."""
 

@@ -102,6 +102,8 @@ export const api = {
   chatReject: (proposal_id: string) => request<{ ok: boolean }>("POST", "/api/czat/odrzuc", { proposal_id }),
 
   costs: () => request<Costs>("GET", "/api/koszty"),
+  saveDeepSeekKey: (key: string) => request<Status>("PUT", "/api/ustawienia/deepseek", { key }),
+  deleteDeepSeekKey: () => request<Status>("DELETE", "/api/ustawienia/deepseek"),
   openResults: () => request<{ ok: boolean; path: string }>("POST", "/api/system/otworz-wyniki"),
 };
 

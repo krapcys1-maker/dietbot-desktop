@@ -60,7 +60,7 @@ export default function App() {
       content = <AssumptionsPage />;
       break;
     case "ustawienia":
-      content = <SettingsPage status={status} />;
+      content = <SettingsPage status={status} onStatusChange={setStatus} />;
       break;
     default:
       content = <WeekPage planId={route[1]} />;
