@@ -1,0 +1,4217 @@
+- id: mleko_1_5
+  nazwa: Mleko 1,5%
+  aliasy: [mleko, mleko chude, mleko 1.5%, mleko do kawy, "lapte 1,5%"]
+  kategoria: nabial
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M111200, wersja: 4.0 (2025), nazwa_oryginalna: 'Milch fettarm, frisch, 1,5 % Fett, pasteurisiert
+      | Milk low-fat, fresh, 1.5 % fat, pasteurised', pobrano: '2026-09-13'}
+  krok_g: 10
+  gestosc_g_ml: 1.03
+  na_100g:
+    kcal: 44
+    bialko: 3.49
+    tluszcz: 1.54
+    weglowodany: 3.86
+    blonnik: 0
+    cukry: 3.86
+    kwasy_nasycone: 1.01
+    sol: 0.09
+    kwasy_organiczne: 0.08
+  miary:
+  - {jednostka: szklanka, gramy: 258, opis: 1 szklanka (250 ml), zrodlo: USDA FoodData Central 171265}
+- id: mleko_3_5
+  nazwa: Mleko 3,5%
+  aliasy: [mleko pełne, mleko tłuste, mleko 3.5%, "mleko 3,2%"]
+  kategoria: nabial
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M111300, wersja: 4.0 (2025), nazwa_oryginalna: 'Vollmilch frisch, 3,5 % Fett, pasteurisiert | Whole
+      milk, fresh, 3.5 % fat, pasteurised', pobrano: '2026-09-13'}
+  krok_g: 10
+  gestosc_g_ml: 1.03
+  na_100g:
+    kcal: 62
+    bialko: 3.55
+    tluszcz: 3.49
+    weglowodany: 4.03
+    blonnik: 0
+    cukry: 4.03
+    kwasy_nasycone: 2.21
+    sol: 0.09
+    kwasy_organiczne: 0.06
+  miary:
+  - {jednostka: szklanka, gramy: 258, opis: 1 szklanka (250 ml), zrodlo: USDA FoodData Central 171265}
+- id: jogurt_naturalny_3_5
+  nazwa: Jogurt naturalny 3,5%
+  aliasy: [jogurt naturalny, jogurt]
+  kategoria: nabial
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M141300, wersja: 4.0 (2025), nazwa_oryginalna: 'Joghurt mild, mind. 3,5 % Fett | Yogurt mild, min.
+      3.5 % fat', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 400
+  na_100g:
+    kcal: 67
+    bialko: 3.98
+    tluszcz: 3.46
+    weglowodany: 4.13
+    blonnik: 0
+    cukry: 4.13
+    kwasy_nasycone: 2.27
+    sol: 0.1
+    kwasy_organiczne: 1.07
+- id: jogurt_naturalny_1_5
+  nazwa: Jogurt naturalny 1,5%
+  aliasy: [jogurt naturalny light, jogurt chudy, jogurt 1.5%]
+  kategoria: nabial
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M141200, wersja: 4.0 (2025), nazwa_oryginalna: 'Joghurt fettarm, mind. 1,5 % bis max. 1,8 % Fett
+      | Yogurt low-fat, min. 1.5 % to max. 1.8 % fat', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 400
+  na_100g:
+    kcal: 62
+    bialko: 5.04
+    tluszcz: 1.6
+    weglowodany: 6.05
+    blonnik: 0
+    cukry: 5.77
+    kwasy_nasycone: 0.92
+    sol: 0.14
+    kwasy_organiczne: 1.23
+- id: skyr_naturalny
+  nazwa: Skyr naturalny
+  aliasy: [skyr, jogurt typu skyr, jogurt skyr]
+  kategoria: nabial
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M710100, wersja: 4.0 (2025), nazwa_oryginalna: 'Skyr, Frischkäse < 10 % Fett i. Tr. | Skyr Icelandic
+      style strained yogurt < 10 % fat in dry matter', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 450
+  na_100g:
+    kcal: 64
+    bialko: 10.35
+    tluszcz: 0.84
+    weglowodany: 3.19
+    blonnik: 0.18
+    cukry: 3.14
+    kwasy_nasycone: 0.47
+    sol: 0.08
+    kwasy_organiczne: 0.59
+- id: kefir
+  nazwa: Kefir 1,5%
+  aliasy: [kefir naturalny, chefir]
+  kategoria: nabial
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M130200, wersja: 4.0 (2025), nazwa_oryginalna: 'Kefir fettarm, mind. 1,5 % bis max. 1,8 % Fett
+      | Kefir low-fat, min. 1.5 % to max. 1.8 % fat', pobrano: '2026-09-13'}
+  krok_g: 10
+  gestosc_g_ml: 1.03
+  na_100g:
+    kcal: 46
+    bialko: 3.23
+    tluszcz: 1.5
+    weglowodany: 4.22
+    blonnik: 0
+    cukry: 4.22
+    kwasy_nasycone: 0.8
+    sol: 0.12
+    alkohol: 0
+    kwasy_organiczne: 0.91
+- id: maslanka
+  nazwa: Maślanka naturalna
+  aliasy: [maślanka]
+  kategoria: nabial
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M150000, wersja: 4.0 (2025), nazwa_oryginalna: Buttermilch | Buttermilk, pobrano: '2026-09-13'}
+  krok_g: 10
+  gestosc_g_ml: 1.03
+  na_100g:
+    kcal: 39
+    bialko: 3.23
+    tluszcz: 0.56
+    weglowodany: 4.73
+    blonnik: 0
+    cukry: 4.73
+    kwasy_nasycone: 0.39
+    sol: 0.09
+    kwasy_organiczne: 0.67
+- id: smietana_10
+  nazwa: Śmietana kwaśna 10%
+  aliasy: [śmietana, śmietana 12%, kwaśna śmietana, smântână]
+  kategoria: nabial
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M172500, wersja: 4.0 (2025), nazwa_oryginalna: 'Sauerrahm/Saure Sahne, mind. 10 % Fett | Sour cream
+      min. 10 % fat', pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 100
+  na_100g:
+    kcal: 119
+    bialko: 3.1
+    tluszcz: 10
+    weglowodany: 4.1
+    blonnik: 0
+    cukry: 4.1
+    kwasy_nasycone: 5.3
+    sol: 0.1
+    kwasy_organiczne: 0.2
+- id: smietana_20
+  nazwa: Śmietana kwaśna 20%
+  aliasy: [śmietana 18%, gęsta śmietana]
+  kategoria: nabial
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M172700, wersja: 4.0 (2025), nazwa_oryginalna: 'Sauerrahm/Schmand, mind. 20 % Fett | Sour cream
+      min. 20 % fat', pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 80
+  na_100g:
+    kcal: 206
+    bialko: 2.8
+    tluszcz: 20
+    weglowodany: 3
+    blonnik: 0
+    cukry: 3
+    kwasy_nasycone: 10.4
+    sol: 0.1
+    kwasy_organiczne: 0.9
+- id: smietanka_30
+  nazwa: Śmietanka 30%
+  aliasy: [śmietanka kremówka, śmietana 30%, śmietana do ubijania]
+  kategoria: nabial
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M173800, wersja: 4.0 (2025), nazwa_oryginalna: Schlagsahne mind. 30 % Fett | Whipping cream 
+      min. 30 % fat, pobrano: '2026-09-13'}
+  krok_g: 5
+
+# ---------------------------------------------------------------- SERY
+  max_porcja_g: 60
+  na_100g:
+    kcal: 308
+    bialko: 2.31
+    tluszcz: 31.7
+    weglowodany: 3.27
+    blonnik: 0
+    cukry: 3.27
+    kwasy_nasycone: 16.88
+    sol: 0.09
+    kwasy_organiczne: 0.15
+- id: serek_wiejski
+  nazwa: Serek wiejski (ok. 4% tłuszczu)
+  aliasy: [serek wiejski, ser twarogowy ziarnisty, cottage cheese, serek ziarnisty]
+  kategoria: sery
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M711300, wersja: 4.0 (2025), nazwa_oryginalna: Körniger Frischkäse mind. 20 % Fett i. Tr. | 
+      Cottage cheese min. 20 % fat in dry matter, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 300
+  na_100g:
+    kcal: 109
+    bialko: 13.3
+    tluszcz: 4.3
+    weglowodany: 3.64
+    blonnik: 0
+    cukry: 3.64
+    kwasy_nasycone: 2.21
+    sol: 0.57
+    kwasy_organiczne: 0.92
+- id: serek_wiejski_lekki
+  nazwa: Serek wiejski lekki (ok. 1% tłuszczu)
+  aliasy: [serek wiejski light, serek wiejski lekki, cottage cheese light]
+  kategoria: sery
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M711100, wersja: 4.0 (2025), nazwa_oryginalna: Körniger Frischkäse < 10 % Fett i. Tr. | 
+      Cottage cheese < 10 % fat in dry matter, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 300
+  na_100g:
+    kcal: 73
+    bialko: 11.8
+    tluszcz: 1.2
+    weglowodany: 3
+    blonnik: 0
+    cukry: 3
+    kwasy_nasycone: 0.77
+    sol: 0.5
+    kwasy_organiczne: 0.9
+- id: twarozek_typu_quark_chudy
+  nazwa: Twarożek kremowy typu quark, chudy
+  aliasy: [quark, twarożek kremowy chudy]
+  kategoria: sery
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M713100, wersja: 4.0 (2025), nazwa_oryginalna: 'Speisequark Magerstufe, Magerquark < 10 % Fett
+      i. Tr. | Quark < 10 % fat in dry matter', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 300
+  uwagi: Niemiecki Quark — NIE jest odpowiednikiem polskiego twarogu (twaróg ma znacznie więcej białka).
+  na_100g:
+    kcal: 66
+    bialko: 11.85
+    tluszcz: 0.18
+    weglowodany: 3.68
+    blonnik: 0
+    cukry: 3.68
+    kwasy_nasycone: 0.11
+    sol: 0.08
+    kwasy_organiczne: 0.89
+- id: serek_smietankowy
+  nazwa: Serek śmietankowy do smarowania
+  aliasy: [serek kanapkowy, serek śmietankowy, serek do smarowania, cream cheese]
+  kategoria: sery
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M710700, wersja: 4.0 (2025), nazwa_oryginalna: 'Frischkäsezubereitung Natur, mind. 50 % Fett i.
+      Tr. | Cream cheese preparation min. 50 % fat in dry matter', pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 60
+  na_100g:
+    kcal: 202
+    bialko: 9.74
+    tluszcz: 16.61
+    weglowodany: 2.73
+    blonnik: 0
+    cukry: 2.73
+    kwasy_nasycone: 11.03
+    sol: 0.8
+    kwasy_organiczne: 0.86
+- id: mozzarella
+  nazwa: Mozzarella
+  aliasy: [ser mozzarella, mozzarella w kulce]
+  kategoria: sery
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M032100, wersja: 4.0 (2025), nazwa_oryginalna: Mozzarella mind. 45 % Fett i. Tr. | Mozzarella
+      min. 45 % fat in dry matter, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 125
+  na_100g:
+    kcal: 259
+    bialko: 17.12
+    tluszcz: 20.99
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 14.26
+    sol: 0.47
+    kwasy_organiczne: 0.39
+  miary:
+  - {jednostka: kulka, gramy: 125, opis: 1 kulka, zrodlo: 'Lidl Rumunia: Lovilio mozzarella 125 g (Monitorul Prețurilor, 13.09.2026)'}
+- id: mozzarella_light
+  nazwa: Mozzarella light
+  aliasy: [mozzarella lekka, ser mozzarella light]
+  kategoria: sery
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M0A1000, wersja: 4.0 (2025), nazwa_oryginalna: Mozzarella mind. 20 % Fett i. Tr. | Mozzarella
+      min. 20 % fat in dry matter, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 150
+  na_100g:
+    kcal: 158
+    bialko: 19.91
+    tluszcz: 8.5
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 5.7
+    sol: 0.54
+    kwasy_organiczne: 0.45
+  miary:
+  - {jednostka: kulka, gramy: 125, opis: 1 kulka, zrodlo: 'Lidl Rumunia: Lovilio mozzarella light 125 g (Monitorul Prețurilor,
+      13.09.2026)'}
+- id: feta
+  nazwa: Ser feta
+  aliasy: [feta, ser typu feta, ser sałatkowy]
+  kategoria: sery
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M012200, wersja: 4.0 (2025), nazwa_oryginalna: Feta mind. 45 % Fett i. Tr. | Feta min. 45 % 
+      fat in dry matter, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 100
+  na_100g:
+    kcal: 284
+    bialko: 15.68
+    tluszcz: 24.09
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 16.06
+    sol: 2.39
+    kwasy_organiczne: 1.4
+- id: halloumi
+  nazwa: Ser halloumi
+  aliasy: [halloumi]
+  kategoria: sery
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M524500, wersja: 4.0 (2025), nazwa_oryginalna: Halloumi Grillkäse | Halloumi cheese, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 150
+  na_100g:
+    kcal: 315
+    bialko: 21.46
+    tluszcz: 25.06
+    weglowodany: 0.1
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 14.79
+    sol: 1.57
+    kwasy_organiczne: 1.11
+    poliole: 0.01
+- id: gouda
+  nazwa: Ser żółty gouda
+  aliasy: [gouda, ser żółty, ser gouda, cașcaval]
+  kategoria: sery
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M402600, wersja: 4.0 (2025), nazwa_oryginalna: Gouda 48 % Fett i. Tr. | Gouda cheese 48 % fat
+      in dry matter, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 80
+  na_100g:
+    kcal: 379
+    bialko: 22.47
+    tluszcz: 31.58
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 22.53
+    sol: 2.17
+    kwasy_organiczne: 1.51
+  miary:
+  - {jednostka: plaster, gramy: 21, opis: 1 plaster, zrodlo: USDA FoodData Central 170854 (slice)}
+- id: cheddar
+  nazwa: Ser cheddar
+  aliasy: [cheddar]
+  kategoria: sery
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M303700, wersja: 4.0 (2025), nazwa_oryginalna: Chester (Cheddar) mind. 50 % Fett i. Tr. | 
+      Chester (Cheddar) cheese min. 50 % fat in dry matter, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 60
+  na_100g:
+    kcal: 387
+    bialko: 22.98
+    tluszcz: 32.2
+    weglowodany: 0.21
+    blonnik: 0
+    cukry: 0.21
+    kwasy_nasycone: 19.34
+    sol: 1.45
+    kwasy_organiczne: 1.33
+  miary:
+  - {jednostka: plaster, gramy: 21, opis: 1 plaster, zrodlo: USDA FoodData Central 170854 (slice)}
+- id: parmezan
+  nazwa: Parmezan
+  aliasy: [parmezan, grana padano, ser parmezan, ser twardy tarty]
+  kategoria: sery
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M306400, wersja: 4.0 (2025), nazwa_oryginalna: Parmesan mind. 30 % Fett i. Tr. | Parmesan 
+      cheese min. 30 % fat in dry matter, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 40
+  na_100g:
+    kcal: 391
+    bialko: 35.6
+    tluszcz: 27.43
+    weglowodany: 0.06
+    blonnik: 0
+    cukry: 0.06
+    kwasy_nasycone: 17.83
+    sol: 1.67
+    kwasy_organiczne: 0.65
+- id: ricotta
+  nazwa: Ricotta
+  aliasy: [ser ricotta]
+  kategoria: sery
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M741600, wersja: 4.0 (2025), nazwa_oryginalna: 'Ricotta, Molkeneiweißkäse, mind. 45 % Fett i. Tr.
+      | Ricotta min. 45 % fat in dry matter', pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 159
+    bialko: 8.58
+    tluszcz: 12.3
+    weglowodany: 3.43
+    blonnik: 0
+    cukry: 3.43
+    kwasy_nasycone: 8.16
+    sol: 0.46
+    kwasy_organiczne: 0.24
+- id: mascarpone
+  nazwa: Mascarpone
+  aliasy: [ser mascarpone]
+  kategoria: sery
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M7A6800, wersja: 4.0 (2025), nazwa_oryginalna: Mascarpone mind. 80 % Fett i. Tr. | Mascarpone
+      min. 80 % fat in dry matter, pobrano: '2026-09-13'}
+  krok_g: 5
+
+# ---------------------------------------------------------------- JAJA
+  na_100g:
+    kcal: 395
+    bialko: 4.5
+    tluszcz: 40.33
+    weglowodany: 3.38
+    blonnik: 0
+    cukry: 3.38
+    kwasy_nasycone: 26.96
+    sol: 0.11
+    kwasy_organiczne: 0.16
+- id: jajko_kurze
+  nazwa: Jajko kurze
+  aliasy: [jajko, jajka, jaja, jaja kurze, jajko gotowane, jajko sadzone]
+  kategoria: jaja
+  stan: surowy
+  zrodlo: {baza: BLS, kod: E111100, wersja: 4.0 (2025), nazwa_oryginalna: Hühnerei roh | Chicken egg raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 300
+  miary:
+  - {jednostka: szt, gramy: 50, opis: '1 jajko rozmiar M, bez skorupki', zrodlo: 'Rozp. (WE) 589/2008: klasa M 53–63 g w skorupce;
+      część jadalna ok. 88% (USDA)'}
+  na_100g:
+    kcal: 135
+    bialko: 13.18
+    tluszcz: 9
+    weglowodany: 0.34
+    blonnik: 0
+    cukry: 0.34
+    kwasy_nasycone: 2.44
+    sol: 0.39
+- id: piers_z_kurczaka
+  nazwa: Pierś z kurczaka (surowa)
+  aliasy: [pierś z kurczaka, filet z kurczaka, kurczak, piersi z kurczaka, piept de pui]
+  kategoria: drob
+  stan: surowy
+  zrodlo: {baza: BLS, kod: V416100, wersja: 4.0 (2025), nazwa_oryginalna: 'Hähnchen Brustfilet, roh | Chicken breast fillet,
+      raw', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 250
+  na_100g:
+    kcal: 109
+    bialko: 23.25
+    tluszcz: 1.81
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 0.41
+    sol: 0.13
+- id: piers_z_indyka
+  nazwa: Pierś z indyka (surowa)
+  aliasy: [pierś z indyka, filet z indyka, indyk]
+  kategoria: drob
+  stan: surowy
+  zrodlo: {baza: BLS, kod: V486100, wersja: 4.0 (2025), nazwa_oryginalna: 'Pute Brust, ohne Haut, roh | Turkey breast, without
+      skin, raw', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 250
+  na_100g:
+    kcal: 105
+    bialko: 24.1
+    tluszcz: 0.99
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 0.36
+    sol: 0.12
+- id: mieso_mielone_wolowe
+  nazwa: Mięso mielone wołowe (ok. 16% tłuszczu, surowe)
+  aliasy: [mielone wołowe, wołowina mielona, mięso mielone z wołowiny, carne tocată de vită]
+  kategoria: mieso
+  stan: surowy
+  zrodlo: {baza: BLS, kod: U010100, wersja: 4.0 (2025), nazwa_oryginalna: 'Rind Hackfleisch, roh | Beef mince, raw', 
+      pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 220
+  na_100g:
+    kcal: 224
+    bialko: 19.1
+    tluszcz: 16.39
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 7.39
+    sol: 0.14
+- id: mieso_mielone_mieszane
+  nazwa: Mięso mielone wołowo-wieprzowe (surowe)
+  aliasy: [mięso mielone, mielone mieszane, mielone wieprzowo-wołowe, carne tocată mixtă]
+  kategoria: mieso
+  stan: surowy
+  zrodlo: {baza: BLS, kod: U050100, wersja: 4.0 (2025), nazwa_oryginalna: 'Rind/Schwein, Hackfleisch gemischt, roh | Beef/pork,
+      mince mixed, raw', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 220
+  na_100g:
+    kcal: 236
+    bialko: 18.8
+    tluszcz: 17.83
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 7.39
+    sol: 0.14
+- id: poledwiczka_wieprzowa
+  nazwa: Polędwiczka wieprzowa (surowa)
+  aliasy: [polędwiczka, polędwica wieprzowa]
+  kategoria: mieso
+  stan: surowy
+  zrodlo: {baza: BLS, kod: U611100, wersja: 4.0 (2025), nazwa_oryginalna: 'Schwein Filet/Lende, roh | Pork tenderloin, raw',
+    pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 250
+  na_100g:
+    kcal: 118
+    bialko: 22.79
+    tluszcz: 2.97
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 0.91
+    sol: 0.12
+- id: schab
+  nazwa: Schab bez kości (surowy)
+  aliasy: [schab, kotlet schabowy surowy]
+  kategoria: mieso
+  stan: surowy
+  zrodlo: {baza: BLS, kod: U624100, wersja: 4.0 (2025), nazwa_oryginalna: Schwein Kotelett (Rücken/caudal) roh | Pork 
+      loin (caudal part) raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 250
+  na_100g:
+    kcal: 115
+    bialko: 23.56
+    tluszcz: 2.35
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 0.76
+    sol: 0.11
+- id: wolowina_gulaszowa
+  nazwa: Wołowina gulaszowa (surowa)
+  aliasy: [wołowina, gulasz wołowy surowy, łopatka wołowa]
+  kategoria: mieso
+  stan: surowy
+  zrodlo: {baza: BLS, kod: U151100, wersja: 4.0 (2025), nazwa_oryginalna: Rind Gulasch (Bug) roh | Beef goulash 
+      (shoulder) raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 250
+  na_100g:
+    kcal: 128
+    bialko: 20.2
+    tluszcz: 5.3
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 2.33
+    sol: 0.12
+- id: boczek_wedzony
+  nazwa: Boczek wędzony
+  aliasy: [boczek, bekon, bacon]
+  kategoria: mieso
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: W415000, wersja: 4.0 (2025), nazwa_oryginalna: 'Schwein Frühstücksspeck, Rohpökelware, geräuchert
+      | Pork breakfast bacon, raw cured, smoked', pobrano: '2026-09-13'}
+  krok_g: 5
+
+# ---------------------------------------------------------------- WĘDLINY
+  max_porcja_g: 60
+  na_100g:
+    kcal: 304
+    bialko: 16.58
+    tluszcz: 26.22
+    weglowodany: 0.49
+    blonnik: 0
+    cukry: 0.49
+    kwasy_nasycone: 9.39
+    sol: 4.5
+- id: szynka_gotowana
+  nazwa: Szynka gotowana wieprzowa
+  aliasy: [szynka, szynka wieprzowa, szynka konserwowa, șuncă]
+  kategoria: wedliny
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: W424000, wersja: 4.0 (2025), nazwa_oryginalna: 'Schwein Kochschinken, Kochpökelware | Pork ham,
+      cooked cured', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 150
+  na_100g:
+    kcal: 130
+    bialko: 22.5
+    tluszcz: 3.7
+    weglowodany: 0.74
+    blonnik: 0
+    cukry: 0.74
+    kwasy_nasycone: 1.33
+    sol: 2.26
+    kwasy_organiczne: 1.27
+  miary:
+  - {jednostka: plaster, gramy: 13, opis: 1 cienki plaster, zrodlo: USDA FoodData Central 173863 (thin slice)}
+- id: wedlina_z_indyka
+  nazwa: Wędlina z piersi indyka
+  aliasy: [szynka z indyka, polędwica z indyka, pierś z indyka wędzona, wędlina drobiowa, szynka z piersi indyka, szynka
+      z piersi kurczaka, wędlina z kurczaka, szynka drobiowa]
+  kategoria: wedliny
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: W561000, wersja: 4.0 (2025), nazwa_oryginalna: 'Putenbrust, Kochpökelware, geräuchert | Turkey
+      breast cold cuts, cooked cured, smoked', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 150
+  na_100g:
+    kcal: 107
+    bialko: 23.02
+    tluszcz: 1.63
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 0.5
+    sol: 3.05
+  miary:
+  - {jednostka: plaster, gramy: 13, opis: 1 cienki plaster, zrodlo: USDA FoodData Central 173863 (thin slice)}
+- id: parowki
+  nazwa: Parówki wieprzowe
+  aliasy: [parówki, parówka, kiełbaski wiedeńskie, crenvurști]
+  kategoria: wedliny
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: W211200, wersja: 4.0 (2025), nazwa_oryginalna: Wiener Würstchen | Vienna sausage, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 200
+  na_100g:
+    kcal: 289
+    bialko: 12.9
+    tluszcz: 26.15
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 9.22
+    sol: 2.04
+    kwasy_organiczne: 0.72
+- id: parowki_drobiowe
+  nazwa: Parówki drobiowe
+  aliasy: [parówki z kurczaka, parówki z indyka]
+  kategoria: wedliny
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: W212000, wersja: 4.0 (2025), nazwa_oryginalna: Geflügel-Wiener Würstchen | Poultry Vienna 
+      sausage, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 200
+  na_100g:
+    kcal: 232
+    bialko: 13.62
+    tluszcz: 18.98
+    weglowodany: 1.01
+    blonnik: 0
+    cukry: 1.01
+    kwasy_nasycone: 5.09
+    sol: 2.21
+    kwasy_organiczne: 0.71
+- id: salami
+  nazwa: Salami
+  aliasy: [salami]
+  kategoria: wedliny
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: W140000, wersja: 4.0 (2025), nazwa_oryginalna: Salami | Salami, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 60
+  na_100g:
+    kcal: 374
+    bialko: 23.54
+    tluszcz: 30.9
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 12.31
+    sol: 2.92
+    kwasy_organiczne: 0.59
+- id: kabanosy
+  nazwa: Kabanosy
+  aliasy: [kabanos, kabanosy wieprzowe]
+  kategoria: wedliny
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: W193000, wersja: 4.0 (2025), nazwa_oryginalna: 'Kabanossi/Peperoni | Kabanossi/Peperoni, sausage,
+      raw, small, firm', pobrano: '2026-09-13'}
+  krok_g: 5
+
+# ---------------------------------------------------------------- RYBY
+  max_porcja_g: 100
+  na_100g:
+    kcal: 329
+    bialko: 21.27
+    tluszcz: 27.13
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 10.32
+    sol: 3.5
+- id: losos_surowy
+  nazwa: Łosoś (surowy filet)
+  aliasy: [łosoś, filet z łososia, somon]
+  kategoria: ryby
+  stan: surowy
+  zrodlo: {baza: BLS, kod: T410100, wersja: 4.0 (2025), nazwa_oryginalna: Lachs roh | Salmon raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 220
+  na_100g:
+    kcal: 180
+    bialko: 19.9
+    tluszcz: 11.2
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 2.4
+    sol: 0.08
+- id: losos_wedzony
+  nazwa: Łosoś wędzony
+  aliasy: [wędzony łosoś, łosoś wędzony plastry, somon afumat]
+  kategoria: ryby
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: T410600, wersja: 4.0 (2025), nazwa_oryginalna: Lachs geräuchert (Räucherlachs) | Salmon 
+      smoked, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 150
+  na_100g:
+    kcal: 170
+    bialko: 21.25
+    tluszcz: 9.2
+    weglowodany: 0.16
+    blonnik: 0
+    cukry: 0.16
+    kwasy_nasycone: 1.73
+    sol: 2.92
+    kwasy_organiczne: 0.65
+- id: dorsz_surowy
+  nazwa: Dorsz (surowy filet)
+  aliasy: [dorsz, filet z dorsza]
+  kategoria: ryby
+  stan: surowy
+  zrodlo: {baza: BLS, kod: T204100, wersja: 4.0 (2025), nazwa_oryginalna: 'Dorsch/Kabeljau, roh | Cod raw', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 300
+  na_100g:
+    kcal: 79
+    bialko: 17.8
+    tluszcz: 0.84
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 0.19
+    sol: 0.18
+- id: mintaj_surowy
+  nazwa: Mintaj (surowy filet)
+  aliasy: [mintaj, filet z mintaja]
+  kategoria: ryby
+  stan: surowy
+  zrodlo: {baza: BLS, kod: T213100, wersja: 4.0 (2025), nazwa_oryginalna: 'Alaska-Pollack/Alaska-Seelachs, roh | Alaska pollock
+      raw', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 300
+  na_100g:
+    kcal: 57
+    bialko: 12.3
+    tluszcz: 0.82
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 0.15
+    sol: 0.27
+- id: tunczyk_w_sosie_wlasnym
+  nazwa: Tuńczyk w sosie własnym (odsączony)
+  aliasy: [tuńczyk, tuńczyk w wodzie, tuńczyk z puszki, ton în suc propriu]
+  kategoria: ryby
+  stan: odsaczony
+  zrodlo: {baza: BLS, kod: T121902, wersja: 4.0 (2025), nazwa_oryginalna: 'Thunfisch im eigenen Saft, Konserve, abgetropft
+      | Tuna canned, drained', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 200
+  na_100g:
+    kcal: 95
+    bialko: 22.87
+    tluszcz: 0.41
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 0.16
+    sol: 0.9
+- id: tunczyk_w_oleju
+  nazwa: Tuńczyk w oleju (odsączony)
+  aliasy: [tuńczyk w oleju]
+  kategoria: ryby
+  stan: odsaczony
+  zrodlo: {baza: BLS, kod: T121702, wersja: 4.0 (2025), nazwa_oryginalna: 'Thunfisch in Öl, Konserve, abgetropft | Tuna in
+      oil, canned, drained', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 150
+  na_100g:
+    kcal: 207
+    bialko: 28.26
+    tluszcz: 10.45
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 1.8
+    sol: 0.84
+- id: makrela_wedzona
+  nazwa: Makrela wędzona
+  aliasy: [makrela, macrou afumat]
+  kategoria: ryby
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: T107600, wersja: 4.0 (2025), nazwa_oryginalna: Makrele geräuchert | Mackerel smoked, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 150
+  na_100g:
+    kcal: 338
+    bialko: 18.89
+    tluszcz: 29.2
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 7.16
+    sol: 1.8
+- id: sardynki_w_oleju
+  nazwa: Sardynki w oleju (odsączone)
+  aliasy: [sardynki, sardynki z puszki]
+  kategoria: ryby
+  stan: odsaczony
+  zrodlo: {baza: BLS, kod: T105702, wersja: 4.0 (2025), nazwa_oryginalna: 'Sardine in Öl, Konserve, abgetropft | Sardine in
+      oil, canned, drained', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 150
+  na_100g:
+    kcal: 222
+    bialko: 24.1
+    tluszcz: 13.9
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 2.4
+    sol: 0.92
+- id: krewetki_surowe
+  nazwa: Krewetki (surowe)
+  aliasy: [krewetki, krewetki mrożone]
+  kategoria: ryby
+  stan: surowy
+  zrodlo: {baza: BLS, kod: T753100, wersja: 4.0 (2025), nazwa_oryginalna: 'Garnele/Granat/Krabbe, roh | Common shrimp raw',
+    pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 250
+  na_100g:
+    kcal: 87
+    bialko: 18.6
+    tluszcz: 1.44
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 0.32
+    sol: 0.36
+- id: pstrag_surowy
+  nazwa: Pstrąg (surowy)
+  aliasy: [pstrąg, filet z pstrąga]
+  kategoria: ryby
+  stan: surowy
+  zrodlo: {baza: BLS, kod: T422100, wersja: 4.0 (2025), nazwa_oryginalna: Forelle roh | Trout raw, pobrano: '2026-09-13'}
+  krok_g: 10
+
+# ---------------------------------------------------------------- PIECZYWO
+  max_porcja_g: 250
+  na_100g:
+    kcal: 156
+    bialko: 21.55
+    tluszcz: 7.63
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 1.44
+    sol: 0.11
+    kwasy_organiczne: 0.48
+- id: bulka_pszenna
+  nazwa: Bułka pszenna
+  aliasy: [bułka, bułki, kajzerka, bułka zwykła, chiflă]
+  kategoria: pieczywo
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: B511000, wersja: 4.0 (2025), nazwa_oryginalna: Weizenbrötchen | Wheat roll, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 180
+  na_100g:
+    kcal: 280
+    bialko: 10.09
+    tluszcz: 1.81
+    weglowodany: 53.97
+    blonnik: 3.6
+    cukry: 3.07
+    kwasy_nasycone: 0.39
+    sol: 1.83
+  miary:
+  - {jednostka: szt, gramy: 60, opis: 1 bułka (kajzerka), zrodlo: 'Lidl Rumunia: bułka Kaiser 60 g (Monitorul Prețurilor,
+      13.09.2026)'}
+- id: chleb_pszenny
+  nazwa: Chleb pszenny
+  aliasy: [chleb biały, chleb pszenny krojony, pâine albă]
+  kategoria: pieczywo
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: B311000, wersja: 4.0 (2025), nazwa_oryginalna: Weizenbrot/Weißbrot | White bread/wheat bread, 
+      pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 160
+  na_100g:
+    kcal: 272
+    bialko: 8.69
+    tluszcz: 2.97
+    weglowodany: 50.54
+    blonnik: 4
+    cukry: 3.97
+    kwasy_nasycone: 0.69
+    sol: 1.42
+    kwasy_organiczne: 0.22
+    poliole: 0.01
+  miary:
+  - {jednostka: kromka, gramy: 25, opis: 1 kromka, zrodlo: USDA FoodData Central 174924}
+- id: chleb_zytni
+  nazwa: Chleb żytni
+  aliasy: [chleb żytni, chleb razowy żytni, pâine de secară]
+  kategoria: pieczywo
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: B221000, wersja: 4.0 (2025), nazwa_oryginalna: Roggenbrot | Rye bread, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 160
+  na_100g:
+    kcal: 220
+    bialko: 6
+    tluszcz: 1.24
+    weglowodany: 43.04
+    blonnik: 6.46
+    cukry: 3.81
+    kwasy_nasycone: 0.09
+    sol: 1.12
+  miary:
+  - {jednostka: kromka, gramy: 32, opis: 1 kromka, zrodlo: USDA FoodData Central 172684}
+- id: chleb_mieszany
+  nazwa: Chleb mieszany pszenno-żytni
+  aliasy: [chleb, chleb mieszany, chleb pszenno-żytni, chleb zwykły]
+  kategoria: pieczywo
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: B251000, wersja: 4.0 (2025), nazwa_oryginalna: Weizenmischbrot | Wheat-rye bread (> 50 % and 
+      < 90 % wheat), pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 160
+  na_100g:
+    kcal: 207
+    bialko: 8.61
+    tluszcz: 1.51
+    weglowodany: 37.33
+    blonnik: 4.57
+    cukry: 0.84
+    kwasy_nasycone: 0.1
+    sol: 1.28
+  miary:
+  - {jednostka: kromka, gramy: 30, opis: 1 kromka, zrodlo: USDA FoodData Central 174924 / 172684 (średnia pszenny–żytni)}
+- id: chleb_pelnoziarnisty
+  nazwa: Chleb pełnoziarnisty
+  aliasy: [chleb razowy, chleb pełnoziarnisty, chleb graham]
+  kategoria: pieczywo
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: B101000, wersja: 4.0 (2025), nazwa_oryginalna: Vollkornbrot | Wholemeal bread, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 160
+  na_100g:
+    kcal: 210
+    bialko: 7.16
+    tluszcz: 1.01
+    weglowodany: 38
+    blonnik: 10.04
+    cukry: 0.82
+    kwasy_nasycone: 0.12
+    sol: 1.2
+- id: chleb_tostowy
+  nazwa: Chleb tostowy pszenny
+  aliasy: [tost, tosty, pieczywo tostowe, pâine toast]
+  kategoria: pieczywo
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: B314000, wersja: 4.0 (2025), nazwa_oryginalna: Weizentoastbrot/Buttertoastbrot | Wheat 
+      toast/butter toast, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 150
+  na_100g:
+    kcal: 261
+    bialko: 8.29
+    tluszcz: 3.59
+    weglowodany: 46.8
+    blonnik: 3.95
+    cukry: 3.7
+    kwasy_nasycone: 2.19
+    sol: 1.5
+    kwasy_organiczne: 0.22
+  miary:
+  - {jednostka: kromka, gramy: 25, opis: 1 kromka tostowa, zrodlo: USDA FoodData Central 174924}
+- id: tortilla_pszenna
+  nazwa: Tortilla pszenna
+  aliasy: [tortilla, placek tortilla, wrap]
+  kategoria: pieczywo
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: B783012, wersja: 4.0 (2025), nazwa_oryginalna: Weizentortilla | Wheat flour tortilla, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 150
+  na_100g:
+    kcal: 296
+    bialko: 8.85
+    tluszcz: 7.85
+    weglowodany: 46.64
+    blonnik: 1.2
+    cukry: 1.33
+    kwasy_nasycone: 2.84
+    sol: 1.54
+    kwasy_organiczne: 0.22
+    poliole: 0.01
+- id: bagietka
+  nazwa: Bagietka pszenna
+  aliasy: [bagietka, bagieta]
+  kategoria: pieczywo
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: B781200, wersja: 4.0 (2025), nazwa_oryginalna: Weizenbaguette | Wheat baguette, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 160
+  na_100g:
+    kcal: 253
+    bialko: 8.3
+    tluszcz: 1.31
+    weglowodany: 50
+    blonnik: 3.67
+    cukry: 1.5
+    kwasy_nasycone: 0.32
+    sol: 1.6
+- id: bulka_tarta
+  nazwa: Bułka tarta
+  aliasy: [panierka, bułka tarta]
+  kategoria: maka
+  stan: suchy
+  zrodlo: {baza: BLS, kod: B821000, wersja: 4.0 (2025), nazwa_oryginalna: Paniermehl/Semmelbrösel/Semmelmehl | Bread 
+      crumbs, pobrano: '2026-09-13'}
+  krok_g: 5
+
+# ---------------------------------------------------------------- RYŻ, MAKARON, ZIEMNIAKI, KASZE, MĄKA
+  na_100g:
+    kcal: 364
+    bialko: 11.6
+    tluszcz: 3.97
+    weglowodany: 67.48
+    blonnik: 5.34
+    cukry: 5.3
+    kwasy_nasycone: 0.91
+    sol: 1.9
+    kwasy_organiczne: 0.29
+    poliole: 0.01
+- id: ryz_bialy
+  nazwa: Ryż biały (suchy)
+  aliasy: [ryż, ryż biały, ryż długoziarnisty, ryż basmati, ryż jaśminowy, orez]
+  kategoria: ryz
+  stan: suchy
+  zrodlo: {baza: BLS, kod: C352000, wersja: 4.0 (2025), nazwa_oryginalna: 'Reis poliert, roh | White rice raw', pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 120
+  na_100g:
+    kcal: 351
+    bialko: 7.93
+    tluszcz: 0.62
+    weglowodany: 77.1
+    blonnik: 2.5
+    cukry: 0.28
+    kwasy_nasycone: 0.13
+    sol: 0.04
+  miary:
+  - {jednostka: szklanka, gramy: 195, opis: 1 szklanka suchego ryżu (250 ml), zrodlo: USDA FoodData Central 169756}
+- id: ryz_parboiled
+  nazwa: Ryż parboiled (suchy)
+  aliasy: [ryż parboiled, ryż w woreczkach]
+  kategoria: ryz
+  stan: suchy
+  zrodlo: {baza: BLS, kod: C359000, wersja: 4.0 (2025), nazwa_oryginalna: 'Reis parboiled, poliert, roh | Rice parboiled,
+      raw', pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 120
+  na_100g:
+    kcal: 333
+    bialko: 8.12
+    tluszcz: 1.03
+    weglowodany: 72.1
+    blonnik: 1.4
+    cukry: 0.34
+    kwasy_nasycone: 0.29
+    sol: 0.01
+- id: makaron_pszenny
+  nazwa: Makaron pszenny (suchy)
+  aliasy: [makaron, spaghetti, penne, świderki, tagliatelle, makaron suchy, paste]
+  kategoria: makaron
+  stan: suchy
+  zrodlo: {baza: BLS, kod: E401000, wersja: 4.0 (2025), nazwa_oryginalna: 'Teigwaren eifrei, roh | Pasta egg-free, raw', 
+      pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 130
+  na_100g:
+    kcal: 346
+    bialko: 12.4
+    tluszcz: 1.6
+    weglowodany: 68.83
+    blonnik: 3.41
+    cukry: 2.02
+    kwasy_nasycone: 0.23
+    sol: 0.01
+- id: ziemniaki
+  nazwa: Ziemniaki (surowe, obrane)
+  aliasy: [ziemniak, ziemniaki, kartofle, cartofi]
+  kategoria: ziemniaki
+  stan: surowy
+  zrodlo: {baza: BLS, kod: K110100, wersja: 4.0 (2025), nazwa_oryginalna: 'Kartoffel geschält, roh | Potatoe peeled, raw',
+    pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 450
+  na_100g:
+    kcal: 83
+    bialko: 1.94
+    tluszcz: 0.1
+    weglowodany: 17.9
+    blonnik: 1.42
+    cukry: 0.9
+    kwasy_nasycone: 0.04
+    sol: 0.01
+  miary:
+  - {jednostka: szt, gramy: 213, opis: 1 średni ziemniak, zrodlo: USDA FoodData Central 170026}
+- id: frytki_mrozone
+  nazwa: Frytki mrożone do piekarnika (przed pieczeniem)
+  aliasy: [frytki, frytki z piekarnika, frytki mrożone]
+  kategoria: ziemniaki
+  stan: surowy
+  zrodlo: {baza: BLS, kod: K130200, wersja: 4.0 (2025), nazwa_oryginalna: 'Pommes frites tiefgefroren | Potato chips/french
+      fries, deep-frozen', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 300
+  na_100g:
+    kcal: 123
+    bialko: 2.23
+    tluszcz: 3.22
+    weglowodany: 20.17
+    blonnik: 2.29
+    cukry: 0.17
+    kwasy_nasycone: 0.28
+    sol: 0.05
+- id: gnocchi
+  nazwa: Gnocchi ziemniaczane
+  aliasy: [gnocchi, kluski ziemniaczane gnocchi]
+  kategoria: ziemniaki
+  stan: surowy
+  zrodlo: {baza: BLS, kod: K270000, wersja: 4.0 (2025), nazwa_oryginalna: Gnocchi roh | Gnocchi raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 350
+  na_100g:
+    kcal: 152
+    bialko: 3.88
+    tluszcz: 0.61
+    weglowodany: 31.9
+    blonnik: 1.84
+    cukry: 0.41
+    kwasy_nasycone: 0.04
+    sol: 1.3
+- id: kasza_bulgur
+  nazwa: Kasza bulgur (sucha)
+  aliasy: [bulgur]
+  kategoria: kasze
+  stan: suchy
+  zrodlo: {baza: BLS, kod: C119100, wersja: 4.0 (2025), nazwa_oryginalna: Bulgur (Hartweizen) roh | Bulgur (durum wheat)
+      raw, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 120
+  na_100g:
+    kcal: 353
+    bialko: 12.4
+    tluszcz: 2
+    weglowodany: 68
+    blonnik: 6.7
+    cukry: 1.9
+    kwasy_nasycone: 0.28
+    sol: 0.03
+- id: kuskus
+  nazwa: Kuskus (suchy)
+  aliasy: [kuskus, couscous]
+  kategoria: kasze
+  stan: suchy
+  zrodlo: {baza: BLS, kod: C119200, wersja: 4.0 (2025), nazwa_oryginalna: Couscous (Hartweizen) roh | Couscous (durum 
+      wheat) raw, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 120
+  na_100g:
+    kcal: 350
+    bialko: 11.69
+    tluszcz: 1.7
+    weglowodany: 68.92
+    blonnik: 6.17
+    cukry: 1.06
+    kwasy_nasycone: 0.24
+    sol: 0.02
+- id: maka_pszenna
+  nazwa: Mąka pszenna typ 450
+  aliasy: [mąka, mąka pszenna, mąka tortowa, făină]
+  kategoria: maka
+  stan: suchy
+  zrodlo: {baza: BLS, kod: C214100, uwagi: "BLS Type 405 ≈ polski typ 450", wersja: 4.0 (2025), nazwa_oryginalna: 'Weizen
+      Mehl, Type 405 | Wheat flour, Type 405', pobrano: '2026-09-13'}
+  krok_g: 5
+  na_100g:
+    kcal: 348
+    bialko: 10.46
+    tluszcz: 0.93
+    weglowodany: 71.77
+    blonnik: 5.3
+    cukry: 0.31
+    kwasy_nasycone: 0.12
+    sol: 0
+  miary:
+  - {jednostka: łyżka, gramy: 7.9, opis: 1 łyżka płaska, zrodlo: USDA FoodData Central 169761}
+  - {jednostka: łyżeczka, gramy: 2.6, opis: 1 łyżeczka płaska, zrodlo: USDA FoodData Central 169761}
+  - {jednostka: szklanka, gramy: 132, opis: 1 szklanka (250 ml), zrodlo: USDA FoodData Central 169761}
+- id: platki_owsiane
+  nazwa: Płatki owsiane
+  aliasy: [owsianka, płatki owsiane górskie, płatki owsiane błyskawiczne, fulgi de ovăz]
+  kategoria: platki
+  stan: suchy
+  zrodlo: {baza: BLS, kod: C133000, wersja: 4.0 (2025), nazwa_oryginalna: Hafer Flocken | Oat flakes, pobrano: '2026-09-13'}
+  krok_g: 5
+
+# ---------------------------------------------------------------- STRĄCZKI
+  na_100g:
+    kcal: 348
+    bialko: 13.22
+    tluszcz: 6.65
+    weglowodany: 53.3
+    blonnik: 10.98
+    cukry: 0.74
+    kwasy_nasycone: 1.34
+    sol: 0
+- id: soczewica_czerwona
+  nazwa: Soczewica czerwona (sucha)
+  aliasy: [soczewica, soczewica czerwona, linte roșie]
+  kategoria: straczki
+  stan: suchy
+  zrodlo: {baza: BLS, kod: H730000, wersja: 4.0 (2025), nazwa_oryginalna: Linse rot reif | Lentil red mature, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 100
+  na_100g:
+    kcal: 334
+    bialko: 25.6
+    tluszcz: 2.17
+    weglowodany: 48.8
+    blonnik: 8.5
+    cukry: 1.2
+    kwasy_nasycone: 0.38
+    sol: 0.02
+- id: ciecierzyca_konserwowa
+  nazwa: Ciecierzyca konserwowa (odsączona)
+  aliasy: [ciecierzyca, cieciorka, ciecierzyca z puszki, năut]
+  kategoria: straczki
+  stan: odsaczony
+  zrodlo: {baza: BLS, kod: H720902, wersja: 4.0 (2025), nazwa_oryginalna: 'Kichererbse reif, Konserve, abgetropft | Chickpea
+      mature, canned, drained', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 250
+  na_100g:
+    kcal: 136
+    bialko: 7.5
+    tluszcz: 2.7
+    weglowodany: 15.5
+    blonnik: 9.8
+    cukry: 1.2
+    kwasy_nasycone: 0.36
+    sol: 0.56
+- id: fasola_czerwona_konserwowa
+  nazwa: Fasola czerwona konserwowa (odsączona)
+  aliasy: [fasola czerwona, fasola kidney, fasola z puszki]
+  kategoria: straczki
+  stan: odsaczony
+  zrodlo: {baza: BLS, kod: H742902, wersja: 4.0 (2025), nazwa_oryginalna: 'Kidneybohne reif, Konserve, abgetropft | Kidney
+      bean mature, canned, drained', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 250
+  na_100g:
+    kcal: 128
+    bialko: 8.5
+    tluszcz: 1
+    weglowodany: 15.1
+    blonnik: 11.23
+    cukry: 0.9
+    kwasy_nasycone: 0.05
+    sol: 0.62
+- id: fasolka_w_sosie_pomidorowym
+  nazwa: Fasolka w sosie pomidorowym
+  aliasy: [fasolka po angielsku, fasolka w sosie pomidorowym, baked beans]
+  kategoria: straczki
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: H900900, wersja: 4.0 (2025), nazwa_oryginalna: 'Bohnen weiß, in Tomatensoße, Konserve | Haricot
+      beans in tomato sauce, canned', pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 94
+    bialko: 5.08
+    tluszcz: 1.33
+    weglowodany: 12.88
+    blonnik: 4.1
+    cukry: 3.48
+    kwasy_nasycone: 0.1
+    sol: 0.81
+    kwasy_organiczne: 0.12
+- id: tofu
+  nazwa: Tofu naturalne
+  aliasy: [tofu]
+  kategoria: straczki
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: H861000, wersja: 4.0 (2025), nazwa_oryginalna: Tofu | Tofu, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 115
+    bialko: 15.51
+    tluszcz: 5.63
+    weglowodany: 0
+    blonnik: 1.3
+    cukry: 0
+    kwasy_nasycone: 0.92
+    sol: 0.03
+- id: hummus
+  nazwa: Hummus
+  aliasy: [hummus, pasta z ciecierzycy]
+  kategoria: straczki
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: H960000, wersja: 4.0 (2025), nazwa_oryginalna: Hummus/Kichererbsenmus | Hummus/chickpea puree,
+    pobrano: '2026-09-13'}
+  krok_g: 5
+
+# ---------------------------------------------------------------- WARZYWA
+  na_100g:
+    kcal: 324
+    bialko: 5.9
+    tluszcz: 28.5
+    weglowodany: 8
+    blonnik: 5.9
+    cukry: 0.7
+    kwasy_nasycone: 3.5
+    sol: 0.98
+    kwasy_organiczne: 0.08
+- id: pomidor
+  nazwa: Pomidor
+  aliasy: [pomidory, pomidor świeży, pomidorki koktajlowe, roșii]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G561100, wersja: 4.0 (2025), nazwa_oryginalna: Tomate roh | Tomato raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 22
+    bialko: 0.95
+    tluszcz: 0.11
+    weglowodany: 3.25
+    blonnik: 1.3
+    cukry: 3.25
+    kwasy_nasycone: 0.02
+    sol: 0.01
+    kwasy_organiczne: 0.39
+  miary:
+  - {jednostka: szt, gramy: 123, opis: 1 średni pomidor, zrodlo: USDA FoodData Central 170457}
+- id: ogorek
+  nazwa: Ogórek świeży
+  aliasy: [ogórek, ogórki, ogórek zielony, castravete]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G520100, wersja: 4.0 (2025), nazwa_oryginalna: Gurke roh | Cucumber raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 16
+    bialko: 1.06
+    tluszcz: 0.2
+    weglowodany: 1.97
+    blonnik: 0.9
+    cukry: 1.97
+    kwasy_nasycone: 0.07
+    sol: 0.01
+    kwasy_organiczne: 0.26
+- id: papryka_czerwona
+  nazwa: Papryka czerwona
+  aliasy: [papryka, papryka słodka świeża, ardei]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G543100, wersja: 4.0 (2025), nazwa_oryginalna: 'Gemüsepaprika rot, roh | Sweet pepper red, raw',
+    pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 36
+    bialko: 1.02
+    tluszcz: 0.2
+    weglowodany: 6.19
+    blonnik: 2.2
+    cukry: 6.19
+    kwasy_nasycone: 0.03
+    sol: 0
+    kwasy_organiczne: 0.32
+  miary:
+  - {jednostka: szt, gramy: 119, opis: 1 średnia papryka, zrodlo: USDA FoodData Central 170108 (1 medium)}
+- id: cebula
+  nazwa: Cebula
+  aliasy: [cebula biała, cebula żółta, ceapă]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G480100, wersja: 4.0 (2025), nazwa_oryginalna: Speisezwiebel roh | Onion raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 34
+    bialko: 1.16
+    tluszcz: 0.15
+    weglowodany: 6.01
+    blonnik: 1.4
+    cukry: 6.01
+    kwasy_nasycone: 0.03
+    sol: 0.02
+    kwasy_organiczne: 0.25
+  miary:
+  - {jednostka: szt, gramy: 110, opis: 1 średnia cebula, zrodlo: 'USDA FoodData Central 170000 (1 medium, 2-1/2" dia)'}
+- id: czosnek
+  nazwa: Czosnek
+  aliasy: [czosnek świeży, ząbek czosnku, usturoi]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G490100, wersja: 4.0 (2025), nazwa_oryginalna: Knoblauch roh | Garlic raw, pobrano: '2026-09-13'}
+  krok_g: 1
+  na_100g:
+    kcal: 97
+    bialko: 6.05
+    tluszcz: 0.42
+    weglowodany: 3
+    blonnik: 28.3
+    cukry: 2
+    kwasy_nasycone: 0.06
+    sol: 0.02
+    kwasy_organiczne: 0.22
+  miary:
+  - {jednostka: ząbek, gramy: 3, opis: 1 ząbek, zrodlo: USDA FoodData Central 169230}
+  max_porcja_g: 12
+- id: marchew
+  nazwa: Marchew
+  aliasy: [marchewka, marchew, morcov]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G620100, wersja: 4.0 (2025), nazwa_oryginalna: 'Karotte/Möhre, roh | Carrot raw', pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 40
+    bialko: 0.84
+    tluszcz: 0.4
+    weglowodany: 6.47
+    blonnik: 2.9
+    cukry: 6.37
+    kwasy_nasycone: 0.09
+    sol: 0.06
+    kwasy_organiczne: 0.43
+  miary:
+  - {jednostka: szt, gramy: 61, opis: 1 średnia marchewka, zrodlo: USDA FoodData Central 170393 (1 medium)}
+- id: brokul
+  nazwa: Brokuł
+  aliasy: [brokuły, brokuł, broccoli]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G312100, wersja: 4.0 (2025), nazwa_oryginalna: Broccoli roh | Broccoli raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 35
+    bialko: 3.62
+    tluszcz: 0.6
+    weglowodany: 2.3
+    blonnik: 3
+    cukry: 1.38
+    kwasy_nasycone: 0.12
+    sol: 0.07
+    kwasy_organiczne: 0.33
+    poliole: 0.4
+- id: kalafior
+  nazwa: Kalafior
+  aliasy: [kalafior, conopidă]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G311100, wersja: 4.0 (2025), nazwa_oryginalna: Blumenkohl roh | Cauliflower raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 35
+    bialko: 2.42
+    tluszcz: 0.28
+    weglowodany: 5.33
+    blonnik: 2.9
+    cukry: 2.16
+    kwasy_nasycone: 0.04
+    sol: 0.03
+    kwasy_organiczne: 0.27
+    poliole: 2.99
+- id: cukinia
+  nazwa: Cukinia
+  aliasy: [cukinia, dovlecel]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G582100, wersja: 4.0 (2025), nazwa_oryginalna: Zucchini roh | Courgette raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 22
+    bialko: 1.3
+    tluszcz: 0.29
+    weglowodany: 3
+    blonnik: 1.1
+    cukry: 2
+    kwasy_nasycone: 0.07
+    sol: 0
+- id: baklazan
+  nazwa: Bakłażan
+  aliasy: [bakłażan, oberżyna, vânătă]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G510100, wersja: 4.0 (2025), nazwa_oryginalna: Aubergine roh | Aubergine raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 19
+    bialko: 0.57
+    tluszcz: 0.18
+    weglowodany: 3.02
+    blonnik: 1.4
+    cukry: 2.69
+    kwasy_nasycone: 0.04
+    sol: 0.01
+    kwasy_organiczne: 0.18
+    poliole: 0.11
+- id: szpinak
+  nazwa: Szpinak świeży
+  aliasy: [szpinak, liście szpinaku, spanac]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G211100, wersja: 4.0 (2025), nazwa_oryginalna: Spinat roh | Spinach raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 18
+    bialko: 2.07
+    tluszcz: 0.3
+    weglowodany: 0.93
+    blonnik: 1.8
+    cukry: 0.75
+    kwasy_nasycone: 0.03
+    sol: 0.12
+    kwasy_organiczne: 0.06
+- id: salata_maslowa
+  nazwa: Sałata masłowa
+  aliasy: [sałata, sałata zielona, mix sałat, sałata masłowa, salată verde]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G105100, wersja: 4.0 (2025), nazwa_oryginalna: Kopfsalat roh | Butterhead lettuce raw, 
+      pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 18
+    bialko: 1.5
+    tluszcz: 0.22
+    weglowodany: 1.7
+    blonnik: 1.4
+    cukry: 1.7
+    kwasy_nasycone: 0.04
+    sol: 0.08
+    kwasy_organiczne: 0.2
+- id: salata_lodowa
+  nazwa: Sałata lodowa
+  aliasy: [sałata lodowa, iceberg]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G103100, wersja: 4.0 (2025), nazwa_oryginalna: Eisbergsalat roh | Iceberg lettuce raw, 
+      pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 15
+    bialko: 0.8
+    tluszcz: 0.2
+    weglowodany: 1.62
+    blonnik: 1.8
+    cukry: 1.62
+    kwasy_nasycone: 0.05
+    sol: 0.02
+- id: rukola
+  nazwa: Rukola
+  aliasy: [rukola, rokietta, rucola]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G130100, wersja: 4.0 (2025), nazwa_oryginalna: Rucola roh | Rocket raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 21
+    bialko: 3.6
+    tluszcz: 0.4
+    weglowodany: 0
+    blonnik: 1.7
+    cukry: 0
+    kwasy_nasycone: 0.07
+    sol: 0.07
+- id: rzodkiewka
+  nazwa: Rzodkiewka
+  aliasy: [rzodkiewki, rzodkiewka, ridichi]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G691100, wersja: 4.0 (2025), nazwa_oryginalna: Radieschen roh | Small red radish raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 18
+    bialko: 1.05
+    tluszcz: 0.14
+    weglowodany: 2.31
+    blonnik: 1.5
+    cukry: 2.13
+    kwasy_nasycone: 0.03
+    sol: 0.06
+    kwasy_organiczne: 0.31
+    poliole: 0.14
+- id: kapusta_biala
+  nazwa: Kapusta biała
+  aliasy: [kapusta, kapusta biała, varză]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G342100, wersja: 4.0 (2025), nazwa_oryginalna: Weißkohl roh | White cabbage raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 32
+    bialko: 1.38
+    tluszcz: 0.19
+    weglowodany: 4.54
+    blonnik: 3
+    cukry: 4.4
+    kwasy_nasycone: 0.03
+    sol: 0.01
+    kwasy_organiczne: 0.2
+    poliole: 0.14
+- id: kapusta_kiszona
+  nazwa: Kapusta kiszona
+  aliasy: [kiszona kapusta, varză murată]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G346100, wersja: 4.0 (2025), nazwa_oryginalna: Weinsauerkraut roh | Wine sauerkraut raw, 
+      pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 23
+    bialko: 1.1
+    tluszcz: 0.3
+    weglowodany: 0.99
+    blonnik: 2.1
+    cukry: 0.77
+    kwasy_nasycone: 0.07
+    sol: 1.17
+    alkohol: 0.26
+    kwasy_organiczne: 2.1
+    poliole: 0.12
+- id: pieczarki
+  nazwa: Pieczarki
+  aliasy: [pieczarki, grzyby, champignon, ciuperci]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: K701100, wersja: 4.0 (2025), nazwa_oryginalna: Champignon roh | Button mushroom raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 28
+    bialko: 3.66
+    tluszcz: 0.27
+    weglowodany: 2.9
+    blonnik: 1.9
+    cukry: 0.2
+    kwasy_nasycone: 0.05
+    sol: 0.1
+    kwasy_organiczne: 0.13
+    poliole: 2.74
+- id: kukurydza_konserwowa
+  nazwa: Kukurydza konserwowa (odsączona)
+  aliasy: [kukurydza, kukurydza z puszki, porumb]
+  kategoria: warzywa
+  stan: odsaczony
+  zrodlo: {baza: BLS, kod: G570902, wersja: 4.0 (2025), nazwa_oryginalna: 'Zuckermais Konserve, abgetropft | Sweetcorn canned,
+      drained', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 150
+  na_100g:
+    kcal: 79
+    bialko: 2.71
+    tluszcz: 1.94
+    weglowodany: 10.84
+    blonnik: 3.59
+    cukry: 6.22
+    kwasy_nasycone: 0.38
+    sol: 0.37
+    kwasy_organiczne: 0.15
+    poliole: 0.1
+- id: groszek_mrozony
+  nazwa: Groszek zielony mrożony
+  aliasy: [groszek, zielony groszek, mazăre]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G760200, wersja: 4.0 (2025), nazwa_oryginalna: 'Erbse grün, tiefgefroren | Pea green, deep-frozen',
+    pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 77
+    bialko: 4.9
+    tluszcz: 0.7
+    weglowodany: 10
+    blonnik: 5.3
+    cukry: 5.4
+    kwasy_nasycone: 0.14
+    sol: 0.01
+    kwasy_organiczne: 0.28
+- id: fasolka_szparagowa
+  nazwa: Fasolka szparagowa zielona
+  aliasy: [fasolka szparagowa, fasolka zielona]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G710100, wersja: 4.0 (2025), nazwa_oryginalna: 'Bohne grün, roh | Bean green, raw', pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 28
+    bialko: 2.24
+    tluszcz: 0.24
+    weglowodany: 3.4
+    blonnik: 1.89
+    cukry: 2.26
+    kwasy_nasycone: 0.07
+    sol: 0
+    poliole: 0.28
+- id: pomidory_z_puszki
+  nazwa: Pomidory z puszki (krojone)
+  aliasy: [pomidory krojone, pomidory z puszki, pomidory w puszce, roșii tăiate conservă]
+  kategoria: warzywa
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: G560900, wersja: 4.0 (2025), nazwa_oryginalna: Tomate Konserve | Tomato canned, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 19
+    bialko: 1.15
+    tluszcz: 0.2
+    weglowodany: 2.54
+    blonnik: 0.93
+    cukry: 2.5
+    kwasy_nasycone: 0.02
+    sol: 0.21
+    kwasy_organiczne: 0.31
+- id: passata
+  nazwa: Passata pomidorowa
+  aliasy: [passata, przecier pomidorowy, sos pomidorowy passata, pasta de roșii]
+  kategoria: warzywa
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: R161200, wersja: 4.0 (2025), nazwa_oryginalna: Tomaten passiert/Tomatenpüree | Tomato puree, 
+      pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 29
+    bialko: 1.18
+    tluszcz: 0.1
+    weglowodany: 3.94
+    blonnik: 1.81
+    cukry: 3.6
+    kwasy_nasycone: 0.02
+    sol: 0.31
+    kwasy_organiczne: 1.19
+- id: koncentrat_pomidorowy
+  nazwa: Koncentrat pomidorowy
+  aliasy: [koncentrat pomidorowy, pasta pomidorowa]
+  kategoria: sosy_i_dodatki
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: R160000, wersja: 4.0 (2025), nazwa_oryginalna: Tomatenmark | Tomato paste, pobrano: '2026-09-13'}
+  krok_g: 5
+  na_100g:
+    kcal: 81
+    bialko: 3.4
+    tluszcz: 0.2
+    weglowodany: 13.2
+    blonnik: 4.7
+    cukry: 12.9
+    kwasy_nasycone: 0.04
+    sol: 0.8
+    kwasy_organiczne: 1.19
+- id: por
+  nazwa: Por
+  aliasy: [por, pory, praz]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G470100, wersja: 4.0 (2025), nazwa_oryginalna: 'Porree/Lauch, roh | Leek raw', pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 36
+    bialko: 2.14
+    tluszcz: 0.25
+    weglowodany: 5
+    blonnik: 2.2
+    cukry: 3.8
+    kwasy_nasycone: 0.04
+    sol: 0
+    kwasy_organiczne: 0.22
+- id: seler_korzen
+  nazwa: Seler korzeniowy
+  aliasy: [seler, seler korzeniowy, țelină]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G660100, wersja: 4.0 (2025), nazwa_oryginalna: Knollensellerie roh | Celeriac raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 30
+    bialko: 1.55
+    tluszcz: 0.33
+    weglowodany: 2.77
+    blonnik: 4.2
+    cukry: 2.11
+    kwasy_nasycone: 0.07
+    sol: 0.19
+    kwasy_organiczne: 0.43
+    poliole: 0.22
+- id: pietruszka_korzen
+  nazwa: Pietruszka korzeń
+  aliasy: [pietruszka, korzeń pietruszki, pătrunjel rădăcină]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G670100, wersja: 4.0 (2025), nazwa_oryginalna: Wurzelpetersilie roh | Parsley root raw, 
+      pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 76
+    bialko: 2.88
+    tluszcz: 0.47
+    weglowodany: 13.8
+    blonnik: 2.13
+    cukry: 6.05
+    kwasy_nasycone: 0.08
+    sol: 0.03
+    kwasy_organiczne: 0.48
+    poliole: 0.82
+- id: natka_pietruszki
+  nazwa: Natka pietruszki
+  aliasy: [natka, pietruszka natka, zielona pietruszka]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G250100, wersja: 4.0 (2025), nazwa_oryginalna: Petersilienblatt roh | Parsley leaf raw, 
+      pobrano: '2026-09-13'}
+  krok_g: 5
+  na_100g:
+    kcal: 33
+    bialko: 4.09
+    tluszcz: 0.36
+    weglowodany: 1.31
+    blonnik: 4.25
+    cukry: 0.85
+    kwasy_nasycone: 0.04
+    sol: 0.31
+- id: szczypiorek
+  nazwa: Szczypiorek
+  aliasy: [szczypior, szczypiorek]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G081100, wersja: 4.0 (2025), nazwa_oryginalna: Schnittlauch roh | Chives raw, pobrano: '2026-09-13'}
+  krok_g: 5
+  na_100g:
+    kcal: 29
+    bialko: 2.6
+    tluszcz: 0.74
+    weglowodany: 1.54
+    blonnik: 2.6
+    cukry: 1.54
+    kwasy_nasycone: 0.09
+    sol: 0.02
+    kwasy_organiczne: 0.26
+- id: bazylia_swieza
+  nazwa: Bazylia świeża
+  aliasy: [bazylia, listki bazylii]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G061000, wersja: 4.0 (2025), nazwa_oryginalna: Basilikum roh | Basil raw, pobrano: '2026-09-13'}
+  krok_g: 5
+  na_100g:
+    kcal: 23
+    bialko: 3.15
+    tluszcz: 0.64
+    weglowodany: 0.31
+    blonnik: 1.6
+    cukry: 0.31
+    kwasy_nasycone: 0.04
+    sol: 0.01
+- id: imbir_swiezy
+  nazwa: Imbir świeży
+  aliasy: [imbir, korzeń imbiru]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: R211200, wersja: 4.0 (2025), nazwa_oryginalna: 'Ingwer/Ingwerwurzel, roh | Ginger root raw', 
+      pobrano: '2026-09-13'}
+  krok_g: 5
+  na_100g:
+    kcal: 48
+    bialko: 1.92
+    tluszcz: 0.75
+    weglowodany: 6.8
+    blonnik: 1.9
+    cukry: 0.53
+    kwasy_nasycone: 0.2
+    sol: 0.03
+    kwasy_organiczne: 0.81
+- id: oliwki_zielone
+  nazwa: Oliwki zielone (odsączone)
+  aliasy: [oliwki, oliwki zielone, măsline]
+  kategoria: warzywa
+  stan: odsaczony
+  zrodlo: {baza: BLS, kod: H510802, wersja: 4.0 (2025), nazwa_oryginalna: 'Oliven grün, gesäuert, abgetropft | Olives green,
+      pickled, drained', pobrano: '2026-09-13'}
+  krok_g: 5
+
+# ---------------------------------------------------------------- OWOCE
+  na_100g:
+    kcal: 132
+    bialko: 1.21
+    tluszcz: 13.55
+    weglowodany: 0
+    blonnik: 2.36
+    cukry: 0
+    kwasy_nasycone: 2.35
+    sol: 4.23
+- id: jablko
+  nazwa: Jabłko
+  aliasy: [jabłko, jabłka, măr]
+  kategoria: owoce
+  stan: surowy
+  zrodlo: {baza: BLS, kod: F110100, wersja: 4.0 (2025), nazwa_oryginalna: Apfel roh | Apple raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 58
+    bialko: 0.42
+    tluszcz: 0.5
+    weglowodany: 11.7
+    blonnik: 2.27
+    cukry: 10.49
+    kwasy_nasycone: 0.2
+    sol: 0
+    alkohol: 0.02
+    kwasy_organiczne: 0.46
+    poliole: 0.6
+  miary:
+  - {jednostka: szt, gramy: 182, opis: 1 średnie jabłko, zrodlo: USDA FoodData Central 171688}
+- id: banan
+  nazwa: Banan
+  aliasy: [banan, banany, banană]
+  kategoria: owoce
+  stan: surowy
+  zrodlo: {baza: BLS, kod: F503100, wersja: 4.0 (2025), nazwa_oryginalna: Banane roh | Banana raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 79
+    bialko: 1.32
+    tluszcz: 0.4
+    weglowodany: 15.89
+    blonnik: 2
+    cukry: 13.89
+    kwasy_nasycone: 0.07
+    sol: 0
+    alkohol: 0.15
+    kwasy_organiczne: 0.57
+  miary:
+  - {jednostka: szt, gramy: 118, opis: 1 średni banan (bez skórki), zrodlo: USDA FoodData Central 173944}
+- id: gruszka
+  nazwa: Gruszka
+  aliasy: [gruszka, gruszki, pară]
+  kategoria: owoce
+  stan: surowy
+  zrodlo: {baza: BLS, kod: F130100, wersja: 4.0 (2025), nazwa_oryginalna: Birne roh | Pear raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 58
+    bialko: 0.3
+    tluszcz: 0.29
+    weglowodany: 13.16
+    blonnik: 2.8
+    cukry: 10.08
+    kwasy_nasycone: 0.04
+    sol: 0
+    alkohol: 0.02
+    kwasy_organiczne: 0.31
+    poliole: 3.08
+- id: pomarancza
+  nazwa: Pomarańcza
+  aliasy: [pomarańcza, pomarańcze, portocală]
+  kategoria: owoce
+  stan: surowy
+  zrodlo: {baza: BLS, kod: F603100, wersja: 4.0 (2025), nazwa_oryginalna: Orange roh | Orange raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 49
+    bialko: 1
+    tluszcz: 0.2
+    weglowodany: 8.85
+    blonnik: 2.2
+    cukry: 8.85
+    kwasy_nasycone: 0.03
+    sol: 0.01
+    alkohol: 0.02
+    kwasy_organiczne: 1.08
+- id: truskawki
+  nazwa: Truskawki
+  aliasy: [truskawka, truskawki, căpșuni]
+  kategoria: owoce
+  stan: surowy
+  zrodlo: {baza: BLS, kod: F301100, wersja: 4.0 (2025), nazwa_oryginalna: Erdbeere roh | Strawberry raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 38
+    bialko: 0.82
+    tluszcz: 0.4
+    weglowodany: 5.92
+    blonnik: 2
+    cukry: 5.86
+    kwasy_nasycone: 0.03
+    sol: 0
+    kwasy_organiczne: 1.01
+    poliole: 0.06
+- id: maliny
+  nazwa: Maliny
+  aliasy: [malina, maliny, maliny mrożone, zmeură]
+  kategoria: owoce
+  stan: surowy
+  zrodlo: {baza: BLS, kod: F302100, wersja: 4.0 (2025), nazwa_oryginalna: Himbeere roh | Raspberry raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 43
+    bialko: 1
+    tluszcz: 0.3
+    weglowodany: 5.2
+    blonnik: 4.7
+    cukry: 5.2
+    kwasy_nasycone: 0.01
+    sol: 0
+    kwasy_organiczne: 2.12
+    poliole: 0
+- id: borowki
+  nazwa: Borówki amerykańskie
+  aliasy: [borówki, jagody, borówka amerykańska, afine]
+  kategoria: owoce
+  stan: surowy
+  zrodlo: {baza: BLS, kod: F304100, wersja: 4.0 (2025), nazwa_oryginalna: Heidelbeere roh | Blueberry raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 61
+    bialko: 0.5
+    tluszcz: 0.6
+    weglowodany: 9.7
+    blonnik: 4.9
+    cukry: 9.7
+    kwasy_nasycone: 0.06
+    sol: 0.01
+    kwasy_organiczne: 1.59
+    poliole: 0
+- id: winogrona
+  nazwa: Winogrona
+  aliasy: [winogrono, winogrona, struguri]
+  kategoria: owoce
+  stan: surowy
+  zrodlo: {baza: BLS, kod: F310100, wersja: 4.0 (2025), nazwa_oryginalna: Weintraube roh | Grape raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 61
+    bialko: 0.75
+    tluszcz: 0.28
+    weglowodany: 12.18
+    blonnik: 1.6
+    cukry: 12.08
+    kwasy_nasycone: 0.06
+    sol: 0.01
+    kwasy_organiczne: 1.33
+    poliole: 0.1
+- id: kiwi
+  nazwa: Kiwi
+  aliasy: [kiwi]
+  kategoria: owoce
+  stan: surowy
+  zrodlo: {baza: BLS, kod: F514100, wersja: 4.0 (2025), nazwa_oryginalna: Kiwi roh | Kiwi fruit raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 61
+    bialko: 0.9
+    tluszcz: 0.5
+    weglowodany: 10.1
+    blonnik: 3.9
+    cukry: 10.1
+    kwasy_nasycone: 0
+    sol: 0.01
+    kwasy_organiczne: 1.5
+- id: awokado
+  nazwa: Awokado
+  aliasy: [awokado, avocado]
+  kategoria: owoce
+  stan: surowy
+  zrodlo: {baza: BLS, kod: F502100, wersja: 4.0 (2025), nazwa_oryginalna: Avocado roh | Avocado raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 132
+    bialko: 1.37
+    tluszcz: 12.5
+    weglowodany: 1.37
+    blonnik: 4.1
+    cukry: 1.37
+    kwasy_nasycone: 2.59
+    sol: 0.01
+- id: sok_z_cytryny
+  nazwa: Sok z cytryny
+  aliasy: [sok cytrynowy, cytryna, sok z cytryny, lămâie]
+  kategoria: owoce
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: F601600, wersja: 4.0 (2025), nazwa_oryginalna: Zitronensaft | Lemon juice, pobrano: '2026-09-13'}
+  krok_g: 5
+
+# ---------------------------------------------------------------- ORZECHY I NASIONA
+  na_100g:
+    kcal: 30
+    bialko: 0.63
+    tluszcz: 0.3
+    weglowodany: 1.7
+    blonnik: 0.13
+    cukry: 1.7
+    kwasy_nasycone: 0.1
+    sol: 0.01
+    alkohol: 0
+    kwasy_organiczne: 6.01
+- id: orzechy_wloskie
+  nazwa: Orzechy włoskie
+  aliasy: [orzechy włoskie, orzechy, nuci]
+  kategoria: orzechy_i_nasiona
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: H120100, wersja: 4.0 (2025), nazwa_oryginalna: Walnuss | Walnut, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 50
+  na_100g:
+    kcal: 721
+    bialko: 16.07
+    tluszcz: 70.6
+    weglowodany: 3
+    blonnik: 4.6
+    cukry: 2.68
+    kwasy_nasycone: 6.52
+    sol: 0
+  miary:
+  - {jednostka: garść, gramy: 30, opis: garść, zrodlo: NHS Guy's and St Thomas' (porcja orzechów 30 g)}
+- id: migdaly
+  nazwa: Migdały
+  aliasy: [migdały, migdał, migdale]
+  kategoria: orzechy_i_nasiona
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: H210100, wersja: 4.0 (2025), nazwa_oryginalna: Mandel süß | Sweet almond, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 50
+  na_100g:
+    kcal: 544
+    bialko: 22.33
+    tluszcz: 46.6
+    weglowodany: 3.87
+    blonnik: 10
+    cukry: 3.63
+    kwasy_nasycone: 4.01
+    sol: 0.01
+    kwasy_organiczne: 0
+  miary:
+  - {jednostka: garść, gramy: 30, opis: garść, zrodlo: NHS Guy's and St Thomas' (porcja orzechów 30 g)}
+- id: orzechy_nerkowca
+  nazwa: Orzechy nerkowca
+  aliasy: [nerkowce, orzechy nerkowca, caju]
+  kategoria: orzechy_i_nasiona
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: H170100, wersja: 4.0 (2025), nazwa_oryginalna: Cashewkern | Cashew nut, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 50
+  na_100g:
+    kcal: 618
+    bialko: 21.01
+    tluszcz: 47.1
+    weglowodany: 26
+    blonnik: 3
+    cukry: 6.15
+    kwasy_nasycone: 9.26
+    sol: 0.03
+  miary:
+  - {jednostka: garść, gramy: 30, opis: garść, zrodlo: NHS Guy's and St Thomas' (porcja orzechów 30 g)}
+- id: orzeszki_ziemne
+  nazwa: Orzeszki ziemne prażone
+  aliasy: [orzeszki ziemne, orzeszki arachidowe, arahide]
+  kategoria: orzechy_i_nasiona
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: H110600, wersja: 4.0 (2025), nazwa_oryginalna: Erdnuss geröstet | Peanut roasted, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 50
+  na_100g:
+    kcal: 620
+    bialko: 29
+    tluszcz: 49.7
+    weglowodany: 9.9
+    blonnik: 8.4
+    cukry: 4.9
+    kwasy_nasycone: 7.7
+    sol: 0.01
+  miary:
+  - {jednostka: garść, gramy: 30, opis: garść, zrodlo: NHS Guy's and St Thomas' (porcja orzechów 30 g)}
+- id: maslo_orzechowe
+  nazwa: Masło orzechowe 100%
+  aliasy: [masło orzechowe, masło z orzeszków ziemnych, unt de arahide]
+  kategoria: orzechy_i_nasiona
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: H110800, wersja: 4.0 (2025), nazwa_oryginalna: Erdnussmus | Peanut butter (100 % pure), 
+      pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 40
+  na_100g:
+    kcal: 620
+    bialko: 29
+    tluszcz: 49.7
+    weglowodany: 9.9
+    blonnik: 8.4
+    cukry: 4.9
+    kwasy_nasycone: 7.7
+    sol: 0.01
+- id: siemie_lniane
+  nazwa: Siemię lniane
+  aliasy: [siemię lniane, len, nasiona lnu, semințe de in]
+  kategoria: orzechy_i_nasiona
+  stan: suchy
+  zrodlo: {baza: BLS, kod: H410100, wersja: 4.0 (2025), nazwa_oryginalna: Leinsamen | Linseed/flax seed, pobrano: '2026-09-13'}
+  krok_g: 5
+  na_100g:
+    kcal: 470
+    bialko: 22.27
+    tluszcz: 36.5
+    weglowodany: 1.7
+    blonnik: 22.7
+    cukry: 1.21
+    kwasy_nasycone: 3.6
+    sol: 0.14
+- id: pestki_dyni
+  nazwa: Pestki dyni
+  aliasy: [pestki dyni, semințe de dovleac]
+  kategoria: orzechy_i_nasiona
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: H310100, wersja: 4.0 (2025), nazwa_oryginalna: Kürbiskern | Pumpkin seed, pobrano: '2026-09-13'}
+  krok_g: 5
+  na_100g:
+    kcal: 588
+    bialko: 35.49
+    tluszcz: 46.34
+    weglowodany: 2.81
+    blonnik: 8.66
+    cukry: 1.34
+    kwasy_nasycone: 7.69
+    sol: 0.07
+- id: slonecznik
+  nazwa: Słonecznik łuszczony
+  aliasy: [słonecznik, pestki słonecznika]
+  kategoria: orzechy_i_nasiona
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: H430100, wersja: 4.0 (2025), nazwa_oryginalna: Sonnenblumenkern | Sunflower seed, pobrano: '2026-09-13'}
+  krok_g: 5
+  na_100g:
+    kcal: 564
+    bialko: 26.11
+    tluszcz: 47.6
+    weglowodany: 4.8
+    blonnik: 5.8
+    cukry: 3.45
+    kwasy_nasycone: 4.75
+    sol: 0
+- id: nasiona_chia
+  nazwa: Nasiona chia
+  aliasy: [chia, nasiona chia]
+  kategoria: orzechy_i_nasiona
+  stan: suchy
+  zrodlo: {baza: BLS, kod: H480100, wersja: 4.0 (2025), nazwa_oryginalna: Chia-Samen | Chia seeds, pobrano: '2026-09-13'}
+  krok_g: 5
+
+# ---------------------------------------------------------------- TŁUSZCZE
+  na_100g:
+    kcal: 479
+    bialko: 22.11
+    tluszcz: 32.79
+    weglowodany: 3.66
+    blonnik: 40.23
+    cukry: 0.47
+    kwasy_nasycone: 3.54
+    sol: 0
+- id: oliwa_z_oliwek
+  nazwa: Oliwa z oliwek
+  aliasy: [oliwa, oliwa extra virgin, oliwa do smażenia, ulei de măsline]
+  kategoria: tluszcze
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: Q120000, wersja: 4.0 (2025), nazwa_oryginalna: Olivenöl | Olive oil, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 20
+  gestosc_g_ml: 0.91
+  na_100g:
+    kcal: 899
+    bialko: 0
+    tluszcz: 99.9
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 12
+    sol: 0
+  miary:
+  - {jednostka: łyżka, gramy: 13.7, opis: 1 łyżka (15 ml), zrodlo: USDA FoodData Central 171413}
+  - {jednostka: łyżeczka, gramy: 4.6, opis: 1 łyżeczka (5 ml), zrodlo: USDA FoodData Central 171413}
+- id: olej_rzepakowy
+  nazwa: Olej rzepakowy
+  aliasy: [olej, olej rzepakowy, olej do smażenia]
+  kategoria: tluszcze
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: Q180000, wersja: 4.0 (2025), nazwa_oryginalna: Rapsöl/Rüböl | Rapeseed oil/canola oil, 
+      pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 20
+  gestosc_g_ml: 0.91
+  na_100g:
+    kcal: 900
+    bialko: 0
+    tluszcz: 100
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 7.2
+    sol: 0
+  miary:
+  - {jednostka: łyżka, gramy: 13.7, opis: 1 łyżka (15 ml), zrodlo: 'USDA FoodData Central 171413 (gęstość oleju ~0,91 g/ml)'}
+  - {jednostka: łyżeczka, gramy: 4.6, opis: 1 łyżeczka (5 ml), zrodlo: 'USDA FoodData Central 171413 (gęstość oleju ~0,91
+      g/ml)'}
+- id: olej_slonecznikowy
+  nazwa: Olej słonecznikowy
+  aliasy: [olej słonecznikowy, ulei de floarea-soarelui]
+  kategoria: tluszcze
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: Q320000, wersja: 4.0 (2025), nazwa_oryginalna: Sonnenblumenöl | Sunflower oil, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 20
+  gestosc_g_ml: 0.92
+  na_100g:
+    kcal: 900
+    bialko: 0
+    tluszcz: 100
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 11
+    sol: 0
+  miary:
+  - {jednostka: łyżka, gramy: 13.7, opis: 1 łyżka (15 ml), zrodlo: 'USDA FoodData Central 171413 (gęstość oleju ~0,91 g/ml)'}
+  - {jednostka: łyżeczka, gramy: 4.6, opis: 1 łyżeczka (5 ml), zrodlo: 'USDA FoodData Central 171413 (gęstość oleju ~0,91
+      g/ml)'}
+- id: maslo
+  nazwa: Masło 82%
+  aliasy: [masło, masło extra, unt]
+  kategoria: tluszcze
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: Q611000, wersja: 4.0 (2025), nazwa_oryginalna: Butter mild gesäuert | Best quality butter, 
+      pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 25
+  na_100g:
+    kcal: 747
+    bialko: 1.19
+    tluszcz: 82.2
+    weglowodany: 0.57
+    blonnik: 0
+    cukry: 0.57
+    kwasy_nasycone: 52.66
+    sol: 0.03
+    kwasy_organiczne: 0.09
+  miary:
+  - {jednostka: łyżka, gramy: 14.4, opis: 1 łyżka, zrodlo: USDA FoodData Central 173410}
+  - {jednostka: łyżeczka, gramy: 4.8, opis: 1 łyżeczka, zrodlo: USDA FoodData Central 173410}
+- id: majonez
+  nazwa: Majonez
+  aliasy: [majonez, majonez klasyczny, maioneză]
+  kategoria: tluszcze
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: Q991000, wersja: 4.0 (2025), nazwa_oryginalna: Mayonnaise (Fertigprodukt) | Mayonnaise 
+      (ready-made product), pobrano: '2026-09-13'}
+  krok_g: 5
+
+# ---------------------------------------------------------------- SŁODYCZE I SŁODZIKI
+  max_porcja_g: 30
+  na_100g:
+    kcal: 750
+    bialko: 1.49
+    tluszcz: 81.2
+    weglowodany: 2.3
+    blonnik: 0.64
+    cukry: 2.3
+    kwasy_nasycone: 6.88
+    sol: 0.91
+    kwasy_organiczne: 0.76
+    poliole: 0
+- id: miod
+  nazwa: Miód
+  aliasy: [miód, miód pszczeli, miere]
+  kategoria: slodycze
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: S120000, wersja: 4.0 (2025), nazwa_oryginalna: Honig | Honey, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 30
+  na_100g:
+    kcal: 305
+    bialko: 0.4
+    tluszcz: 0
+    weglowodany: 74.09
+    blonnik: 0
+    cukry: 70.76
+    kwasy_nasycone: 0
+    sol: 0.01
+    alkohol: 0
+  miary:
+  - {jednostka: łyżka, gramy: 21.3, opis: 1 łyżka, zrodlo: USDA FoodData Central 169640}
+  - {jednostka: łyżeczka, gramy: 7.1, opis: 1 łyżeczka, zrodlo: USDA FoodData Central 169640}
+- id: cukier
+  nazwa: Cukier biały
+  aliasy: [cukier, cukier biały, zahăr]
+  kategoria: slodycze
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: S111000, wersja: 4.0 (2025), nazwa_oryginalna: Zucker weiß (Raffinadezucker/Weißzucker) | 
+      Sugar white (refined sugar), pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 20
+  na_100g:
+    kcal: 400
+    bialko: 0
+    tluszcz: 0
+    weglowodany: 100
+    blonnik: 0
+    cukry: 100
+    kwasy_nasycone: 0
+    sol: 0.01
+  miary:
+  - {jednostka: łyżka, gramy: 12.7, opis: 1 łyżka, zrodlo: USDA FoodData Central 169655}
+  - {jednostka: łyżeczka, gramy: 4.2, opis: 1 łyżeczka, zrodlo: USDA FoodData Central 169655}
+- id: dzem
+  nazwa: Dżem (konfitura)
+  aliasy: [dżem, konfitura, gem]
+  kategoria: slodycze
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: S132000, wersja: 4.0 (2025), nazwa_oryginalna: Konfitüre extra | Jam extra quality, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 40
+  na_100g:
+    kcal: 234
+    bialko: 0.4
+    tluszcz: 0.2
+    weglowodany: 56.3
+    blonnik: 1.1
+    cukry: 56.3
+    kwasy_nasycone: 0.02
+    sol: 0.01
+    alkohol: 0.2
+    kwasy_organiczne: 0.79
+    poliole: 0.03
+- id: czekolada_gorzka
+  nazwa: Czekolada gorzka
+  aliasy: [gorzka czekolada, czekolada deserowa]
+  kategoria: slodycze
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: S560000, wersja: 4.0 (2025), nazwa_oryginalna: Zartbitter-/Halbbitterschokolade | 
+      Bittersweet/semisweet chocolate, pobrano: '2026-09-13'}
+  krok_g: 5
+  na_100g:
+    kcal: 534
+    bialko: 6.62
+    tluszcz: 32.26
+    weglowodany: 49.6
+    blonnik: 9.27
+    cukry: 46.9
+    kwasy_nasycone: 19.42
+    sol: 0.02
+- id: czekolada_mleczna
+  nazwa: Czekolada mleczna
+  aliasy: [czekolada, czekolada mleczna]
+  kategoria: slodycze
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: S530000, wersja: 4.0 (2025), nazwa_oryginalna: Milchschokolade | Milk chocolate, pobrano: '2026-09-13'}
+  krok_g: 5
+  na_100g:
+    kcal: 532
+    bialko: 6.83
+    tluszcz: 31.34
+    weglowodany: 54.03
+    blonnik: 3.32
+    cukry: 52.83
+    kwasy_nasycone: 18.75
+    sol: 0.19
+- id: kakao
+  nazwa: Kakao naturalne
+  aliasy: [kakao, kakao w proszku]
+  kategoria: slodycze
+  stan: suchy
+  zrodlo: {baza: BLS, kod: S713000, wersja: 4.0 (2025), nazwa_oryginalna: Kakaopulver stark entölt | Cocoa powder 
+      strongly deoiled, pobrano: '2026-09-13'}
+  krok_g: 5
+  na_100g:
+    kcal: 311
+    bialko: 25.5
+    tluszcz: 11.2
+    weglowodany: 12.3
+    blonnik: 29.69
+    cukry: 1.01
+    kwasy_nasycone: 6.9
+    sol: 0.82
+- id: lody_waniliowe
+  nazwa: Lody waniliowe
+  aliasy: [lody, lody śmietankowe, înghețată]
+  kategoria: slodycze
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: S241000, wersja: 4.0 (2025), nazwa_oryginalna: Vanilleeis | Vanilla ice cream, pobrano: '2026-09-13'}
+  krok_g: 10
+
+# ---------------------------------------------------------------- SOSY I DODATKI
+  na_100g:
+    kcal: 194
+    bialko: 2.38
+    tluszcz: 10.16
+    weglowodany: 22.64
+    blonnik: 0.34
+    cukry: 18.14
+    kwasy_nasycone: 7.36
+    sol: 0.1
+    kwasy_organiczne: 0.56
+- id: ketchup
+  nazwa: Ketchup
+  aliasy: [ketchup, keczup]
+  kategoria: sosy_i_dodatki
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: R141100, wersja: 4.0 (2025), nazwa_oryginalna: Tomatenketchup | Tomato ketchup, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 40
+  na_100g:
+    kcal: 98
+    bialko: 1.4
+    tluszcz: 0.1
+    weglowodany: 21.16
+    blonnik: 1.81
+    cukry: 20.82
+    kwasy_nasycone: 0.03
+    sol: 1.9
+    kwasy_organiczne: 1.19
+- id: musztarda
+  nazwa: Musztarda
+  aliasy: [musztarda, musztarda sarepska, muștar]
+  kategoria: sosy_i_dodatki
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: R132000, wersja: 4.0 (2025), nazwa_oryginalna: Senf mittelscharf | Mustard medium hot, 
+      pobrano: '2026-09-13'}
+  krok_g: 5
+  na_100g:
+    kcal: 111
+    bialko: 5.51
+    tluszcz: 6.96
+    weglowodany: 2.94
+    blonnik: 4.5
+    cukry: 2.76
+    kwasy_nasycone: 0.5
+    sol: 3.27
+    kwasy_organiczne: 1.74
+- id: sos_sojowy
+  nazwa: Sos sojowy
+  aliasy: [sos sojowy, sos sojowy ciemny]
+  kategoria: sosy_i_dodatki
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: R143000, wersja: 4.0 (2025), nazwa_oryginalna: Sojasauce/Sojasoße | Soya sauce, pobrano: '2026-09-13'}
+  krok_g: 5
+  na_100g:
+    kcal: 66
+    bialko: 6.3
+    tluszcz: 0.88
+    weglowodany: 5.47
+    blonnik: 1.14
+    cukry: 4.89
+    kwasy_nasycone: 0.34
+    sol: 11.53
+    alkohol: 1.02
+    kwasy_organiczne: 0.65
+    poliole: 0.04
+- id: pesto_bazyliowe
+  nazwa: Pesto bazyliowe (zielone)
+  aliasy: [pesto, pesto zielone, pesto alla genovese]
+  kategoria: sosy_i_dodatki
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: X372012, uwagi: "receptura BLS (potrawa), nie produkt sklepowy", wersja: 4.0 (2025), 
+      nazwa_oryginalna: Pesto verde | Pesto verde, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 40
+  na_100g:
+    kcal: 542
+    bialko: 6.7
+    tluszcz: 56.5
+    weglowodany: 0.7
+    blonnik: 2.1
+    cukry: 0.7
+    kwasy_nasycone: 7.5
+    sol: 1.8
+    kwasy_organiczne: 0.06
+- id: mleczko_kokosowe
+  nazwa: Mleczko kokosowe (pełnotłuste)
+  aliasy: [mleczko kokosowe, mleko kokosowe, lapte de cocos]
+  kategoria: sosy_i_dodatki
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: H154000, wersja: 4.0 (2025), nazwa_oryginalna: Kokosmilch/Kokosnussmilch | Coconut milk, 
+      pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 150
+  na_100g:
+    kcal: 227
+    bialko: 2.77
+    tluszcz: 21.9
+    weglowodany: 2.1
+    blonnik: 5
+    cukry: 2.1
+    kwasy_nasycone: 19.1
+    sol: 0.06
+- id: ocet_balsamiczny
+  nazwa: Ocet balsamiczny
+  aliasy: [ocet balsamiczny, balsamico]
+  kategoria: sosy_i_dodatki
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: R125000, wersja: 4.0 (2025), nazwa_oryginalna: Balsamicoessig | Balsamic vinegar, pobrano: '2026-09-13'}
+  krok_g: 5
+
+# ---------------------------------------------------------------- NAPOJE
+  na_100g:
+    kcal: 95
+    bialko: 0
+    tluszcz: 0
+    weglowodany: 20.04
+    blonnik: 0
+    cukry: 20.04
+    kwasy_nasycone: 0
+    sol: 0.06
+    alkohol: 0.09
+    kwasy_organiczne: 4.86
+- id: kawa_napar
+  nazwa: Kawa czarna (napar)
+  aliasy: [kawa, kawa czarna, espresso, cafea]
+  kategoria: napoje
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: N410100, wersja: 4.0 (2025), nazwa_oryginalna: Kaffee (Getränk) | Coffee (infusion), pobrano: '2026-09-13'}
+  krok_g: 50
+  gestosc_g_ml: 1.0
+
+# ---------------------------------------------------------------- DANIA GOTOWE I PRZEKĄSKI (pula 20%)
+  na_100g:
+    kcal: 1
+    bialko: 0.12
+    tluszcz: 0
+    weglowodany: 0
+    blonnik: 0.31
+    cukry: 0
+    kwasy_nasycone: 0
+    sol: 0.01
+- id: chipsy_ziemniaczane
+  nazwa: Chipsy ziemniaczane
+  aliasy: [chipsy, chipsy ziemniaczane, chipsuri]
+  kategoria: przekaski
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: K280100, wersja: 4.0 (2025), nazwa_oryginalna: 'Kartoffelchips/Stapelchips, diverse Sorten | Potato
+      crisps/potato chips (various types)', pobrano: '2026-09-13'}
+  krok_g: 5
+  na_100g:
+    kcal: 526
+    bialko: 5.5
+    tluszcz: 34.3
+    weglowodany: 45.88
+    blonnik: 4.8
+    cukry: 1.53
+    kwasy_nasycone: 2.87
+    sol: 1.59
+    kwasy_organiczne: 0.7
+- id: sernik
+  nazwa: Sernik (na kruchym/drożdżowym spodzie)
+  aliasy: [sernik, ciasto sernik]
+  kategoria: slodycze
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: D461200, wersja: 4.0 (2025), nazwa_oryginalna: Käsekuchen/Quarkkuchen (Hefeteig) | Cheesecake
+      (yeast dough), pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 243
+    bialko: 9.7
+    tluszcz: 9.7
+    weglowodany: 28
+    blonnik: 1.3
+    cukry: 13.1
+    kwasy_nasycone: 5.6
+    sol: 0.12
+    kwasy_organiczne: 0.65
+    poliole: 0.04
+- id: croissant
+  nazwa: Croissant
+  aliasy: [croissant, rogalik francuski]
+  kategoria: pieczywo
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: D771600, wersja: 4.0 (2025), nazwa_oryginalna: Croissant (Hefeblätterteig/Plunderteig) | 
+      Danish pastry croissant, pobrano: '2026-09-13'}
+  krok_g: 10
+
+# ---------------------------------------------------------------- PRZYPRAWY (pomijalne w bilansie)
+  na_100g:
+    kcal: 426
+    bialko: 8
+    tluszcz: 23.57
+    weglowodany: 44
+    blonnik: 2.62
+    cukry: 7.2
+    kwasy_nasycone: 13.52
+    sol: 0.87
+    kwasy_organiczne: 0.02
+- id: sol
+  nazwa: Sól
+  aliasy: [sól, sól kamienna, szczypta soli, sare]
+  kategoria: przyprawy
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: recznie, uwagi: "przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro"}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+  miary:
+  - {jednostka: łyżeczka, gramy: 6.1, opis: 1 łyżeczka, zrodlo: USDA FoodData Central 173468}
+  - {jednostka: szczypta, gramy: 0.4, opis: szczypta, zrodlo: USDA FoodData Central 173468 (dash)}
+- id: pieprz_czarny
+  nazwa: Pieprz czarny
+  aliasy: [pieprz, pieprz czarny mielony, piper]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: "przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro"}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: papryka_slodka_mielona
+  nazwa: Papryka słodka mielona
+  aliasy: [papryka słodka, papryka w proszku, boia dulce]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: "przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro"}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: oregano_suszone
+  nazwa: Oregano suszone
+  aliasy: [oregano]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: "przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro"}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: curry_przyprawa
+  nazwa: Przyprawa curry
+  aliasy: [curry, curry w proszku]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: "przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro"}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: czosnek_granulowany
+  nazwa: Czosnek granulowany
+  aliasy: [czosnek suszony, czosnek w proszku]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: "przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro"}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: cynamon
+  nazwa: Cynamon mielony
+  aliasy: [cynamon, scorțișoară]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: "przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro"}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: ziola_prowansalskie
+  nazwa: Zioła prowansalskie
+  aliasy: [zioła, zioła prowansalskie, mieszanka ziół]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: "przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro"}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: lisc_laurowy
+  nazwa: Liść laurowy
+  aliasy: [liść laurowy, liście laurowe, dafin]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: "przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro"}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: majeranek
+  nazwa: Majeranek suszony
+  aliasy: [majeranek]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: "przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro"}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: mieso_mielone_wolowe_chude
+  nazwa: Mięso mielone wołowe chude (ok. 3–5% tłuszczu, surowe)
+  aliasy: [chuda wołowina mielona, wołowina mielona chuda, tatar wołowy, mielone wołowe 5%, wołowina mielona 5%, chuda 
+      wołowina mielona 5%]
+  kategoria: mieso
+  stan: surowy
+  zrodlo: {baza: BLS, kod: U070100, wersja: 4.0 (2025), nazwa_oryginalna: 'Rind Tatar/Schabefleisch, roh | Beef mince, lean,
+      raw', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 220
+  na_100g:
+    kcal: 115
+    bialko: 22
+    tluszcz: 3
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 1.11
+    sol: 0.17
+- id: zoltko_jaja
+  nazwa: Żółtko jaja kurzego
+  aliasy: [żółtko, żółtka, żółtko jaja, żółtko surowe]
+  kategoria: jaja
+  stan: surowy
+  zrodlo: {baza: BLS, kod: E112100, wersja: 4.0 (2025), nazwa_oryginalna: 'Hühnerei Eigelb, roh | Chicken egg yolk, raw',
+    pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 60
+  miary:
+  - {jednostka: szt, gramy: 17, opis: 1 żółtko z jajka rozmiaru M, zrodlo: USDA FDC 172184 (1 large yolk 17 g)}
+  na_100g:
+    kcal: 345
+    bialko: 15.6
+    tluszcz: 31.3
+    weglowodany: 0.21
+    blonnik: 0
+    cukry: 0.21
+    kwasy_nasycone: 8.51
+    sol: 0.13
+- id: woda
+  nazwa: Woda
+  aliasy: [woda, woda mineralna, woda z kranu]
+  kategoria: napoje
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: N110000, wersja: 4.0 (2025), nazwa_oryginalna: Trinkwasser | Drinking water, pobrano: '2026-09-13'}
+  krok_g: 50
+  gestosc_g_ml: 1.0
+  na_100g:
+    kcal: 0
+    bialko: 0
+    tluszcz: 0
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 0
+    sol: 0.01
+- id: ciasto_na_pizze
+  nazwa: Ciasto na pizzę drożdżowe (surowe)
+  aliasy: [ciasto do pizzy, ciasto na pizzę, ciasto drożdżowe na pizzę, blat do pizzy]
+  kategoria: maka
+  stan: surowy
+  zrodlo: {baza: BLS, kod: D079000, wersja: 4.0 (2025), nazwa_oryginalna: 'Pizzateig (mit Hefe) roh | Pizza dough with yeast,
+      raw', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 350
+  na_100g:
+    kcal: 246
+    bialko: 6.47
+    tluszcz: 5.13
+    weglowodany: 42
+    blonnik: 3.18
+    cukry: 0.94
+    kwasy_nasycone: 0.39
+    sol: 0.37
+- id: ogorek_kiszony
+  nazwa: Ogórek kiszony
+  aliasy: [ogórki kiszone, ogórek kiszony, castraveți murați]
+  kategoria: warzywa
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: G890702, wersja: 4.0 (2025), nazwa_oryginalna: 'Salzgurke/Salzdillgurke, milchsauer fermentiert,
+      abgetropft | Gherkin lactic acid fermented, drained', pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 12
+    bialko: 0.52
+    tluszcz: 0
+    weglowodany: 1.38
+    blonnik: 0.7
+    cukry: 1.36
+    kwasy_nasycone: 0
+    sol: 2.25
+    kwasy_organiczne: 0.79
+    poliole: 0.02
+- id: ogorek_konserwowy
+  nazwa: Ogórek konserwowy
+  aliasy: [ogórki konserwowe, ogórek konserwowy, korniszony]
+  kategoria: warzywa
+  stan: odsaczony
+  zrodlo: {baza: BLS, kod: G520802, wersja: 4.0 (2025), nazwa_oryginalna: 'Gurke gesäuert (Gewürzgurke) abgetropft | Cucumber/gherkin
+      pickled, drained', pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 33
+    bialko: 0.9
+    tluszcz: 0
+    weglowodany: 5.52
+    blonnik: 0.88
+    cukry: 5.49
+    kwasy_nasycone: 0
+    sol: 1.14
+    kwasy_organiczne: 1.66
+    poliole: 0.03
+- id: burak
+  nazwa: Burak czerwony (surowy)
+  aliasy: [burak, buraki, sfeclă roșie]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G613100, wersja: 4.0 (2025), nazwa_oryginalna: 'Rote Rübe/Rote Bete, roh | Beetroot raw', 
+      pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 43
+    bialko: 2.06
+    tluszcz: 0.1
+    weglowodany: 7.22
+    blonnik: 2.5
+    cukry: 7.22
+    kwasy_nasycone: 0.02
+    sol: 0.14
+    kwasy_organiczne: 0.12
+- id: kapusta_pekinska
+  nazwa: Kapusta pekińska
+  aliasy: [kapusta pekińska, kapusta chińska]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G321100, wersja: 4.0 (2025), nazwa_oryginalna: Chinakohl roh | Chinese white cabbage raw, 
+      pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 18
+    bialko: 1.8
+    tluszcz: 0.2
+    weglowodany: 1.38
+    blonnik: 1.7
+    cukry: 1.24
+    kwasy_nasycone: 0.01
+    sol: 0.03
+    kwasy_organiczne: 0.13
+    poliole: 0.14
+- id: maka_ziemniaczana
+  nazwa: Mąka ziemniaczana
+  aliasy: [mąka ziemniaczana, skrobia ziemniaczana]
+  kategoria: maka
+  stan: suchy
+  zrodlo: {baza: BLS, kod: K230000, wersja: 4.0 (2025), nazwa_oryginalna: Kartoffelstärke (Kartoffelmehl) | Potato 
+      starch (potato flour), pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 30
+  na_100g:
+    kcal: 338
+    bialko: 0.61
+    tluszcz: 0.1
+    weglowodany: 83.1
+    blonnik: 1
+    cukry: 0
+    kwasy_nasycone: 0.03
+    sol: 0.02
+- id: kielbasa_krakowska
+  nazwa: Kiełbasa krakowska parzona
+  aliasy: [kiełbasa krakowska, kiełbasa, krakowska]
+  kategoria: wedliny
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: W252100, wersja: 4.0 (2025), nazwa_oryginalna: Krakauer/Kochpolnische | Krakow cooked sausage,
+    pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 120
+  na_100g:
+    kcal: 238
+    bialko: 15.8
+    tluszcz: 19.4
+    weglowodany: 0
+    blonnik: 0.06
+    cukry: 0
+    kwasy_nasycone: 4.79
+    sol: 2
+- id: papryka_zolta
+  nazwa: Papryka żółta
+  aliasy: [papryka żółta, ardei galben]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G542100, wersja: 4.0 (2025), nazwa_oryginalna: 'Gemüsepaprika gelb, roh | Sweet pepper yellow,
+      raw', pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 28
+    bialko: 0.8
+    tluszcz: 0.2
+    weglowodany: 4.42
+    blonnik: 2.2
+    cukry: 4.42
+    kwasy_nasycone: 0.05
+    sol: 0
+    kwasy_organiczne: 0.32
+- id: papryka_zielona
+  nazwa: Papryka zielona
+  aliasy: [papryka zielona, ardei verde]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G541100, wersja: 4.0 (2025), nazwa_oryginalna: 'Gemüsepaprika grün, roh | Sweet pepper green, raw',
+    pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 38
+    bialko: 1.08
+    tluszcz: 0.24
+    weglowodany: 6.88
+    blonnik: 2
+    cukry: 6.51
+    kwasy_nasycone: 0.06
+    sol: 0.01
+    kwasy_organiczne: 0.32
+    poliole: 0.37
+- id: dynia
+  nazwa: Dynia (miąższ, surowa)
+  aliasy: [dynia, dynia hokkaido, dovleac]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G581000, wersja: 4.0 (2025), nazwa_oryginalna: Kürbis Hokkaido (C. maxima) roh | Hokkaido 
+      pumpkin raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 30
+    bialko: 1.4
+    tluszcz: 0.2
+    weglowodany: 5.3
+    blonnik: 0.78
+    cukry: 4.59
+    kwasy_nasycone: 0.05
+    sol: 0.02
+    poliole: 0.01
+- id: ananas
+  nazwa: Ananas świeży
+  aliasy: [ananas]
+  kategoria: owoce
+  stan: surowy
+  zrodlo: {baza: BLS, kod: F501100, wersja: 4.0 (2025), nazwa_oryginalna: Ananas roh | Pineapple raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 46
+    bialko: 0.5
+    tluszcz: 0.1
+    weglowodany: 9.4
+    blonnik: 1.4
+    cukry: 9.4
+    kwasy_nasycone: 0.02
+    sol: 0.01
+    alkohol: 0.02
+    kwasy_organiczne: 0.72
+- id: mango
+  nazwa: Mango
+  aliasy: [mango]
+  kategoria: owoce
+  stan: surowy
+  zrodlo: {baza: BLS, kod: F516100, wersja: 4.0 (2025), nazwa_oryginalna: Mango roh | Mango raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 60
+    bialko: 0.7
+    tluszcz: 0.45
+    weglowodany: 12
+    blonnik: 1.7
+    cukry: 11
+    kwasy_nasycone: 0.1
+    sol: 0.02
+    kwasy_organiczne: 0.42
+- id: brzoskwinia
+  nazwa: Brzoskwinia
+  aliasy: [brzoskwinia, brzoskwinie, piersică]
+  kategoria: owoce
+  stan: surowy
+  zrodlo: {baza: BLS, kod: F203100, wersja: 4.0 (2025), nazwa_oryginalna: Pfirsich roh | Peach raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 39
+    bialko: 0.7
+    tluszcz: 0.11
+    weglowodany: 8.02
+    blonnik: 1.7
+    cukry: 6.99
+    kwasy_nasycone: 0.01
+    sol: 0
+    kwasy_organiczne: 0.57
+    poliole: 1.03
+- id: makaron_jajeczny
+  nazwa: Makaron jajeczny (suchy)
+  aliasy: [makaron jajeczny, tagliatelle jajeczne, wstążki, płaty lasagne]
+  kategoria: makaron
+  stan: suchy
+  zrodlo: {baza: BLS, kod: E432000, wersja: 4.0 (2025), nazwa_oryginalna: Eierteigwaren roh | Egg pasta raw, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 130
+  na_100g:
+    kcal: 342
+    bialko: 13.2
+    tluszcz: 2
+    weglowodany: 66.09
+    blonnik: 3.38
+    cukry: 1.64
+    kwasy_nasycone: 0.8
+    sol: 1.25
+- id: makaron_pelnoziarnisty
+  nazwa: Makaron pełnoziarnisty (suchy)
+  aliasy: [makaron pełnoziarnisty, makaron razowy]
+  kategoria: makaron
+  stan: suchy
+  zrodlo: {baza: BLS, kod: E510000, wersja: 4.0 (2025), nazwa_oryginalna: 'Vollkornteigwaren eifrei, roh | Wholemeal pasta
+      egg-free, raw', pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 130
+  na_100g:
+    kcal: 356
+    bialko: 14.3
+    tluszcz: 2.93
+    weglowodany: 62.9
+    blonnik: 10.2
+    cukry: 2.8
+    kwasy_nasycone: 0.43
+    sol: 0.01
+- id: ryz_brazowy
+  nazwa: Ryż brązowy (suchy)
+  aliasy: [ryż brązowy, ryż naturalny]
+  kategoria: ryz
+  stan: suchy
+  zrodlo: {baza: BLS, kod: C351000, wersja: 4.0 (2025), nazwa_oryginalna: 'Reis unpoliert, roh | Brown rice raw', 
+      pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 120
+  na_100g:
+    kcal: 360
+    bialko: 8.38
+    tluszcz: 2.7
+    weglowodany: 73.43
+    blonnik: 4
+    cukry: 0.73
+    kwasy_nasycone: 0.48
+    sol: 0.01
+- id: chlebek_pita
+  nazwa: Chlebek pita / placek pszenny
+  aliasy: [pita, chlebek pita, placek pita, lipie]
+  kategoria: pieczywo
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: B782100, wersja: 4.0 (2025), nazwa_oryginalna: Weizenfladenbrot | Wheat flatbread, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 160
+  na_100g:
+    kcal: 248
+    bialko: 8.2
+    tluszcz: 2.3
+    weglowodany: 47
+    blonnik: 3.34
+    cukry: 0.32
+    kwasy_nasycone: 0.2
+    sol: 1.26
+- id: jarmuz
+  nazwa: Jarmuż
+  aliasy: [jarmuż, kale]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G322100, wersja: 4.0 (2025), nazwa_oryginalna: Grünkohl roh | Curly kale raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 53
+    bialko: 4.16
+    tluszcz: 0.67
+    weglowodany: 3.32
+    blonnik: 8.39
+    cukry: 2.64
+    kwasy_nasycone: 0.1
+    sol: 0.06
+    kwasy_organiczne: 0.23
+    poliole: 0.19
+- id: szynka_parmenska
+  nazwa: Szynka dojrzewająca (typu parmeńska)
+  aliasy: [szynka parmeńska, szynka dojrzewająca, prosciutto]
+  kategoria: wedliny
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: W443000, wersja: 4.0 (2025), nazwa_oryginalna: 'Lachsschinken, Rohpökelware, geräuchert | Pork
+      loin lean rolled, raw cured, smoked', pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 80
+  na_100g:
+    kcal: 123
+    bialko: 24.43
+    tluszcz: 2.08
+    weglowodany: 0.76
+    blonnik: 0
+    cukry: 0.74
+    kwasy_nasycone: 0.71
+    sol: 3.84
+    kwasy_organiczne: 1.27
+    poliole: 0.02
+- id: pieczarki_konserwowe
+  nazwa: Pieczarki konserwowe (odsączone)
+  aliasy: [pieczarki z puszki, pieczarki konserwowe]
+  kategoria: warzywa
+  stan: odsaczony
+  zrodlo: {baza: BLS, kod: K701902, wersja: 4.0 (2025), nazwa_oryginalna: 'Champignon Konserve, abgetropft | Button mushroom
+      canned, drained', pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 43
+    bialko: 5.52
+    tluszcz: 0.82
+    weglowodany: 3.23
+    blonnik: 2.54
+    cukry: 0.11
+    kwasy_nasycone: 0.06
+    sol: 1.16
+    kwasy_organiczne: 0.09
+    poliole: 3.12
+- id: szparagi
+  nazwa: Szparagi zielone
+  aliasy: [szparagi, sparanghel]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G450100, wersja: 4.0 (2025), nazwa_oryginalna: Spargel roh | Asparagus raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 28
+    bialko: 1.96
+    tluszcz: 0.16
+    weglowodany: 3.98
+    blonnik: 1.4
+    cukry: 3.8
+    kwasy_nasycone: 0.03
+    sol: 0.01
+    kwasy_organiczne: 0.16
+    poliole: 0.09
+- id: kalarepa
+  nazwa: Kalarepa
+  aliasy: [kalarepa]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G331100, wersja: 4.0 (2025), nazwa_oryginalna: Kohlrabi roh | Kohlrabi raw, pobrano: '2026-09-13'}
+  krok_g: 10
+  na_100g:
+    kcal: 28
+    bialko: 1.94
+    tluszcz: 0.16
+    weglowodany: 3.88
+    blonnik: 1.5
+    cukry: 3.7
+    kwasy_nasycone: 0.03
+    sol: 0.05
+    kwasy_organiczne: 0.31
+    poliole: 0.14
+- id: dymka
+  nazwa: Cebula dymka (szczypior z cebulką)
+  aliasy: [dymka, cebulka dymka, szczypior dymki]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: BLS, kod: G482100, wersja: 4.0 (2025), nazwa_oryginalna: 'Frühlingszwiebel/Lauchzwiebel, roh | Spring onion
+      raw', pobrano: '2026-09-13'}
+  krok_g: 5
+  na_100g:
+    kcal: 27
+    bialko: 1.9
+    tluszcz: 0.19
+    weglowodany: 3
+    blonnik: 2.6
+    cukry: 2.8
+    kwasy_nasycone: 0.03
+    sol: 0.03
+    kwasy_organiczne: 0.22
+- id: limonka_sok
+  nazwa: Sok z limonki
+  aliasy: [limonka, sok z limonki]
+  kategoria: owoce
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: F602600, wersja: 4.0 (2025), nazwa_oryginalna: Limettensaft | Lime juice, pobrano: '2026-09-13'}
+  krok_g: 5
+  na_100g:
+    kcal: 24
+    bialko: 0.45
+    tluszcz: 0.2
+    weglowodany: 1.52
+    blonnik: 0.13
+    cukry: 1.52
+    kwasy_nasycone: 0
+    sol: 0
+    alkohol: 0.02
+    kwasy_organiczne: 4.78
+- id: pomidory_suszone_w_oleju
+  nazwa: Pomidory suszone w oleju (odsączone)
+  aliasy: [pomidory suszone, suszone pomidory]
+  kategoria: warzywa
+  stan: odsaczony
+  zrodlo: {baza: BLS, kod: G567702, wersja: 4.0 (2025), nazwa_oryginalna: 'Tomate getrocknet, in Öl, Konserve, abgetropft
+      | Tomato dried, in oil, canned, drained', pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 60
+  na_100g:
+    kcal: 293
+    bialko: 6.49
+    tluszcz: 16.32
+    weglowodany: 23.33
+    blonnik: 9.4
+    cukry: 23.33
+    kwasy_nasycone: 1.23
+    sol: 3.31
+    kwasy_organiczne: 2.78
+- id: tortellini_z_miesem
+  nazwa: Tortellini z mięsem (suche)
+  aliasy: [tortellini, tortellini z mięsem]
+  kategoria: makaron
+  stan: suchy
+  zrodlo: {baza: BLS, kod: E609200, wersja: 4.0 (2025), nazwa_oryginalna: Eierteigwaren Tortellini (Fleischfüllung) 
+      getrocknet | Egg pasta Tortellini (meat filling) dried, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 150
+  na_100g:
+    kcal: 369
+    bialko: 13.51
+    tluszcz: 7.01
+    weglowodany: 61.85
+    blonnik: 2.3
+    cukry: 1.25
+    kwasy_nasycone: 2.82
+    sol: 2.16
+- id: bulka_pelnoziarnista
+  nazwa: Bułka pełnoziarnista
+  aliasy: [bułka grahamka, grahamka, bułka razowa, bułka pełnoziarnista]
+  kategoria: pieczywo
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: B411000, wersja: 4.0 (2025), nazwa_oryginalna: Weizenvollkornbrötchen | Wholemeal wheat roll, 
+      pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 180
+  na_100g:
+    kcal: 288
+    bialko: 10.5
+    tluszcz: 3.26
+    weglowodany: 49
+    blonnik: 9.79
+    cukry: 1.4
+    kwasy_nasycone: 0.92
+    sol: 1.46
+- id: udo_z_kurczaka
+  nazwa: Udo z kurczaka ze skórą, bez kości (surowe)
+  aliasy: [udo z kurczaka, udka z kurczaka, pulpă de pui]
+  kategoria: drob
+  stan: surowy
+  zrodlo: {baza: BLS, kod: V4A5100, wersja: 4.0 (2025), nazwa_oryginalna: 'Hähnchen Oberschenkel, mit Haut, roh | Chicken
+      thigh, with skin, raw', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 250
+  na_100g:
+    kcal: 212
+    bialko: 17.17
+    tluszcz: 15.96
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 3.53
+    sol: 0.19
+- id: bulion_warzywny
+  nazwa: Bulion warzywny (gotowy do użycia)
+  aliasy: [bulion warzywny, bulion, wywar warzywny, rosół warzywny, supă de legume]
+  kategoria: sosy_i_dodatki
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: X416243, wersja: 4.0 (2025), nazwa_oryginalna: Gemüsebrühe | Vegetable stock, pobrano: '2026-09-13'}
+  krok_g: 50
+  gestosc_g_ml: 1.0
+  na_100g:
+    kcal: 4
+    bialko: 0.32
+    tluszcz: 0.1
+    weglowodany: 0.54
+    blonnik: 0
+    cukry: 0.54
+    kwasy_nasycone: 0.1
+    sol: 0.67
+- id: bulion_drobiowy
+  nazwa: Bulion drobiowy (gotowy do użycia)
+  aliasy: [bulion drobiowy, rosół, bulion z kurczaka, wywar drobiowy]
+  kategoria: sosy_i_dodatki
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: X411243, wersja: 4.0 (2025), nazwa_oryginalna: Hühnerbrühe | Chicken stock, pobrano: '2026-09-13'}
+  krok_g: 50
+  gestosc_g_ml: 1.0
+  na_100g:
+    kcal: 5
+    bialko: 0.5
+    tluszcz: 0.3
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 0.1
+    sol: 0.85
+- id: koperek
+  nazwa: Koperek świeży
+  aliasy: [koperek, koper, mărar]
+  kategoria: przyprawy
+  stan: surowy
+  zrodlo: {baza: recznie, uwagi: zioło w ilościach do kilku gramów — pomijalne w bilansie kcal/makro}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: kolendra
+  nazwa: Kolendra świeża
+  aliasy: [kolendra, liście kolendry, coriandru]
+  kategoria: przyprawy
+  stan: surowy
+  zrodlo: {baza: recznie, uwagi: zioło w ilościach do kilku gramów — pomijalne w bilansie kcal/makro}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: rozmaryn
+  nazwa: Rozmaryn
+  aliasy: [rozmaryn, rozmaryn suszony, rozmarin]
+  kategoria: przyprawy
+  stan: surowy
+  zrodlo: {baza: recznie, uwagi: zioło w ilościach do kilku gramów — pomijalne w bilansie kcal/makro}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: sezam
+  nazwa: Sezam
+  aliasy: [sezam, ziarna sezamu, sezam prażony, susan]
+  kategoria: orzechy_i_nasiona
+  stan: suchy
+  zrodlo: {baza: BLS, kod: H420100, wersja: 4.0 (2025), nazwa_oryginalna: Sesam | Sesame seed, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 20
+  na_100g:
+    kcal: 565
+    bialko: 20.9
+    tluszcz: 50.4
+    weglowodany: 1.42
+    blonnik: 11.18
+    cukry: 1.2
+    kwasy_nasycone: 7.55
+    sol: 0.11
+- id: twarog_poltlusty
+  nazwa: Twaróg półtłusty (brânză de vaci ok. 4%)
+  aliasy: [twaróg, twarożek, twaróg półtłusty, ser biały, brânză de vaci, branza de vaci]
+  kategoria: sery
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: OFF, kod: '20223281', nazwa_oryginalna: 'Pilos brânză de vaci / извара 4,2% 275 g', url: 
+      https://world.openfoodfacts.org/product/20223281, pobrano: '2026-09-13', uwagi: 'etykieta produktu Lidl (Pilos) sprzedawanego
+      w Rumunii; Open Food Facts, ODbL'}
+  na_100g: {kcal: 119, bialko: 17, tluszcz: 4.2, weglowodany: 3.4, cukry: 3, kwasy_nasycone: 2.8, sol: 0.1}
+  krok_g: 10
+  max_porcja_g: 300
+  uwagi: Polski twaróg/rumuńska brânză de vaci — NIE niemiecki Quark (ten ma ok. 12 g białka).
+- id: odzywka_bialkowa_wpc
+  nazwa: Odżywka białkowa WPC 80 (bez smaku)
+  aliasy: [odżywka białkowa, odżywka białkowa wpc, odżywka wpc, białko serwatkowe, wpc 80, proteină din zer]
+  kategoria: produkty_bialkowe
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: OFF, kod: '5060326271954', nazwa_oryginalna: HSN Whey protein concentrate 80% (unflavored), url: 
+      https://world.openfoodfacts.org/product/5060326271954, pobrano: '2026-09-13', uwagi: typowa etykieta WPC 80 bez 
+      smaku; smakowe mają zwykle 3–8 g węglowodanów więcej}
+  krok_g: 5
+  max_porcja_g: 45
+  na_100g: {kcal: 370, bialko: 80, tluszcz: 3.3, weglowodany: 5.1, cukry: 5.1, sol: 0.35}
+  uwagi: 'Z założeń użytkownika: szejk na bazie odżywki białkowej (ok. 30 g proszku) jako przekąska bilansująca.'
+- id: twarog_chudy
+  nazwa: Twaróg chudy (polski, ok. 0,5% tłuszczu)
+  aliasy: [twaróg chudy, twarożek chudy, ser biały chudy]
+  kategoria: sery
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: OFF, kod: '5900820012960', nazwa_oryginalna: Mlekpol twaróg chudy 275 g, url: 
+      https://world.openfoodfacts.org/product/5900820012960, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 300
+  na_100g: {kcal: 89, bialko: 19, tluszcz: 0, weglowodany: 3.3, cukry: 3.3, sol: 0.1}
+  uwagi: Polski twaróg chudy; rumuńska brânză de vaci degresată ma zwykle mniej białka (ok. 12 g).
+- id: majonez_lekki
+  nazwa: Majonez lekki (light)
+  aliasy: [majonez light, majonez lekki, maioneză light]
+  kategoria: sosy_i_dodatki
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: OFF, kod: '1614446276241', nazwa_oryginalna: Winiary Majonez lekki, url: 
+      https://world.openfoodfacts.org/product/1614446276241, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 30
+  na_100g: {kcal: 338, bialko: 1.1, tluszcz: 33.2, weglowodany: 8.4, cukry: 4.6}
+- id: feta_light
+  nazwa: Ser feta light
+  aliasy: [feta light, ser feta light, ser sałatkowy light]
+  kategoria: sery
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: OFF, kod: '5201704051113', nazwa_oryginalna: Kolios Feta Spitiko Light, url: 
+      https://world.openfoodfacts.org/product/5201704051113, pobrano: '2026-09-13'}
+  krok_g: 5
+  max_porcja_g: 100
+  na_100g: {kcal: 170, bialko: 19, tluszcz: 10, weglowodany: 1, cukry: 0.5, sol: 2.2}
+- id: sos_slodko_kwasny
+  nazwa: Sos słodko-kwaśny (ze słoika)
+  aliasy: [sos słodko-kwaśny, sos słodko kwaśny, sos słodko-kwaśny ze słoika]
+  kategoria: sosy_i_dodatki
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: OFF, kod: '5900783003562', nazwa_oryginalna: Pudliszki Słodko-kwaśny łagodny sos do ryżu 500 g, url: 
+      https://world.openfoodfacts.org/product/5900783003562, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 200
+  na_100g: {kcal: 86, bialko: 0.8, tluszcz: 0.2, weglowodany: 19.9, cukry: 14.4, sol: 1.4}
+- id: pierogi_ruskie
+  nazwa: Pierogi ruskie (gotowe, schłodzone)
+  aliasy: [pierogi ruskie]
+  kategoria: dania_gotowe
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: OFF, kod: '5902885000159', nazwa_oryginalna: Jawo Pierogi ruskie 450 g, url: 
+      https://world.openfoodfacts.org/product/5902885000159, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 400
+  na_100g: {kcal: 177, bialko: 8, tluszcz: 3, weglowodany: 29, cukry: 2.8, sol: 0.71}
+  uwagi: Wartości z etykiety dla produktu jak w opakowaniu (przed odgrzaniem).
+- id: wloszczyzna
+  nazwa: Włoszczyzna (marchew, pietruszka, seler, por)
+  aliasy: [włoszczyzna, warzywa na zupę, mieszanka warzyw na zupę]
+  kategoria: warzywa
+  stan: surowy
+  zrodlo: {baza: recznie, pobrano: '2026-09-13', uwagi: 'średnia ważona z BLS 4.0: marchew G620100 50%, pietruszka G670100
+      20%, seler G660100 20%, por G470100 10%'}
+  krok_g: 10
+  max_porcja_g: 300
+  na_100g: {kcal: 45, bialko: 1.52, tluszcz: 0.39, weglowodany: 7.05, blonnik: 2.94}
+- id: pizza_margherita_z_pizzerii
+  nazwa: Pizza margherita (z pizzerii, upieczona)
+  aliasy: [pizza margherita z pizzerii, pizza z dostawy margherita, zamówiona pizza margherita]
+  kategoria: dania_gotowe
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: X912033, wersja: 4.0 (2025), nazwa_oryginalna: 'Pizza Margherita (mit Tomatensauce, Mozzarella)
+      | Pizza margherita (with tomato sauce, mozzarella)', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 600
+  miary:
+  - {jednostka: kawałek, gramy: 65, opis: 1 z 8 kawałków pizzy 32 cm, zrodlo: 'szacunek DietBot: typowa porcja w lokalach
+      i sklepach w Rumunii/Polsce (±20%)'}
+  na_100g: {kcal: 238, bialko: 7.77, tluszcz: 13.55, weglowodany: 20, blonnik: 1.9, cukry: 1.6, kwasy_nasycone: 4.18, 
+      sol: 0.69, kwasy_organiczne: 0.24}
+  uwagi: 'Jedzenie na wynos: wartości BLS dla typowego produktu — w konkretnym lokalu mogą różnić się o ok. 20%.'
+  tagi: [na_wynos]
+- id: pizza_salami_z_pizzerii
+  nazwa: Pizza z salami (z pizzerii, upieczona)
+  aliasy: [pizza salami z pizzerii, pizza pepperoni z dostawy, zamówiona pizza z salami]
+  kategoria: dania_gotowe
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: X914133, wersja: 4.0 (2025), nazwa_oryginalna: 'Pizza Salame (mit Tomatensauce, Mozzarella, Salami,
+      Oliven, Peperoni) | Pizza salame (with tomato sauce, mozzarellea, salami, olives, peperoni)', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 600
+  miary:
+  - {jednostka: kawałek, gramy: 70, opis: 1 z 8 kawałków pizzy 32 cm, zrodlo: 'szacunek DietBot: typowa porcja w lokalach
+      i sklepach w Rumunii/Polsce (±20%)'}
+  na_100g: {kcal: 251, bialko: 9.6, tluszcz: 16, weglowodany: 16, blonnik: 1.7, cukry: 1.4, kwasy_nasycone: 5.22, sol: 
+      1.02, kwasy_organiczne: 0.3}
+  uwagi: 'Jedzenie na wynos: wartości BLS dla typowego produktu — w konkretnym lokalu mogą różnić się o ok. 20%.'
+  tagi: [na_wynos]
+- id: pizza_z_szynka_z_pizzerii
+  nazwa: Pizza z szynką (z pizzerii, upieczona)
+  aliasy: [pizza z szynką z pizzerii, pizza prosciutto z dostawy, zamówiona pizza z szynką]
+  kategoria: dania_gotowe
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: X912412, wersja: 4.0 (2025), nazwa_oryginalna: 'Pizza Prosciutto (mit Tomatensauce, Kochschinken,
+      Mozzarella) | Pizza prosciutto (with tomato sauce, boiled ham, mozzarella)', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 600
+  miary:
+  - {jednostka: kawałek, gramy: 70, opis: 1 z 8 kawałków pizzy 32 cm, zrodlo: 'szacunek DietBot: typowa porcja w lokalach
+      i sklepach w Rumunii/Polsce (±20%)'}
+  na_100g: {kcal: 224, bialko: 11.36, tluszcz: 12.17, weglowodany: 16, blonnik: 1.6, cukry: 1.5, kwasy_nasycone: 3.81, 
+      sol: 1, kwasy_organiczne: 0.48}
+  uwagi: 'Jedzenie na wynos: wartości BLS dla typowego produktu — w konkretnym lokalu mogą różnić się o ok. 20%.'
+  tagi: [na_wynos]
+- id: pizza_z_pieczarkami_z_pizzerii
+  nazwa: Pizza z pieczarkami (z pizzerii, upieczona)
+  aliasy: [pizza funghi z pizzerii, pizza z pieczarkami z dostawy, zamówiona pizza z pieczarkami]
+  kategoria: dania_gotowe
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: X912133, wersja: 4.0 (2025), nazwa_oryginalna: 'Pizza al funghi (mit Tomatensauce, Champignons,
+      Mozzarella) | Pizza al funghi (with tomato sauce, button mushrooms, mozzarella)', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 600
+  miary:
+  - {jednostka: kawałek, gramy: 70, opis: 1 z 8 kawałków pizzy 32 cm, zrodlo: 'szacunek DietBot: typowa porcja w lokalach
+      i sklepach w Rumunii/Polsce (±20%)'}
+  na_100g: {kcal: 202, bialko: 7.29, tluszcz: 11.24, weglowodany: 17, blonnik: 2, cukry: 1.3, kwasy_nasycone: 3.46, sol: 
+      0.59, kwasy_organiczne: 0.23, poliole: 0.67}
+  uwagi: 'Jedzenie na wynos: wartości BLS dla typowego produktu — w konkretnym lokalu mogą różnić się o ok. 20%.'
+  tagi: [na_wynos]
+- id: cheeseburger_z_fast_foodu
+  nazwa: Cheeseburger (z fast foodu)
+  aliasy: [cheeseburger, burger z fast foodu, cheeseburger z restauracji]
+  kategoria: dania_gotowe
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: Y911160, wersja: 4.0 (2025), nazwa_oryginalna: Cheeseburger | Cheeseburger, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 500
+  miary:
+  - {jednostka: szt, gramy: 120, opis: 1 cheeseburger, zrodlo: 'szacunek DietBot: typowa porcja w lokalach i sklepach w Rumunii/Polsce
+      (±20%)'}
+  na_100g: {kcal: 202, bialko: 10.6, tluszcz: 9.1, weglowodany: 18.1, blonnik: 1.5, cukry: 3.9, kwasy_nasycone: 3.54, 
+      sol: 1.5, alkohol: 0.01, kwasy_organiczne: 0.7, poliole: 0.01}
+  uwagi: 'Jedzenie na wynos: wartości BLS dla typowego produktu — w konkretnym lokalu mogą różnić się o ok. 20%.'
+  tagi: [na_wynos]
+- id: kebab_z_kurczakiem_w_picie
+  nazwa: Kebab z kurczakiem w chlebku (z budki)
+  aliasy: [kebab, kebab z kurczakiem, döner kebab, kebab w bułce]
+  kategoria: dania_gotowe
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: Y921162, wersja: 4.0 (2025), nazwa_oryginalna: 'Döner Kebab, Fladenbrot gefüllt mit Grillfleisch
+      (Geflügel), Rohkost und Sauce | Doner kebab, flatbread filled with grilled poultry, salad and sauce', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 500
+  miary:
+  - {jednostka: szt, gramy: 400, opis: 1 kebab w chlebku, zrodlo: 'szacunek DietBot: typowa porcja w lokalach i sklepach w
+      Rumunii/Polsce (±20%)'}
+  na_100g: {kcal: 199, bialko: 13.08, tluszcz: 7.9, weglowodany: 18, blonnik: 1.6, cukry: 1.1, kwasy_nasycone: 1.3, sol: 
+      1.58, kwasy_organiczne: 0.2}
+  uwagi: 'Jedzenie na wynos: wartości BLS dla typowego produktu — w konkretnym lokalu mogą różnić się o ok. 20%.'
+  tagi: [na_wynos]
+- id: hot_dog_z_budki
+  nazwa: Hot dog (z budki lub stacji)
+  aliasy: [hot dog, hot-dog, hotdog ze stacji]
+  kategoria: dania_gotowe
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: Y021512, wersja: 4.0 (2025), nazwa_oryginalna: Hot Dog | Hot Dog, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 400
+  miary:
+  - {jednostka: szt, gramy: 130, opis: 1 hot dog, zrodlo: 'szacunek DietBot: typowa porcja w lokalach i sklepach w Rumunii/Polsce
+      (±20%)'}
+  na_100g: {kcal: 231, bialko: 9.61, tluszcz: 13.28, weglowodany: 17.15, blonnik: 1.7, cukry: 2.97, kwasy_nasycone: 2.58,
+    sol: 2, kwasy_organiczne: 0.26}
+  uwagi: 'Jedzenie na wynos: wartości BLS dla typowego produktu — w konkretnym lokalu mogą różnić się o ok. 20%.'
+  tagi: [na_wynos]
+- id: zapiekanka_z_szynka_i_serem
+  nazwa: Zapiekanka z szynką i serem (z budki)
+  aliasy: [zapiekanka z budki, zapiekanka z szynką, bagietka zapiekana z serem]
+  kategoria: dania_gotowe
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: X987112, wersja: 4.0 (2025), nazwa_oryginalna: Pizzabaguette mit Kochschinken und Käse 
+      überbacken | Pizza baguette with boiled ham and cheese gratinated, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 450
+  miary:
+  - {jednostka: szt, gramy: 280, opis: połówka bagietki zapiekana, zrodlo: 'szacunek DietBot: typowa porcja w lokalach i sklepach
+      w Rumunii/Polsce (±20%)'}
+  na_100g: {kcal: 222, bialko: 15.7, tluszcz: 10.03, weglowodany: 16, blonnik: 1.4, cukry: 2, kwasy_nasycone: 6.18, sol: 
+      1.19, kwasy_organiczne: 0.61, poliole: 0}
+  uwagi: 'Jedzenie na wynos: wartości BLS dla typowego produktu — w konkretnym lokalu mogą różnić się o ok. 20%.'
+  tagi: [na_wynos]
+- id: sushi_z_lososiem
+  nazwa: Sushi z łososiem (zamówione)
+  aliasy: [sushi, sushi z łososiem, maki z łososiem, zestaw sushi]
+  kategoria: dania_gotowe
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: Y627112, wersja: 4.0 (2025), nazwa_oryginalna: Sushi mit Lachs | Sushi with salmon, pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 500
+  miary:
+  - {jednostka: kawałek, gramy: 28, opis: 1 kawałek maki/nigiri, zrodlo: 'szacunek DietBot: typowa porcja w lokalach i sklepach
+      w Rumunii/Polsce (±20%)'}
+  na_100g: {kcal: 126, bialko: 7.3, tluszcz: 3.19, weglowodany: 16.4, blonnik: 0.8, cukry: 0.38, kwasy_nasycone: 0.66, 
+      sol: 0.15, alkohol: 0, kwasy_organiczne: 0.24}
+  uwagi: 'Jedzenie na wynos: wartości BLS dla typowego produktu — w konkretnym lokalu mogą różnić się o ok. 20%.'
+  tagi: [na_wynos]
+- id: sajgonki_smazone
+  nazwa: Sajgonki z warzywami i mięsem (smażone)
+  aliasy: [sajgonki, spring rolls, sajgonki z mięsem]
+  kategoria: dania_gotowe
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: X922163, wersja: 4.0 (2025), nazwa_oryginalna: 'Frühlingsrollen gefüllt mit Gemüse, Schweinefleisch
+      und Krabben, frittiert | Spring rolls filled with vegetables, pork and shrimps, deep-fried', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 350
+  miary:
+  - {jednostka: szt, gramy: 70, opis: 1 sajgonka, zrodlo: 'szacunek DietBot: typowa porcja w lokalach i sklepach w Rumunii/Polsce
+      (±20%)'}
+  na_100g: {kcal: 342, bialko: 11.4, tluszcz: 20.04, weglowodany: 27.7, blonnik: 2.7, cukry: 1.4, kwasy_nasycone: 2.64, 
+      sol: 0.53, alkohol: 0.01, kwasy_organiczne: 0.09, poliole: 0.02}
+  uwagi: 'Jedzenie na wynos: wartości BLS dla typowego produktu — w konkretnym lokalu mogą różnić się o ok. 20%.'
+- id: lasagne_gotowa
+  nazwa: Lasagne bolognese (gotowa, upieczona)
+  aliasy: [lasagne gotowa, lasagne z restauracji, lasagna bolognese]
+  kategoria: dania_gotowe
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: X730033, wersja: 4.0 (2025), nazwa_oryginalna: 'Lasagne al forno, Teigwaren geschichtet mit Bechamel-
+      und Bologneser Sauce, mit Käse überbacken | Lasagna al forno (pasta sheets with Bechamel- and Bolognese sauce, gratinated
+      with cheese)', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 500
+  na_100g: {kcal: 197, bialko: 9.69, tluszcz: 13.3, weglowodany: 8.9, blonnik: 1.2, cukry: 3.1, kwasy_nasycone: 4.5, sol: 
+      0.64, kwasy_organiczne: 0.23}
+  uwagi: 'Jedzenie na wynos: wartości BLS dla typowego produktu — w konkretnym lokalu mogą różnić się o ok. 20%.'
+- id: burrito_z_wolowina
+  nazwa: Burrito z wołowiną i serem (gotowe)
+  aliasy: [burrito, burrito z wołowiną, burrito z mięsem]
+  kategoria: dania_gotowe
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: X9A4000, wersja: 4.0 (2025), nazwa_oryginalna: 'Burrito gefüllt mit Gemüse, Rinderhackfleisch und
+      Käse | Burrito filled with vegetables, beef mince and cheese', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 450
+  miary:
+  - {jednostka: szt, gramy: 250, opis: 1 burrito, zrodlo: 'szacunek DietBot: typowa porcja w lokalach i sklepach w Rumunii/Polsce
+      (±20%)'}
+  na_100g: {kcal: 289, bialko: 11.5, tluszcz: 11, weglowodany: 35, blonnik: 1.8, cukry: 2.2, kwasy_nasycone: 4, sol: 
+      1.41, kwasy_organiczne: 0.3, poliole: 0.01}
+  uwagi: 'Jedzenie na wynos: wartości BLS dla typowego produktu — w konkretnym lokalu mogą różnić się o ok. 20%.'
+- id: frytki_smazone
+  nazwa: Frytki smażone (porcja z budki)
+  aliasy: [frytki z budki, frytki smażone, frytki z fast foodu]
+  kategoria: dania_gotowe
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: K130492, wersja: 4.0 (2025), nazwa_oryginalna: 'Pommes frites tiefgefroren, frittiert | Potato
+      chips/french fries, deep-frozen, deep-fried', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 300
+  na_100g: {kcal: 203, bialko: 2.9, tluszcz: 9.04, weglowodany: 25.94, blonnik: 3.24, cukry: 0.24, kwasy_nasycone: 0.7, 
+      sol: 0.07}
+  uwagi: 'Jedzenie na wynos: wartości BLS dla typowego produktu — w konkretnym lokalu mogą różnić się o ok. 20%.'
+  tagi: [na_wynos]
+- id: paluszki_rybne_pieczone
+  nazwa: Paluszki rybne panierowane (upieczone)
+  aliasy: [paluszki rybne, paluszki rybne z piekarnika, fish fingers]
+  kategoria: dania_gotowe
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: T930162, wersja: 4.0 (2025), nazwa_oryginalna: 'Fischstäbchen (Alaska-Seelachs) paniert, tiefgefroren,
+      gebraten ohne Fett (Ofen) | Fish fingers (Alaska pollock) breaded, deep-frozen, fried without fat (oven)', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 300
+  miary:
+  - {jednostka: szt, gramy: 30, opis: 1 paluszek rybny, zrodlo: 'szacunek DietBot: typowa porcja w lokalach i sklepach w Rumunii/Polsce
+      (±20%)'}
+  na_100g: {kcal: 206, bialko: 13.75, tluszcz: 9.33, weglowodany: 16.32, blonnik: 0.91, cukry: 1.09, kwasy_nasycone: 
+      1.34, sol: 0.71, kwasy_organiczne: 0.06, poliole: 0}
+  uwagi: Mrożone paluszki z mintaja upieczone w piekarniku bez tłuszczu (wartości po upieczeniu).
+- id: falafel_w_picie
+  nazwa: Falafel w chlebku pita (z budki)
+  aliasy: [falafel w picie, falafel w bułce, kebab z falafelem]
+  kategoria: dania_gotowe
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: Y9A1060, wersja: 4.0 (2025), nazwa_oryginalna: 'Falafel frittiert, in Fladenbrot, vegetarisch gefüllt
+      | Falafel deep-fried, in flatbread, vegetarian filled', pobrano: '2026-09-13'}
+  krok_g: 10
+  max_porcja_g: 450
+  miary:
+  - {jednostka: szt, gramy: 300, opis: 1 porcja w chlebku, zrodlo: 'szacunek DietBot: typowa porcja w lokalach i sklepach
+      w Rumunii/Polsce (±20%)'}
+  na_100g: {kcal: 156, bialko: 5.4, tluszcz: 7.8, weglowodany: 14, blonnik: 2.8, cukry: 1.8, kwasy_nasycone: 2.3, sol: 
+      0.78, alkohol: 0, kwasy_organiczne: 0.8}
+  uwagi: 'Jedzenie na wynos: wartości BLS dla typowego produktu — w konkretnym lokalu mogą różnić się o ok. 20%.'
+  tagi: [na_wynos]
+- id: kmin_rzymski
+  nazwa: Kmin rzymski (kumin) mielony
+  aliasy: [kmin rzymski, kumin, kmin rzymski mielony, chimion]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: kminek
+  nazwa: Kminek
+  aliasy: [kminek, kminek cały, chimen]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: kurkuma
+  nazwa: Kurkuma mielona
+  aliasy: [kurkuma, turmeric, curcuma]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: papryka_ostra_mielona
+  nazwa: Papryka ostra mielona / chili w proszku
+  aliasy: [papryka ostra, chili w proszku, chili mielone, pieprz cayenne]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: chili_platki
+  nazwa: Płatki chili
+  aliasy: [płatki chili, chili suszone, pepperoncino]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: papryka_wedzona
+  nazwa: Papryka wędzona mielona
+  aliasy: [papryka wędzona, wędzona papryka, boia afumată]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: imbir_mielony
+  nazwa: Imbir mielony
+  aliasy: [imbir mielony, imbir suszony]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: galka_muszkatolowa
+  nazwa: Gałka muszkatołowa
+  aliasy: [gałka muszkatołowa, muszkat]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: ziele_angielskie
+  nazwa: Ziele angielskie
+  aliasy: [ziarna ziela angielskiego]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: tymianek
+  nazwa: Tymianek suszony
+  aliasy: [tymianek, tymianek suszony, cimbru]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: bazylia_suszona
+  nazwa: Bazylia suszona
+  aliasy: [suszona bazylia]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: garam_masala
+  nazwa: Garam masala
+  aliasy: [garam masala, przyprawa garam masala]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: kolendra_mielona
+  nazwa: Kolendra mielona (nasiona)
+  aliasy: [kolendra mielona, nasiona kolendry]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: przyprawa_do_gyrosa
+  nazwa: Przyprawa do gyrosa
+  aliasy: [przyprawa do gyrosa, przyprawa gyros]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: zatar
+  nazwa: Za'atar (mieszanka ziół z sezamem)
+  aliasy: [zatar, zaatar, za'atar]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: sumak
+  nazwa: Sumak
+  aliasy: [sumak, sumac]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: ocet_jablkowy
+  nazwa: Ocet jabłkowy
+  aliasy: [ocet jabłkowy, ocet, oțet de mere]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: cukier_waniliowy
+  nazwa: Cukier wanilinowy / ekstrakt waniliowy
+  aliasy: [wanilia, cukier waniliowy, cukier wanilinowy, ekstrakt waniliowy]
+  kategoria: przyprawy
+  stan: suchy
+  zrodlo: {baza: recznie, uwagi: przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  pomijalny: true
+  krok_g: 1
+- id: bialka_jaj
+  nazwa: Białka jaj kurzych (surowe)
+  aliasy: [białka jaj, białko jaja, białka jajek, płynne białko jaj, albuș de ou]
+  kategoria: jaja
+  stan: surowy
+  zrodlo: {baza: BLS, kod: E113100, wersja: 4.0 (2025), nazwa_oryginalna: 'Hühnerei Eiklar, roh | Chicken egg white, raw',
+    pobrano: '2026-09-14'}
+  krok_g: 10
+  max_porcja_g: 300
+  miary:
+  - {jednostka: szt, gramy: 33, opis: białko z 1 jajka rozmiar M, zrodlo: 'USDA FDC 172183: białko jaja dużego ok. 33 g'}
+  na_100g: {kcal: 42, bialko: 9.9, tluszcz: 0.03, weglowodany: 0.41, blonnik: 0, cukry: 0.41, kwasy_nasycone: 0, sol: 
+      0.46}
+  uwagi: Do chudych omletów i jajecznic; w Rumunii także jako płynne białko w kartonie (albuș lichid).
+- id: ser_zolty_light
+  nazwa: Ser żółty light (gouda 30% tłuszczu w s.m.)
+  aliasy: [ser żółty light, gouda light, ser gouda light, cașcaval light]
+  kategoria: sery
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M402400, wersja: 4.0 (2025), nazwa_oryginalna: Gouda mind. 30 % Fett i. Tr. | Gouda cheese 
+      min. 30 % fat in dry matter, pobrano: '2026-09-14'}
+  krok_g: 5
+  max_porcja_g: 60
+  miary:
+  - {jednostka: plaster, gramy: 15, opis: 1 plaster sera żółtego, zrodlo: 'szacunek DietBot: typowy plaster z opakowania'}
+  na_100g: {kcal: 266, bialko: 29.59, tluszcz: 16, weglowodany: 0, blonnik: 0, cukry: 0, kwasy_nasycone: 8.4, sol: 2.33, 
+      kwasy_organiczne: 1.1}
+- id: pieczywo_chrupkie
+  nazwa: Pieczywo chrupkie żytnie pełnoziarniste
+  aliasy: [pieczywo chrupkie, chleb chrupki, wasa, pâine crocantă]
+  kategoria: pieczywo
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: B6A2100, wersja: 4.0 (2025), nazwa_oryginalna: Roggenvollkornknäckebrot | Wholemeal rye 
+      crispbread, pobrano: '2026-09-14'}
+  krok_g: 5
+  max_porcja_g: 80
+  miary:
+  - {jednostka: kromka, gramy: 10, opis: 1 kromka pieczywa chrupkiego, zrodlo: 'szacunek DietBot: typowa kromka ok. 10 g'}
+  na_100g: {kcal: 327, bialko: 9.44, tluszcz: 1.39, weglowodany: 59.32, blonnik: 19.91, cukry: 1.91, kwasy_nasycone: 
+      0.15, sol: 1.33}
+- id: bataty
+  nazwa: Bataty (surowe, obrane)
+  aliasy: [bataty, batat, słodkie ziemniaki, cartofi dulci]
+  kategoria: ziemniaki
+  stan: surowy
+  zrodlo: {baza: BLS, kod: K420100, wersja: 4.0 (2025), nazwa_oryginalna: 'Batate/Süßkartoffel, roh | Batata/sweet potato,
+      raw', pobrano: '2026-09-14'}
+  krok_g: 10
+  max_porcja_g: 400
+  miary:
+  - {jednostka: szt, gramy: 250, opis: 1 średni batat, zrodlo: 'USDA FDC: średni batat ok. 130–250 g części jadalnej'}
+  na_100g: {kcal: 119, bialko: 1.63, tluszcz: 0.6, weglowodany: 25.2, blonnik: 3.14, cukry: 5.5, kwasy_nasycone: 0, sol: 
+      0.01, kwasy_organiczne: 0, poliole: 0.27}
+- id: poledwica_lososiowa
+  nazwa: Polędwica łososiowa (chuda wędlina wieprzowa)
+  aliasy: [polędwica łososiowa, polędwica sopocka, chuda polędwica, mușchi file afumat]
+  kategoria: wedliny
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: W443000, wersja: 4.0 (2025), nazwa_oryginalna: 'Lachsschinken, Rohpökelware, geräuchert | Pork
+      loin lean rolled, raw cured, smoked', pobrano: '2026-09-14'}
+  krok_g: 10
+  max_porcja_g: 150
+  miary:
+  - {jednostka: plaster, gramy: 12, opis: 1 plaster wędliny, zrodlo: szacunek DietBot}
+  na_100g: {kcal: 123, bialko: 24.43, tluszcz: 2.08, weglowodany: 0.76, blonnik: 0, cukry: 0.74, kwasy_nasycone: 0.71, 
+      sol: 3.84, kwasy_organiczne: 1.27, poliole: 0.02}
+- id: jogurt_owocowy
+  nazwa: Jogurt owocowy (truskawkowy, brzoskwiniowy)
+  aliasy: [jogurt owocowy, jogurt truskawkowy, jogurt brzoskwiniowy, jogurt z owocami, iaurt cu fructe]
+  kategoria: nabial
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M241300, wersja: 4.0 (2025), nazwa_oryginalna: 'Joghurt mild, max. 3,8 % Fett, mit Fruchtzubereitung,
+      gesüßt | Yogurt mild, max. 3.8 % fat, with fruit preparation, sweetened', pobrano: '2026-09-14'}
+  krok_g: 10
+  max_porcja_g: 400
+  miary:
+  - {jednostka: kubek, gramy: 150, opis: 1 kubek jogurtu owocowego, zrodlo: 'szacunek DietBot: typowe opakowanie w sklepie'}
+  na_100g: {kcal: 96, bialko: 3.01, tluszcz: 2.96, weglowodany: 13, blonnik: 1.15, cukry: 12.1, kwasy_nasycone: 1.92, 
+      sol: 0.1, kwasy_organiczne: 1.1, poliole: 0.08}
+- id: jogurt_owocowy_light
+  nazwa: Jogurt owocowy light (do 1% tłuszczu)
+  aliasy: [jogurt owocowy light, jogurt owocowy 0%, jogurt light, iaurt light cu fructe]
+  kategoria: nabial
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M241100, wersja: 4.0 (2025), nazwa_oryginalna: 'Joghurt mild, aus entrahmter Milch, max. 1 % Fett,
+      mit Fruchtzubereitung, gesüßt | Yogurt mild, max. 1 % fat, with fruit preparation, sweetened', pobrano: '2026-09-14'}
+  krok_g: 10
+  max_porcja_g: 400
+  miary:
+  - {jednostka: kubek, gramy: 150, opis: 1 kubek jogurtu, zrodlo: 'szacunek DietBot: typowe opakowanie w sklepie'}
+  na_100g: {kcal: 75, bialko: 3.45, tluszcz: 0.42, weglowodany: 13.26, blonnik: 0.32, cukry: 12.25, kwasy_nasycone: 0.15,
+    sol: 0.13, kwasy_organiczne: 1.35, poliole: 0.11}
+- id: jogurt_waniliowy
+  nazwa: Jogurt waniliowy
+  aliasy: [jogurt waniliowy, jogurt o smaku waniliowym, iaurt cu vanilie]
+  kategoria: nabial
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M2R8300, wersja: 4.0 (2025), nazwa_oryginalna: 'Joghurt mind. 3,5 % Fett, mit Vanillezubereitung,
+      gesüßt | Yogurt min. 3.5 % fat, with vanilla preparation, sweetened', pobrano: '2026-09-14'}
+  krok_g: 10
+  max_porcja_g: 400
+  miary:
+  - {jednostka: kubek, gramy: 150, opis: 1 kubek jogurtu, zrodlo: 'szacunek DietBot: typowe opakowanie w sklepie'}
+  na_100g: {kcal: 94, bialko: 3.51, tluszcz: 3.05, weglowodany: 12.5, blonnik: 0.01, cukry: 11.64, kwasy_nasycone: 2, 
+      sol: 0.09, kwasy_organiczne: 0.94}
+- id: jogurt_pitny_owocowy
+  nazwa: Jogurt pitny owocowy
+  aliasy: [jogurt pitny, jogurt do picia, napój jogurtowy, iaurt de băut]
+  kategoria: nabial
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M2L2300, wersja: 4.0 (2025), nazwa_oryginalna: 'Trinkjoghurt mind. 3,5 % Fett, mit Fruchtzubereitung,
+      gesüßt | Yogurt drink min. 3.5 % fat, with fruit preparation, sweetened', pobrano: '2026-09-14'}
+  krok_g: 10
+  max_porcja_g: 500
+  gestosc_g_ml: 1.04
+  miary:
+  - {jednostka: butelka, gramy: 260, opis: 1 butelka 250 ml, zrodlo: 'szacunek DietBot: typowe opakowanie w sklepie'}
+  na_100g: {kcal: 96, bialko: 3.01, tluszcz: 2.96, weglowodany: 13, blonnik: 1.15, cukry: 12.1, kwasy_nasycone: 1.9, sol: 
+      0.1, kwasy_organiczne: 1.1, poliole: 0.08}
+- id: serek_homogenizowany_waniliowy
+  nazwa: Serek homogenizowany waniliowy
+  aliasy: [serek homogenizowany, serek waniliowy, serek homogenizowany waniliowy, desert de brânză cu vanilie]
+  kategoria: sery
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: M8C3300, wersja: 4.0 (2025), nazwa_oryginalna: 'Speisequarkzubereitung mind. 20 % Fett i. Tr.,
+      mit Vanillezubereitung, gesüßt | Quark preparation min. 20 % fat in dry matter, with vanilla preparation, sweetened',
+    pobrano: '2026-09-14'}
+  krok_g: 10
+  max_porcja_g: 300
+  miary:
+  - {jednostka: kubek, gramy: 150, opis: 1 kubek serka, zrodlo: 'szacunek DietBot: typowe opakowanie w sklepie'}
+  na_100g: {kcal: 114, bialko: 7.28, tluszcz: 3.66, weglowodany: 12.32, blonnik: 0.02, cukry: 10.51, kwasy_nasycone: 
+      2.12, sol: 0.08, kwasy_organiczne: 0.82}
+- id: budyn_czekoladowy
+  nazwa: Budyń czekoladowy na mleku 1,5%
+  aliasy: [budyń czekoladowy, budyń, pudding czekoladowy, budincă de ciocolată]
+  kategoria: slodycze
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: Y8A4100, wersja: 4.0 (2025), nazwa_oryginalna: 'Schokoladenpudding, Flammeri, zubereitet aus Pulver
+      und Milch 1,5 % Fett | Chocolate pudding made from powder with milk 1.5 % fat', pobrano: '2026-09-14'}
+  krok_g: 10
+  max_porcja_g: 300
+  miary:
+  - {jednostka: miseczka, gramy: 150, opis: 1 miseczka budyniu, zrodlo: szacunek DietBot}
+  na_100g: {kcal: 100, bialko: 3.58, tluszcz: 1.6, weglowodany: 17.6, blonnik: 0.46, cukry: 12.21, kwasy_nasycone: 1, 
+      sol: 0.15, kwasy_organiczne: 0.07}
+  uwagi: 'Budyń z proszku ugotowany na mleku 1,5% (BLS: zubereitet aus Pulver und Milch 1,5 % Fett).'
+- id: wafle_ryzowe
+  nazwa: Wafle ryżowe
+  aliasy: [wafle ryżowe, wafel ryżowy, wafle z ryżu, rondele de orez]
+  kategoria: pieczywo
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: C532700, wersja: 4.0 (2025), nazwa_oryginalna: Reiswaffeln ungesalzen | Puffed rice waffles 
+      unsalted, pobrano: '2026-09-14'}
+  krok_g: 5
+  max_porcja_g: 60
+  miary:
+  - {jednostka: szt, gramy: 9, opis: 1 wafel ryżowy, zrodlo: 'szacunek DietBot: typowe opakowanie w sklepie'}
+  na_100g: {kcal: 371, bialko: 8, tluszcz: 2.42, weglowodany: 77.47, blonnik: 3.63, cukry: 0.42, kwasy_nasycone: 0.42, 
+      sol: 0.01}
+- id: lody_czekoladowe
+  nazwa: Lody czekoladowe
+  aliasy: [lody czekoladowe, înghețată de ciocolată]
+  kategoria: slodycze
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: S242000, wersja: 4.0 (2025), nazwa_oryginalna: Schokoladeneis | Chocolate ice cream, pobrano: '2026-09-14'}
+  krok_g: 10
+  max_porcja_g: 250
+  miary:
+  - {jednostka: gałka, gramy: 50, opis: 1 gałka lodów, zrodlo: 'szacunek DietBot: gałka ok. 50 g'}
+  na_100g: {kcal: 232, bialko: 3.62, tluszcz: 10.48, weglowodany: 29.25, blonnik: 2.41, cukry: 25.11, kwasy_nasycone: 
+      4.43, sol: 0.09, kwasy_organiczne: 0.51, poliole: 0}
+- id: lody_na_patyku
+  nazwa: Lody na patyku w polewie czekoladowej
+  aliasy: [lody na patyku, lody w polewie, înghețată pe băț]
+  kategoria: slodycze
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: S241500, wersja: 4.0 (2025), nazwa_oryginalna: 'Speiseeis Vanille, überzogen mit Schokolade | Vanilla
+      ice cream, covered with chocolate', pobrano: '2026-09-14'}
+  krok_g: 10
+  max_porcja_g: 200
+  miary:
+  - {jednostka: szt, gramy: 70, opis: 1 lód na patyku, zrodlo: 'szacunek DietBot: typowe opakowanie w sklepie'}
+  na_100g: {kcal: 292, bialko: 3.67, tluszcz: 16.3, weglowodany: 31.75, blonnik: 1.2, cukry: 28.21, kwasy_nasycone: 
+      10.67, sol: 0.13, kwasy_organiczne: 0.4}
+- id: popcorn_solony
+  nazwa: Popcorn solony
+  aliasy: [popcorn, prażona kukurydza, floricele de porumb]
+  kategoria: przekaski
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: C518000, wersja: 4.0 (2025), nazwa_oryginalna: Popcorn gesalzen | Popcorn salty, pobrano: '2026-09-14'}
+  krok_g: 5
+  max_porcja_g: 120
+  na_100g: {kcal: 395, bialko: 7.53, tluszcz: 14.71, weglowodany: 54.67, blonnik: 6.7, cukry: 1.21, kwasy_nasycone: 6.06,
+    sol: 1.54}
+- id: chipsy_tortilla
+  nazwa: Chipsy tortilla (nachosy)
+  aliasy: [nachosy, chipsy tortilla, chipsy kukurydziane, tortilla chips, nachos]
+  kategoria: przekaski
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: C546000, wersja: 4.0 (2025), nazwa_oryginalna: Tortillachips (Nachos) | Tortilla chips 
+      (Nachos), pobrano: '2026-09-14'}
+  krok_g: 5
+  max_porcja_g: 150
+  na_100g: {kcal: 471, bialko: 5.96, tluszcz: 21.2, weglowodany: 61.9, blonnik: 4.4, cukry: 0.6, kwasy_nasycone: 9.73, 
+      sol: 0.82}
+- id: paluszki_solone
+  nazwa: Paluszki słone
+  aliasy: [paluszki, paluszki słone, sticksuri]
+  kategoria: przekaski
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: D064000, wersja: 4.0 (2025), nazwa_oryginalna: Salzbrezeln/Salzstangen (Laugendauergebäck) | 
+      Salted pretzels/pretzel sticks (snack), pobrano: '2026-09-14'}
+  krok_g: 5
+  max_porcja_g: 150
+  na_100g: {kcal: 389, bialko: 11.54, tluszcz: 4.3, weglowodany: 73.72, blonnik: 4.17, cukry: 2.41, kwasy_nasycone: 0.42,
+    sol: 4.03, kwasy_organiczne: 0.2, poliole: 0.03}
+- id: baton_czekoladowy
+  nazwa: Baton czekoladowy z karmelem i orzeszkami
+  aliasy: [baton, batonik, baton czekoladowy, baton cu caramel și arahide]
+  kategoria: slodycze
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: S581100, wersja: 4.0 (2025), nazwa_oryginalna: 'Milchschokoladen-Riegel gefüllt mit Karamell, gerösteten
+      Erdnüssen und Candycreme | Milk chocolate bar filled with caramel, roasted peanuts and soft nougat', pobrano: '2026-09-14'}
+  krok_g: 5
+  max_porcja_g: 150
+  miary:
+  - {jednostka: szt, gramy: 50, opis: 1 baton, zrodlo: 'szacunek DietBot: typowe opakowanie w sklepie'}
+  na_100g: {kcal: 494, bialko: 9.08, tluszcz: 25.48, weglowodany: 54.96, blonnik: 4.22, cukry: 45.54, kwasy_nasycone: 
+      14.84, sol: 0.65, kwasy_organiczne: 0.27, poliole: 0.32}
+- id: zelki_owocowe
+  nazwa: Żelki owocowe
+  aliasy: [żelki, żelki owocowe, jeleuri]
+  kategoria: slodycze
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: S361000, wersja: 4.0 (2025), nazwa_oryginalna: Fruchtgummi (Gummibonbon) | Gum drops with 
+      fruit essence, pobrano: '2026-09-14'}
+  krok_g: 5
+  max_porcja_g: 150
+  na_100g: {kcal: 312, bialko: 4.8, tluszcz: 0.3, weglowodany: 70.7, blonnik: 1.01, cukry: 56.7, kwasy_nasycone: 0, sol: 
+      0.14, kwasy_organiczne: 0.27, poliole: 0.02}
+- id: drozdzowka_z_kruszonka
+  nazwa: Drożdżówka z kruszonką
+  aliasy: [drożdżówka, drożdżówka z kruszonką, ciasto drożdżowe z kruszonką, cozonac cu crumble]
+  kategoria: slodycze
+  stan: gotowy_do_jedzenia
+  zrodlo: {baza: BLS, kod: D461500, wersja: 4.0 (2025), nazwa_oryginalna: Streuselkuchen (Hefeteig) | Crumb cake (yeast 
+      dough), pobrano: '2026-09-14'}
+  krok_g: 10
+  max_porcja_g: 200
+  miary:
+  - {jednostka: szt, gramy: 90, opis: 1 drożdżówka, zrodlo: 'szacunek DietBot: typowe opakowanie w sklepie'}
+  na_100g: {kcal: 425, bialko: 7.27, tluszcz: 17.97, weglowodany: 57, blonnik: 2.93, cukry: 18.29, kwasy_nasycone: 11.1, 
+      sol: 0.06, kwasy_organiczne: 0.03}

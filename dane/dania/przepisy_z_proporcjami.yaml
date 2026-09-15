@@ -1,0 +1,210 @@
+# Przepisy wzorcowe z grupami składników. Grupa to jedna masa w przepisie (ciasto, panierka, masa mielona, farsz,
+# surówka): silnik może zrobić jej więcej albo mniej, ale udział każdego składnika w masie zostaje jak w "typowo_g"
+# (± tolerancja, domyślnie 5%, plus jeden krok wagi na zaokrąglenie). Weryfikator sprawdza to niezależnie.
+
+- id: nalesniki_z_twarogiem_i_miodem
+  nazwa: Naleśniki z twarogiem i miodem
+  opis: Cienkie naleśniki na mleku z farszem z twarogu, jogurtu i miodu, z cynamonem.
+  posilki: [kolacja]
+  kuchnia: polska
+  tagi: [slodkie, na_cieplo]
+  skladniki:
+    - {produkt: maka_pszenna, rola: weglowodany, porcjowanie: z_garnka, typowo_g: 55}
+    - {produkt: mleko_1_5, rola: nabial, porcjowanie: z_garnka, typowo_g: 130}
+    - {produkt: jajko_kurze, rola: dodatek, porcjowanie: z_garnka, typowo_g: 30}
+    - {produkt: olej_rzepakowy, rola: tluszcz, porcjowanie: z_garnka, typowo_g: 5}
+    - {produkt: twarog_poltlusty, rola: bialko, porcjowanie: z_garnka, typowo_g: 160}
+    - {produkt: jogurt_naturalny_1_5, rola: nabial, porcjowanie: z_garnka, typowo_g: 30}
+    - {produkt: miod, rola: dodatek, porcjowanie: z_garnka, typowo_g: 10}
+    - {produkt: cynamon, rola: przyprawa, typowo_g: 1}
+  grupy:
+    - {nazwa: ciasto naleśnikowe, skladniki: [maka_pszenna, mleko_1_5, jajko_kurze, olej_rzepakowy]}
+    - {nazwa: farsz twarogowy, skladniki: [twarog_poltlusty, jogurt_naturalny_1_5, miod]}
+  przygotowanie:
+    - Mąkę, mleko, jajko i połowę oleju zmiksuj na gładkie ciasto i odstaw na 10 minut.
+    - Rozgrzej patelnię, przetrzyj ją resztą oleju i smaż cienkie naleśniki z obu stron.
+    - Twaróg rozgnieć widelcem z jogurtem, miodem i cynamonem.
+    - Naleśniki posmaruj farszem i zwiń w rulony albo złóż w trójkąty.
+  czas_min: 30
+  zrodlo: DietBot — przepis wzorcowy z proporcjami
+  status: zatwierdzone
+
+- id: nalesniki_z_kurczakiem_i_szpinakiem
+  nazwa: Naleśniki z kurczakiem i szpinakiem zapiekane z mozzarellą
+  opis: Naleśniki nadziewane kurczakiem ze szpinakiem w sosie śmietanowym, zapieczone z mozzarellą.
+  posilki: [obiad]
+  kuchnia: polska
+  tagi: [na_cieplo]
+  skladniki:
+    - {produkt: maka_pszenna, rola: weglowodany, porcjowanie: z_garnka, typowo_g: 60}
+    - {produkt: mleko_1_5, rola: nabial, porcjowanie: z_garnka, typowo_g: 150}
+    - {produkt: jajko_kurze, rola: dodatek, porcjowanie: z_garnka, typowo_g: 30}
+    - {produkt: olej_rzepakowy, rola: tluszcz, porcjowanie: z_garnka, typowo_g: 5}
+    - {produkt: piers_z_kurczaka, rola: bialko, porcjowanie: z_garnka, typowo_g: 100}
+    - {produkt: szpinak, rola: warzywa, porcjowanie: z_garnka, typowo_g: 100}
+    - {produkt: smietana_10, rola: sos, porcjowanie: z_garnka, typowo_g: 30}
+    - {produkt: oliwa_z_oliwek, rola: tluszcz, porcjowanie: z_garnka, typowo_g: 5}
+    - {produkt: mozzarella_light, rola: dodatek, porcjowanie: z_garnka, typowo_g: 40}
+    - {produkt: czosnek, rola: przyprawa, typowo_g: 3}
+    - {produkt: sol, rola: przyprawa, typowo_g: 1}
+    - {produkt: pieprz_czarny, rola: przyprawa, typowo_g: 1}
+  grupy:
+    - {nazwa: ciasto naleśnikowe, skladniki: [maka_pszenna, mleko_1_5, jajko_kurze, olej_rzepakowy]}
+  przygotowanie:
+    - Mąkę, mleko, jajko i olej zmiksuj na gładkie ciasto i usmaż cienkie naleśniki.
+    - Kurczaka pokrój w kostkę i podsmaż na oliwie z czosnkiem, solą i pieprzem.
+    - Dodaj szpinak i śmietanę, duś, aż szpinak zmięknie.
+    - Nałóż farsz na naleśniki, zwiń je, posyp startą mozzarellą i zapiecz 10 minut w 200°C.
+  czas_min: 40
+  zrodlo: DietBot — przepis wzorcowy z proporcjami
+  status: zatwierdzone
+
+- id: kotlet_schabowy_z_ziemniakami_i_buraczkami
+  nazwa: Kotlet schabowy z ziemniakami i buraczkami
+  opis: Klasyczny schabowy w panierce z bułki tartej, z gotowanymi ziemniakami z koperkiem i buraczkami.
+  posilki: [obiad]
+  kuchnia: polska
+  tagi: [na_cieplo]
+  skladniki:
+    - {produkt: schab, rola: bialko, typowo_g: 140}
+    - {produkt: jajko_kurze, rola: dodatek, typowo_g: 15}
+    - {produkt: bulka_tarta, rola: dodatek, typowo_g: 20}
+    - {produkt: maka_pszenna, rola: dodatek, typowo_g: 8}
+    - {produkt: olej_rzepakowy, rola: tluszcz, typowo_g: 10}
+    - {produkt: ziemniaki, rola: weglowodany, typowo_g: 300}
+    - {produkt: burak, rola: warzywa, typowo_g: 150}
+    - {produkt: sok_z_cytryny, rola: sos, typowo_g: 5}
+    - {produkt: koperek, rola: przyprawa, typowo_g: 3}
+    - {produkt: sol, rola: przyprawa, typowo_g: 2}
+    - {produkt: pieprz_czarny, rola: przyprawa, typowo_g: 1}
+  grupy:
+    - {nazwa: kotlet w panierce, skladniki: [schab, jajko_kurze, bulka_tarta, maka_pszenna]}
+  przygotowanie:
+    - Schab rozbij tłuczkiem na cienkie kotlety, posól i popieprz.
+    - Obtocz mięso kolejno w mące, roztrzepanym jajku i bułce tartej.
+    - Smaż na rozgrzanym oleju po 3–4 minuty z każdej strony.
+    - Ziemniaki ugotuj w osolonej wodzie i posyp koperkiem.
+    - Buraki ugotuj, zetrzyj na tarce i wymieszaj z sokiem z cytryny i szczyptą soli.
+  czas_min: 45
+  zrodlo: DietBot — przepis wzorcowy z proporcjami
+  status: zatwierdzone
+
+- id: kotlet_z_kurczaka_z_ziemniakami_i_mizeria
+  nazwa: Kotlet z kurczaka w panierce z ziemniakami i mizerią
+  opis: Pierś z kurczaka w chrupiącej panierce, ziemniaki z koperkiem i mizeria na jogurcie.
+  posilki: [obiad]
+  kuchnia: polska
+  tagi: [na_cieplo]
+  skladniki:
+    - {produkt: piers_z_kurczaka, rola: bialko, typowo_g: 150}
+    - {produkt: jajko_kurze, rola: dodatek, typowo_g: 15}
+    - {produkt: bulka_tarta, rola: dodatek, typowo_g: 20}
+    - {produkt: maka_pszenna, rola: dodatek, typowo_g: 8}
+    - {produkt: olej_rzepakowy, rola: tluszcz, typowo_g: 10}
+    - {produkt: ziemniaki, rola: weglowodany, typowo_g: 300}
+    - {produkt: ogorek, rola: warzywa, typowo_g: 150}
+    - {produkt: jogurt_naturalny_1_5, rola: sos, typowo_g: 60}
+    - {produkt: koperek, rola: przyprawa, typowo_g: 3}
+    - {produkt: sol, rola: przyprawa, typowo_g: 2}
+    - {produkt: pieprz_czarny, rola: przyprawa, typowo_g: 1}
+  grupy:
+    - {nazwa: kotlet w panierce, skladniki: [piers_z_kurczaka, jajko_kurze, bulka_tarta, maka_pszenna]}
+    - {nazwa: mizeria, skladniki: [ogorek, jogurt_naturalny_1_5]}
+  przygotowanie:
+    - Pierś przekrój na płaty, rozbij tłuczkiem, posól i popieprz.
+    - Obtocz mięso w mące, roztrzepanym jajku i bułce tartej, smaż na oleju po 4 minuty z każdej strony.
+    - Ziemniaki ugotuj w osolonej wodzie i posyp koperkiem.
+    - Ogórka pokrój w cienkie plasterki, wymieszaj z jogurtem, solą i odrobiną koperku.
+  czas_min: 40
+  zrodlo: DietBot — przepis wzorcowy z proporcjami
+  status: zatwierdzone
+
+- id: kotlety_mielone_z_ziemniakami_i_surowka_z_marchewki
+  nazwa: Kotlety mielone z ziemniakami i surówką z marchewki
+  opis: Domowe mielone z chudej wołowiny z cebulką, gotowane ziemniaki i surówka z marchewki z jabłkiem.
+  posilki: [obiad]
+  kuchnia: polska
+  tagi: [na_cieplo]
+  skladniki:
+    - {produkt: mieso_mielone_wolowe_chude, rola: bialko, typowo_g: 150}
+    - {produkt: bulka_tarta, rola: dodatek, typowo_g: 12}
+    - {produkt: jajko_kurze, rola: dodatek, typowo_g: 15}
+    - {produkt: cebula, rola: warzywa, typowo_g: 20}
+    - {produkt: olej_rzepakowy, rola: tluszcz, typowo_g: 8}
+    - {produkt: ziemniaki, rola: weglowodany, typowo_g: 280}
+    - {produkt: marchew, rola: warzywa, typowo_g: 120}
+    - {produkt: jablko, rola: owoce, typowo_g: 50}
+    - {produkt: sok_z_cytryny, rola: sos, typowo_g: 5}
+    - {produkt: koperek, rola: przyprawa, typowo_g: 3}
+    - {produkt: sol, rola: przyprawa, typowo_g: 2}
+    - {produkt: pieprz_czarny, rola: przyprawa, typowo_g: 1}
+  grupy:
+    - {nazwa: masa mielona, skladniki: [mieso_mielone_wolowe_chude, bulka_tarta, jajko_kurze, cebula]}
+    - {nazwa: surówka z marchewki, skladniki: [marchew, jablko, sok_z_cytryny]}
+  przygotowanie:
+    - Mięso wymieszaj z drobno posiekaną cebulą, jajkiem, solą i pieprzem, dodaj część bułki tartej.
+    - Uformuj kotlety, obtocz w reszcie bułki tartej i smaż na oleju po 5 minut z każdej strony.
+    - Ziemniaki ugotuj w osolonej wodzie i posyp koperkiem.
+    - Marchew i jabłko zetrzyj na tarce, wymieszaj z sokiem z cytryny.
+  czas_min: 45
+  zrodlo: DietBot — przepis wzorcowy z proporcjami
+  status: zatwierdzone
+
+- id: placki_ziemniaczane_z_lososiem_wedzonym
+  nazwa: Placki ziemniaczane z łososiem wędzonym i śmietaną
+  opis: Chrupiące placki ziemniaczane z cebulą, podane z łososiem wędzonym, śmietaną i koperkiem.
+  posilki: [obiad]
+  kuchnia: polska
+  tagi: [na_cieplo]
+  skladniki:
+    - {produkt: ziemniaki, rola: weglowodany, porcjowanie: z_garnka, typowo_g: 250}
+    - {produkt: cebula, rola: warzywa, porcjowanie: z_garnka, typowo_g: 30}
+    - {produkt: jajko_kurze, rola: dodatek, porcjowanie: z_garnka, typowo_g: 30}
+    - {produkt: maka_pszenna, rola: dodatek, porcjowanie: z_garnka, typowo_g: 15}
+    - {produkt: olej_rzepakowy, rola: tluszcz, typowo_g: 12}
+    - {produkt: losos_wedzony, rola: bialko, typowo_g: 120}
+    - {produkt: smietana_10, rola: sos, typowo_g: 40}
+    - {produkt: koperek, rola: przyprawa, typowo_g: 3}
+    - {produkt: sol, rola: przyprawa, typowo_g: 2}
+    - {produkt: pieprz_czarny, rola: przyprawa, typowo_g: 1}
+  grupy:
+    - {nazwa: masa na placki, skladniki: [ziemniaki, cebula, jajko_kurze, maka_pszenna]}
+  przygotowanie:
+    - Ziemniaki i cebulę zetrzyj na drobnej tarce, odciśnij nadmiar soku.
+    - Dodaj jajko, mąkę, sól i pieprz, wymieszaj na gładką masę.
+    - Nakładaj łyżką na rozgrzany olej i smaż placki na złoto z obu stron.
+    - Podawaj z łososiem wędzonym, śmietaną i koperkiem.
+  czas_min: 40
+  zrodlo: DietBot — przepis wzorcowy z proporcjami
+  status: zatwierdzone
+
+- id: kluski_slaskie_z_gulaszem_wolowym
+  nazwa: Kluski śląskie z gulaszem wołowym i surówką z kapusty
+  opis: Kluski z gotowanych ziemniaków i mąki ziemniaczanej, gęsty gulasz wołowy i surówka z białej kapusty.
+  posilki: [obiad]
+  kuchnia: polska
+  tagi: [na_cieplo]
+  skladniki:
+    - {produkt: ziemniaki, rola: weglowodany, porcjowanie: z_garnka, typowo_g: 200}
+    - {produkt: maka_ziemniaczana, rola: dodatek, porcjowanie: z_garnka, typowo_g: 40, max_g: 80}
+    - {produkt: wolowina_gulaszowa, rola: bialko, porcjowanie: z_garnka, typowo_g: 150}
+    - {produkt: cebula, rola: warzywa, porcjowanie: z_garnka, typowo_g: 50}
+    - {produkt: koncentrat_pomidorowy, rola: sos, porcjowanie: z_garnka, typowo_g: 15}
+    - {produkt: olej_rzepakowy, rola: tluszcz, porcjowanie: z_garnka, typowo_g: 8}
+    - {produkt: kapusta_biala, rola: warzywa, typowo_g: 100}
+    - {produkt: marchew, rola: warzywa, typowo_g: 50}
+    - {produkt: sok_z_cytryny, rola: sos, typowo_g: 5}
+    - {produkt: papryka_slodka_mielona, rola: przyprawa, typowo_g: 2}
+    - {produkt: sol, rola: przyprawa, typowo_g: 2}
+    - {produkt: pieprz_czarny, rola: przyprawa, typowo_g: 1}
+  grupy:
+    - {nazwa: ciasto na kluski, skladniki: [ziemniaki, maka_ziemniaczana]}
+    - {nazwa: surówka z kapusty, skladniki: [kapusta_biala, marchew, sok_z_cytryny]}
+  przygotowanie:
+    - Wołowinę pokrój w kostkę, obsmaż na oleju z cebulą i papryką, dodaj koncentrat i wodę, duś do miękkości (ok. 90 minut).
+    - Ziemniaki ugotuj, przeciśnij przez praskę i wystudź; wymieszaj z mąką ziemniaczaną i szczyptą soli.
+    - Formuj kulki, spłaszcz je i zrób palcem wgłębienie; gotuj w osolonej wodzie 2 minuty od wypłynięcia.
+    - Kapustę poszatkuj, marchew zetrzyj, wymieszaj z sokiem z cytryny i solą.
+  czas_min: 120
+  zrodlo: DietBot — przepis wzorcowy z proporcjami
+  status: zatwierdzone

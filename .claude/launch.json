@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dietbot",
+      "runtimeExecutable": "D:/bot dieta/.venv/Scripts/dietbot.exe",
+      "runtimeArgs": ["serwer", "--port", "8765", "--no-przegladarka", "--bez-telegrama"],
+      "port": 8765
+    },
+    {
+      "name": "dietbot-kopia-testowa",
+      "runtimeExecutable": "D:/bot dieta/.venv/Scripts/python.exe",
+      "runtimeArgs": ["-c", "import os, sys; os.environ['DIETBOT_HOME'] = r'C:/Users/user/AppData/Local/Temp/claude/D--bot-dieta/dfa8b18b-6b37-4d2c-94ff-ed41562944b4/scratchpad/ui_home'; sys.argv = ['dietbot', 'serwer', '--port', '8791', '--no-przegladarka', '--bez-telegrama']; from dietbot.cli import app; app()"],
+      "port": 8791
+    }
+  ]
+}

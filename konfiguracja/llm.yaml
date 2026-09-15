@@ -1,0 +1,17 @@
+# Ustawienia modelu językowego. Klucz API trzymamy w pliku .env (nie w tym pliku).
+# Model NIGDY nie liczy kalorii ani gramatur — wybiera dania, rozstrzyga nazwy, pisze teksty po polsku.
+
+dostawca: deepseek              # deepseek | openai | openrouter | inny zgodny z API OpenAI
+model: deepseek-flash           # DeepSeek V4.1 Flash
+adres_api: https://api.deepseek.com
+zmienna_klucza: DEEPSEEK_API_KEY
+temperatura: 0.3
+max_tokenow_odpowiedzi: 6000
+limit_czasu_s: 180
+proby: 3                        # ponowienia przy pustej odpowiedzi lub błędnym JSON
+
+budzet_usd: 5.0                 # twardy limit wydatków (sumowany z rejestru wyniki/llm_koszty.jsonl)
+ceny_usd_za_milion_tokenow:     # cennik szczytowy (bez zniżki nocnej) — liczymy ostrożnie
+  wejscie: 0.30
+  wejscie_z_cache: 0.006
+  wyjscie: 1.20

@@ -1,0 +1,163 @@
+# Śniadania. Gramatury "typowo_g" dla osoby referencyjnej 2000 kcal — silnik skaluje je do celów każdej osoby
+# i dobiera dokładne ilości w zakresach roli składnika. Jajka liczone w sztukach (miara produktu).
+
+- id: kanapki_z_szynka_jajkiem_i_pomidorem
+  nazwa: Kanapki z szynką, jajkiem i pomidorem
+  opis: Klasyczne kanapki na bułce z masłem, szynką, jajkiem na twardo i pomidorem.
+  posilki: [sniadanie, kolacja]
+  kuchnia: polska
+  tagi: [szybkie]
+  skladniki:
+    - {produkt: bulka_pszenna, rola: weglowodany, typowo_g: 100}
+    - {produkt: maslo, rola: tluszcz, typowo_g: 5, opcjonalny: true}
+    - {produkt: szynka_gotowana, rola: bialko, typowo_g: 60}
+    - {produkt: jajko_kurze, rola: bialko, typowo_g: 100, jednostka: szt}
+    - {produkt: pomidor, rola: warzywa, typowo_g: 150}
+  przygotowanie:
+    - Jajka ugotuj na twardo (9–10 minut), obierz i pokrój w plastry.
+    - Bułki przekrój, posmaruj cienko masłem, połóż szynkę, jajko i plastry pomidora.
+  czas_min: 15
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: serek_wiejski_z_rzodkiewka_i_ogorkiem
+  nazwa: Serek wiejski z rzodkiewką, ogórkiem i pieczywem
+  opis: Serek wiejski ze szczypiorkiem, rzodkiewką i ogórkiem, do tego świeża bułka.
+  posilki: [sniadanie, kolacja]
+  kuchnia: polska
+  tagi: [szybkie, wege]
+  skladniki:
+    - {produkt: serek_wiejski, rola: nabial, typowo_g: 200}
+    - {produkt: bulka_pszenna, rola: weglowodany, typowo_g: 100}
+    - {produkt: rzodkiewka, rola: warzywa, typowo_g: 60}
+    - {produkt: ogorek, rola: warzywa, typowo_g: 80}
+    - {produkt: szczypiorek, rola: dodatek, typowo_g: 5, opcjonalny: true}
+    - {produkt: sol, rola: przyprawa, typowo_g: 1}
+    - {produkt: pieprz_czarny, rola: przyprawa, typowo_g: 0.5}
+  przygotowanie:
+    - Rzodkiewkę i ogórek pokrój w kostkę, szczypiorek posiekaj.
+    - Wymieszaj z serkiem, dopraw solą i pieprzem. Podawaj z bułką.
+  czas_min: 10
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: jajecznica_na_masle_z_wedlina
+  nazwa: Jajecznica na maśle z wędliną i pomidorem
+  opis: Puszysta jajecznica na maśle z kawałkami wędliny z indyka, pieczywo i pomidor.
+  posilki: [sniadanie]
+  kuchnia: polska
+  tagi: [na_cieplo, szybkie]
+  skladniki:
+    - {produkt: jajko_kurze, rola: bialko, typowo_g: 150, jednostka: szt}
+    - {produkt: maslo, rola: tluszcz, typowo_g: 7}
+    - {produkt: wedlina_z_indyka, rola: bialko, typowo_g: 40}
+    - {produkt: chleb_mieszany, rola: weglowodany, typowo_g: 100}
+    - {produkt: pomidor, rola: warzywa, typowo_g: 150}
+    - {produkt: szczypiorek, rola: dodatek, typowo_g: 5, opcjonalny: true}
+    - {produkt: sol, rola: przyprawa, typowo_g: 1}
+  przygotowanie:
+    - Na maśle podsmaż pokrojoną wędlinę przez minutę.
+    - Wbij jajka, mieszaj na małym ogniu do ścięcia. Posyp szczypiorkiem, podawaj z chlebem i pomidorem.
+  czas_min: 10
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: kanapki_z_lososiem_wedzonym_i_jajkiem
+  nazwa: Kanapki z łososiem wędzonym, serkiem i jajkiem
+  opis: Chleb żytni z serkiem śmietankowym, wędzonym łososiem, jajkiem i ogórkiem.
+  posilki: [sniadanie, kolacja]
+  kuchnia: miedzynarodowa
+  tagi: [szybkie]
+  skladniki:
+    - {produkt: chleb_zytni, rola: weglowodany, typowo_g: 100}
+    - {produkt: serek_smietankowy, rola: tluszcz, typowo_g: 25}
+    - {produkt: losos_wedzony, rola: bialko, typowo_g: 90}
+    - {produkt: jajko_kurze, rola: bialko, typowo_g: 50, jednostka: szt}
+    - {produkt: ogorek, rola: warzywa, typowo_g: 100}
+  przygotowanie:
+    - Jajko ugotuj na twardo i pokrój w plastry.
+    - Chleb posmaruj serkiem, ułóż łososia, jajko i plasterki ogórka.
+  czas_min: 12
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: omlet_z_warzywami_i_mozzarella
+  nazwa: Omlet z papryką, szpinakiem i mozzarellą
+  opis: Omlet z warzywami i mozzarellą light, z kromką pieczywa.
+  posilki: [sniadanie, kolacja]
+  kuchnia: wloska
+  tagi: [na_cieplo, wege]
+  skladniki:
+    - {produkt: jajko_kurze, rola: bialko, typowo_g: 150, jednostka: szt}
+    - {produkt: mozzarella_light, rola: bialko, typowo_g: 50}
+    - {produkt: papryka_czerwona, rola: warzywa, typowo_g: 80}
+    - {produkt: szpinak, rola: warzywa, typowo_g: 40}
+    - {produkt: oliwa_z_oliwek, rola: tluszcz, typowo_g: 5}
+    - {produkt: chleb_mieszany, rola: weglowodany, typowo_g: 70}
+    - {produkt: sol, rola: przyprawa, typowo_g: 1}
+  przygotowanie:
+    - Paprykę pokrój w kostkę i podsmaż na oliwie 3 minuty, dodaj szpinak.
+    - Zalej roztrzepanymi jajkami, posyp mozzarellą, smaż pod przykryciem do ścięcia. Podawaj z pieczywem.
+  czas_min: 15
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: tosty_z_szynka_i_serem
+  nazwa: Tosty z szynką, serem i pomidorem
+  opis: Chrupiące tosty z szynką i żółtym serem, z pomidorem na boku.
+  posilki: [sniadanie]
+  kuchnia: miedzynarodowa
+  tagi: [na_cieplo, szybkie]
+  skladniki:
+    - {produkt: chleb_tostowy, rola: weglowodany, typowo_g: 100}
+    - {produkt: szynka_gotowana, rola: bialko, typowo_g: 90}
+    - {produkt: gouda, rola: bialko, typowo_g: 25}
+    - {produkt: pomidor, rola: warzywa, typowo_g: 150}
+    - {produkt: ketchup, rola: sos, typowo_g: 10, opcjonalny: true}
+  przygotowanie:
+    - Na kromki połóż szynkę i ser, przykryj drugą kromką.
+    - Opiekaj w opiekaczu lub na suchej patelni 3–4 minuty. Podawaj z pomidorem.
+  czas_min: 10
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: pasta_jajeczna_na_pieczywie
+  nazwa: Pasta jajeczna z wędliną na pieczywie
+  opis: Pasta z jajek z odrobiną majonezu i jogurtu, ze szczypiorkiem, podana na chlebie z wędliną.
+  posilki: [sniadanie, kolacja]
+  kuchnia: polska
+  tagi: [szybkie]
+  skladniki:
+    - {produkt: jajko_kurze, rola: bialko, typowo_g: 150, jednostka: szt}
+    - {produkt: majonez, rola: tluszcz, typowo_g: 10}
+    - {produkt: skyr_naturalny, rola: sos, typowo_g: 30}
+    - {produkt: wedlina_z_indyka, rola: bialko, typowo_g: 35}
+    - {produkt: chleb_mieszany, rola: weglowodany, typowo_g: 100}
+    - {produkt: pomidor, rola: warzywa, typowo_g: 100}
+    - {produkt: szczypiorek, rola: dodatek, typowo_g: 5, opcjonalny: true}
+    - {produkt: sol, rola: przyprawa, typowo_g: 1}
+  przygotowanie:
+    - Jajka ugotuj na twardo, obierz i rozgnieć widelcem.
+    - Wymieszaj z majonezem, skyrem i szczypiorkiem, dopraw. Nałóż na chleb z wędliną, podawaj z pomidorem.
+  czas_min: 15
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: makrela_wedzona_z_serkiem_i_pieczywem
+  nazwa: Makrela wędzona z serkiem wiejskim i chlebem żytnim
+  opis: Wędzona makrela, lekki serek wiejski ze szczypiorkiem, chleb żytni i pomidor.
+  posilki: [sniadanie, kolacja]
+  kuchnia: polska
+  tagi: [szybkie]
+  skladniki:
+    - {produkt: makrela_wedzona, rola: bialko, typowo_g: 80}
+    - {produkt: serek_wiejski_lekki, rola: nabial, typowo_g: 120}
+    - {produkt: chleb_zytni, rola: weglowodany, typowo_g: 100}
+    - {produkt: pomidor, rola: warzywa, typowo_g: 120}
+    - {produkt: szczypiorek, rola: dodatek, typowo_g: 5, opcjonalny: true}
+  przygotowanie:
+    - Makrelę oczyść z ości i podziel na kawałki.
+    - Serek wymieszaj ze szczypiorkiem. Podawaj z chlebem i pomidorem.
+  czas_min: 10
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone

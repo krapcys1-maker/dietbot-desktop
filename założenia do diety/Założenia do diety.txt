@@ -1,0 +1,134 @@
+[ZADANIE]
+
+Cześć, wciel się w rolę doświadczonego dietetyka. Twoim zadaniem jest stworzenie szczegółowego, gotowego do użycia jadłospisu na 3 pierwsze dni tygodnia (poniedziałek, wtorek, środa) dla dwóch osób (kobiety i mężczyzny). Priorytetem jest precyzyjne trzymanie się bilansu kalorycznego i makroskładników oraz poprawne zinterpretowanie zasady 80/20.
+
+[#1 NAJWAŻNIEJSZE: CELE I DOPUSZCZALNA TOLERANCJA]
+
+Poniższe wartości są Twoim głównym celem. Twoim zadaniem jest zmieścić się w podanych przedziałach. Nie musisz celować w konkretną liczbę, a wylądowanie gdziekolwiek wewnątrz tych widełek jest sukcesem.
+
+Kobieta:
+
+Białko: 90 g → 360 kcal
+
+Tłuszcze: 60 g → 540 kcal
+
+Węglowodany: 175 g → 700 kcal
+
+Suma: 1600 kcal widełki 1700
+
+Mężczyzna:
+
+Białko: 150 g → 600 kcal
+
+Tłuszcze: 80 g → 720 kcal
+
+Węglowodany: 257 g → 1028 kcal
+
+Suma: 2348 kcal (praktycznie 2350) widełki 2400
+
+[#2 STRUKTURA I PRIORYTETY POSIŁKÓW]
+
+1.  **Struktura Dnia:** 3 główne posiłki (śniadanie, obiad, kolacja).
+
+2.  **Poranna Rutyna:** Każdego dnia obie osoby spożywają: 2x kawa z 50ml mleka każda + 20g siemienia lnianego z wodą. Wlicz to do bilansu.
+
+3.  **Kotwice Białkowe:** Aby osiągnąć cel białkowy, każdy główny posiłek powinien zawierać solidne źródło białka. Celuj w około:
+
+    *   Kobieta: 30-40 g białka na posiłek.
+
+    *   Mężczyzna: 45-55 g białka na posiłek.
+
+4.  **Charakter Kolacji:** Kolacja powinna być lżejsza niż obiad. Skup się na posiłkach typu: sałatki z dużą ilością białka (kurczak, tuńczyk, jajka, strączki), kanapki z dobrej jakości wędliną/pastami, serek wiejski z dodatkami, shakshuka, omlety. UNIKAJ serwowania na kolację typowych dań obiadowych (np. ziemniaki z mięsem/rybą).
+
+5.  **Słodkie Kolacje:** Maksymalnie 2 razy w tygodniu kolacja może być słodka (np. jogurt z granolą i owocami, placuszki wysokobiałkowe). Taka kolacja należy do puli 80% (zdrowe jedzenie).
+
+
+[#3 NARZĘDZIA DO BILANSOWANIA]
+
+Jeśli po zaplanowaniu 3 głównych posiłków nadal występuje deficyt kalorii lub makroskładników (szczególnie białka), możesz dodać JEDNĄ przekąskę w ciągu dnia.
+
+Dozwolone przekąski bilansujące:
+
+- Szejk na bazie odżywki białkowej (ok. 30g prochu)
+
+- Serek wiejski wysokobiałkowy (200g)
+
+- Garść orzechów lub migdałów
+
+- Gotowe produkty typu "protein" - jogurt, serek, pudding itp.
+
+Wyraźnie zaznacz, kiedy i dlaczego dodajesz przekąskę (np. "Przekąska dodana w celu uzupełnienia białka").
+
+[#4 KRYTYCZNA ZASADA: INTERPRETACJA 80/20]
+
+To jest kluczowa zasada, której interpretacja jest najważniejsza.
+
+- Pula 80%: To zdrowe, zbilansowane posiłki zgodne z resztą zasad.
+
+- Pula 20%: To celowo zaplanowane "brudne" lub rekreacyjne jedzenie. Ma to być 2-3 razy w tygodniu. W planie wyraźnie zaznacz, który posiłek jest z puli '20%', pisząc obok niego np. **(Posiłek 20%)**.
+
+Przykłady posiłków z puli 20% (DO UŻYCIA):
+
+- Pizza (kupna lub domowa)
+
+- Burger z frytkami
+
+- Duża porcja lodów z polewą
+
+- Batonik
+
+- Paczka chipsów
+
+- Tosty z dużą ilością żółtego sera i ketchupem
+
+- Kawałek ciasta z cukierni
+
+- Kupne pierogi z mięsem/ruskie
+
+- Fast food
+
+- Klasyki włoskiej kuchni - lasagne, bolognese z wołowiną, carbonara
+
+
+Przykłady posiłków, które NALEŻĄ DO PULI 80% (NIE KLASYFIKUJ ICH JAKO 20%):
+
+- Jogurt z owocami, miodem i orzechami
+
+- Ryż na mleku z owocami
+
+- Zdrowsza wersja spaghetti bolognese
+
+- Shakshuka
+
+- Sałatka z serem halloumi
+
+[#5 PRODUKTY I WYTYCZNE KULINARNE]
+
+- **Zupa:** We wtorek i środę obiad to ta sama zupa, gotowana na zapas (4 porcje). Ma być sycąca i z wkładką białkową (np. z kurczakiem, soczewicą, mięsem mielonym).
+
+- **Węglowodany:** Tylko ryż, ziemniaki, makaron. BEZ KASZY.
+
+- **Wykluczenia:** Rukola, owsianki, słodkie śniadania i obiady
+
+
+- **Kuchnie:** włoska, polska, azjatycka, międzynarodowa, wege, hiszpańska, indyjska. Bądź kreatywny.
+
+[#6 FORMAT I INSTRUKCJA KROK PO KROKU]
+
+1.  **Zaplanuj posiłki:** Dla każdego dnia stwórz 3 główne posiłki (śniadanie, obiad, kolacja), trzymając się wszystkich wytycznych (kotwice białkowe, lżejsza kolacja, zasada 80/20 itd.).
+
+2.  **Oblicz sumy:** Po zaplanowaniu posiłków, oblicz sumę kalorii i makroskładników dla każdej osoby.
+
+3.  **Skoryguj:** Jeśli suma odbiega od celu, użyj "Narzędzi do Bilansowania" (np. dodaj przekąskę lub delikatnie zmodyfikuj gramaturę w posiłku), aby precyzyjnie trafić w cel.
+
+4. **Priorytetem jest uczciwość.** Jeśli po próbie zbilansowania posiłków i dodania przekąski nadal masz trudność z precyzyjnym osiągnięciem celów (np. brakuje białka lub przekraczasz kalorie), NIE ZMYŚLAJ WYNIKÓW. Zamiast tego, wyraźnie zaznacz problem w podsumowaniu dnia, np. "UWAGA: W tym dniu bilans białka jest o 15g niższy od celu. Czy akceptujesz taką odchyłkę, czy mam zmodyfikować któryś posiłek?". Wolę wiedzieć o problemie niż dostać nieprawdziwe dane.
+
+5.  **Formatowanie:**
+
+    *   Dla każdego dnia podaj listę posiłków z dokładną gramaturą składników (np. "ryż biały, 100g suchego produktu").
+
+    *   Po każdym dniu przedstaw czytelne podsumowanie: **Suma Dnia (Kobieta): ... kcal, B: ... g, T: ... g, W: ... g** oraz analogicznie dla mężczyzny.
+
+    *   Upewnij się, że ostateczne, podane przez Ciebie sumy są poprawne i zgadzają się z celami. To kryterium sukcesu.
+
+DO obliczeń makro i kcal używaj jedynie tej bazy Edamam

@@ -1,0 +1,104 @@
+# Przekąski bilansujące — silnik dodaje maksymalnie jedną dziennie na osobę i tylko wtedy, gdy pomaga
+# zmieścić się w widełkach (każda przekąska ma w silniku koszt). Ilości nie skalują się z celem energii.
+
+- id: przekaska_szejk_bialkowy
+  nazwa: Szejk białkowy (odżywka WPC z wodą)
+  posilki: [przekaska]
+  kuchnia: miedzynarodowa
+  tagi: [szybkie]
+  skladniki:
+  - {produkt: odzywka_bialkowa_wpc, rola: bialko, typowo_g: 30, min_g: 25, max_g: 35, skaluje_sie: false}
+  przygotowanie:
+  - Wymieszaj odżywkę z 250–300 ml zimnej wody w shakerze.
+  zrodlo: założenia użytkownika (szejk na bazie odżywki białkowej, ok. 30 g proszku)
+  status: zatwierdzone
+- id: przekaska_serek_wiejski
+  nazwa: Serek wiejski (opakowanie 200 g)
+  posilki: [przekaska]
+  kuchnia: polska
+  tagi: [szybkie]
+  skladniki:
+  - {produkt: serek_wiejski, rola: nabial, typowo_g: 200, min_g: 200, max_g: 200, skaluje_sie: false}
+  zrodlo: założenia użytkownika
+  status: zatwierdzone
+
+- id: przekaska_skyr
+  nazwa: Skyr naturalny (kubek 150 g)
+  posilki: [przekaska]
+  kuchnia: miedzynarodowa
+  tagi: [szybkie]
+  skladniki:
+  - {produkt: skyr_naturalny, rola: nabial, typowo_g: 150, min_g: 150, max_g: 150, skaluje_sie: false}
+  zrodlo: założenia użytkownika (gotowy produkt wysokobiałkowy)
+  status: zatwierdzone
+
+- id: przekaska_orzechy_wloskie
+  nazwa: Garść orzechów włoskich
+  posilki: [przekaska]
+  kuchnia: polska
+  tagi: [szybkie]
+  skladniki:
+  - {produkt: orzechy_wloskie, rola: tluszcz, typowo_g: 30, min_g: 20, max_g: 40, skaluje_sie: false}
+  zrodlo: założenia użytkownika
+  status: zatwierdzone
+
+- id: przekaska_migdaly
+  nazwa: Garść migdałów
+  posilki: [przekaska]
+  kuchnia: miedzynarodowa
+  tagi: [szybkie]
+  skladniki:
+  - {produkt: migdaly, rola: tluszcz, typowo_g: 30, min_g: 20, max_g: 40, skaluje_sie: false}
+  zrodlo: założenia użytkownika
+  status: zatwierdzone
+
+- id: przekaska_jablko
+  nazwa: Jabłko
+  posilki: [przekaska]
+  kuchnia: polska
+  tagi: [szybkie]
+  skladniki:
+  - {produkt: jablko, rola: owoce, typowo_g: 180, min_g: 130, max_g: 230, skaluje_sie: false}
+  zrodlo: jadłospisy użytkownika (owoc jako przekąska bilansująca)
+  status: zatwierdzone
+
+- id: przekaska_banan
+  nazwa: Banan
+  posilki: [przekaska]
+  kuchnia: miedzynarodowa
+  tagi: [szybkie]
+  skladniki:
+  - {produkt: banan, rola: owoce, typowo_g: 120, min_g: 90, max_g: 150, skaluje_sie: false}
+  zrodlo: jadłospisy użytkownika (owoc jako przekąska bilansująca)
+  status: zatwierdzone
+
+# kupne jogurty i serki (pula 80%) — dopisane na prośbę domowników 14.09.2026
+- id: przekaska_jogurt_owocowy
+  nazwa: Jogurt owocowy (kubek 150 g)
+  posilki: [przekaska]
+  kuchnia: miedzynarodowa
+  tagi: [szybkie]
+  skladniki:
+  - {produkt: jogurt_owocowy, rola: nabial, typowo_g: 150, min_g: 150, max_g: 150, skaluje_sie: false}
+  zrodlo: prośba domowników (kupny jogurt jako przekąska bilansująca)
+  status: zatwierdzone
+
+- id: przekaska_serek_homogenizowany
+  nazwa: Serek homogenizowany waniliowy (kubek 150 g)
+  posilki: [przekaska]
+  kuchnia: polska
+  tagi: [szybkie]
+  skladniki:
+  - {produkt: serek_homogenizowany_waniliowy, rola: nabial, typowo_g: 150, min_g: 150, max_g: 150, skaluje_sie: false}
+  zrodlo: prośba domowników (kupny serek jako przekąska bilansująca)
+  status: zatwierdzone
+
+- id: przekaska_jogurt_pitny
+  nazwa: Jogurt pitny owocowy (butelka 250 ml)
+  posilki: [przekaska]
+  kuchnia: miedzynarodowa
+  tagi: [szybkie]
+  skladniki:
+  - {produkt: jogurt_pitny_owocowy, rola: nabial, typowo_g: 260, min_g: 260, max_g: 260, skaluje_sie: false}
+  zrodlo: prośba domowników (kupny jogurt pitny jako przekąska bilansująca)
+  status: zatwierdzone

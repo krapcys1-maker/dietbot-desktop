@@ -1,0 +1,161 @@
+# Przekąski z puli 20% z założeń domowników („duża porcja lodów”, „paczka chipsów”, „batonik”, „kawałek ciasta”).
+# Planer wstawia je jako dodatek do trzech posiłków w dniu bez innego posiłku z puli 20% i liczy do puli tygodnia
+# (2–3 rzeczy w tygodniu). Silnik dobiera porcję w podanym zakresie i dopasowuje do niej gramatury całego dnia.
+
+- id: przekaska20_lody_waniliowe
+  nazwa: Lody waniliowe (duża porcja)
+  opis: Kilka gałek lodów waniliowych na deser.
+  posilki: [przekaska]
+  kuchnia: miedzynarodowa
+  tagi: [pula_20, slodkie, szybkie]
+  skladniki:
+    - {produkt: lody_waniliowe, rola: dodatek, typowo_g: 150, min_g: 100, max_g: 200}
+  przygotowanie:
+    - Nałóż lody do miseczki (gałka to ok. 50 g).
+  czas_min: 2
+  zrodlo: założenia domowników — pula 20% (BLS 4.0)
+  status: zatwierdzone
+
+- id: przekaska20_lody_czekoladowe
+  nazwa: Lody czekoladowe
+  opis: Miseczka lodów czekoladowych.
+  posilki: [przekaska]
+  kuchnia: miedzynarodowa
+  tagi: [pula_20, slodkie, szybkie]
+  skladniki:
+    - {produkt: lody_czekoladowe, rola: dodatek, typowo_g: 150, min_g: 100, max_g: 200}
+  przygotowanie:
+    - Nałóż lody do miseczki (gałka to ok. 50 g).
+  czas_min: 2
+  zrodlo: założenia domowników — pula 20% (BLS 4.0)
+  status: zatwierdzone
+
+- id: przekaska20_lody_na_patyku
+  nazwa: Lody na patyku w czekoladzie
+  opis: Kupne lody waniliowe na patyku w polewie czekoladowej.
+  posilki: [przekaska]
+  kuchnia: miedzynarodowa
+  tagi: [pula_20, slodkie, szybkie]
+  skladniki:
+    - {produkt: lody_na_patyku, rola: dodatek, typowo_g: 70, min_g: 70, max_g: 140, jednostka: szt, skaluje_sie: false}
+  przygotowanie:
+    - Wyjmij z zamrażarki kilka minut przed jedzeniem.
+  czas_min: 1
+  zrodlo: założenia domowników — pula 20% (BLS 4.0)
+  status: zatwierdzone
+
+- id: przekaska20_chipsy
+  nazwa: Chipsy ziemniaczane
+  opis: Paczka chipsów ziemniaczanych — porcja odmierzona do miseczki.
+  posilki: [przekaska]
+  kuchnia: miedzynarodowa
+  tagi: [pula_20, szybkie]
+  skladniki:
+    - {produkt: chipsy_ziemniaczane, rola: dodatek, typowo_g: 60, min_g: 35, max_g: 90}
+  przygotowanie:
+    - Odsyp porcję z planu do miseczki, resztę paczki zamknij na później.
+  czas_min: 1
+  zrodlo: założenia domowników — pula 20% (BLS 4.0)
+  status: zatwierdzone
+
+- id: przekaska20_nachosy
+  nazwa: Nachosy (chipsy tortilla)
+  opis: Chrupiące chipsy tortilla — porcja do miseczki.
+  posilki: [przekaska]
+  kuchnia: meksykanska
+  tagi: [pula_20, szybkie]
+  skladniki:
+    - {produkt: chipsy_tortilla, rola: dodatek, typowo_g: 60, min_g: 35, max_g: 90}
+  przygotowanie:
+    - Odsyp porcję z planu do miseczki.
+  czas_min: 1
+  zrodlo: założenia domowników — pula 20% (BLS 4.0)
+  status: zatwierdzone
+
+- id: przekaska20_popcorn
+  nazwa: Popcorn solony
+  opis: Miska popcornu do filmu.
+  posilki: [przekaska]
+  kuchnia: amerykanska
+  tagi: [pula_20, szybkie]
+  skladniki:
+    - {produkt: popcorn_solony, rola: dodatek, typowo_g: 50, min_g: 30, max_g: 80}
+  przygotowanie:
+    - Przygotuj popcorn w mikrofalówce albo w garnku i odmierz porcję z planu.
+  czas_min: 5
+  zrodlo: założenia domowników — pula 20% (BLS 4.0)
+  status: zatwierdzone
+
+- id: przekaska20_paluszki
+  nazwa: Paluszki słone
+  opis: Garść słonych paluszków.
+  posilki: [przekaska]
+  kuchnia: polska
+  tagi: [pula_20, szybkie]
+  skladniki:
+    - {produkt: paluszki_solone, rola: dodatek, typowo_g: 60, min_g: 35, max_g: 100}
+  przygotowanie:
+    - Odsyp porcję z planu, resztę opakowania zamknij.
+  czas_min: 1
+  zrodlo: założenia domowników — pula 20% (BLS 4.0)
+  status: zatwierdzone
+
+- id: przekaska20_baton
+  nazwa: Baton czekoladowy
+  opis: Kupny baton czekoladowy z karmelem i orzeszkami.
+  posilki: [przekaska]
+  kuchnia: miedzynarodowa
+  tagi: [pula_20, slodkie, szybkie]
+  skladniki:
+    - {produkt: baton_czekoladowy, rola: dodatek, typowo_g: 50, min_g: 50, max_g: 100, jednostka: szt, skaluje_sie: false}
+  czas_min: 1
+  zrodlo: założenia domowników — pula 20% (BLS 4.0)
+  status: zatwierdzone
+
+- id: przekaska20_czekolada
+  nazwa: Kilka kostek czekolady mlecznej
+  opis: Czekolada mleczna — kilka kostek do kawy albo filmu.
+  posilki: [przekaska]
+  kuchnia: miedzynarodowa
+  tagi: [pula_20, slodkie, szybkie]
+  skladniki:
+    - {produkt: czekolada_mleczna, rola: dodatek, typowo_g: 40, min_g: 25, max_g: 60}
+  czas_min: 1
+  zrodlo: założenia domowników — pula 20% (BLS 4.0)
+  status: zatwierdzone
+
+- id: przekaska20_zelki
+  nazwa: Żelki owocowe
+  opis: Paczka żelków — porcja odmierzona do miseczki.
+  posilki: [przekaska]
+  kuchnia: miedzynarodowa
+  tagi: [pula_20, slodkie, szybkie]
+  skladniki:
+    - {produkt: zelki_owocowe, rola: dodatek, typowo_g: 60, min_g: 40, max_g: 100}
+  czas_min: 1
+  zrodlo: założenia domowników — pula 20% (BLS 4.0)
+  status: zatwierdzone
+
+- id: przekaska20_sernik
+  nazwa: Kawałek sernika z cukierni
+  opis: Kawałek sernika do kawy.
+  posilki: [przekaska]
+  kuchnia: polska
+  tagi: [pula_20, slodkie, szybkie]
+  skladniki:
+    - {produkt: sernik, rola: dodatek, typowo_g: 120, min_g: 90, max_g: 160}
+  czas_min: 1
+  zrodlo: założenia domowników — pula 20% (kawałek ciasta z cukierni)
+  status: zatwierdzone
+
+- id: przekaska20_drozdzowka
+  nazwa: Drożdżówka z kruszonką
+  opis: Drożdżówka z piekarni do kawy.
+  posilki: [przekaska]
+  kuchnia: polska
+  tagi: [pula_20, slodkie, szybkie]
+  skladniki:
+    - {produkt: drozdzowka_z_kruszonka, rola: dodatek, typowo_g: 90, min_g: 90, max_g: 90, jednostka: szt, skaluje_sie: false}
+  czas_min: 1
+  zrodlo: założenia domowników — pula 20% (BLS 4.0)
+  status: zatwierdzone

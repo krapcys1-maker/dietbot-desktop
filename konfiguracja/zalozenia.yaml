@@ -1,0 +1,77 @@
+# Założenia diety — plik do edycji. Silnik sprawdza spójność przy każdym uruchomieniu.
+# Źródło: "założenia do diety/Założenia do diety.txt" (13.09.2026) + jawne widełki makro
+# (w oryginale cele były punktowe; widełki dobrane tak, jak wychodziły w zaakceptowanych jadłospisach).
+
+wersja: 1
+
+energia:
+  # makro_4_9_4 — kcal = 4·białko + 9·tłuszcz + 4·węglowodany (tak policzone są cele poniżej)
+  # etykieta    — kcal z tabel/etykiet (UE, z błonnikiem 2 kcal/g); daje ok. 2–3% więcej kcal
+  metoda: makro_4_9_4
+
+osoby:
+  - id: kobieta
+    nazwa: Kobieta
+    cele_dzienne:
+      kcal:        {min: 1600, cel: 1650, max: 1700}
+      bialko:      {min: 90,   cel: 100,  max: 110}   # 3 posiłki × min. 30 g + stałe pozycje ≈ 97 g
+      tluszcz:     {min: 55,   cel: 60,   max: 65}
+      weglowodany: {min: 160,  cel: 172,  max: 185}
+    kotwica_bialka_na_posilek: {min: 30, max: 40}
+    tolerancja_kotwicy_g: 5          # "celuj w około" — odchylenie do 5 g nie jest błędem
+    wyklucza_produkty: []
+    # największa rozsądna masa całego talerza (wszystkie składniki razem, np. zupa z pieczywem)
+    maks_masa_posilku_g: {sniadanie: 500, obiad: 680, kolacja: 590}
+
+  - id: mezczyzna
+    nazwa: Mężczyzna
+    cele_dzienne:
+      kcal:        {min: 2350, cel: 2375, max: 2400}
+      bialko:      {min: 145,  cel: 150,  max: 160}
+      tluszcz:     {min: 75,   cel: 80,   max: 85}
+      weglowodany: {min: 245,  cel: 257,  max: 268}
+    kotwica_bialka_na_posilek: {min: 45, max: 55}
+    tolerancja_kotwicy_g: 5
+    wyklucza_produkty: []
+    maks_masa_posilku_g: {sniadanie: 600, obiad: 820, kolacja: 710}
+
+dzien:
+  posilki: [sniadanie, obiad, kolacja]
+  kolacja_lzejsza_niz_obiad: true
+  stale_pozycje:
+    - {produkt: mleko_1_5, gramy: 103, opis: "mleko do kawy (2 × 50 ml)"}
+    - {produkt: kawa_napar, gramy: 300, opis: "2 kawy (300 ml naparu)"}
+    - {produkt: siemie_lniane, gramy: 20, opis: "siemię lniane 20 g z wodą"}
+  przekaski:
+    max_na_osobe_dziennie: 1   # przekąska bilansująca tylko gdy trzeba (silnik ma za nią karę)
+    dozwolone:
+      - przekaska_szejk_bialkowy
+      - przekaska_serek_wiejski
+      - przekaska_skyr
+      - przekaska_orzechy_wloskie
+      - przekaska_migdaly
+      - przekaska_jablko
+      - przekaska_banan
+      - przekaska_jogurt_owocowy
+      - przekaska_serek_homogenizowany
+      - przekaska_jogurt_pitny
+
+tydzien:
+  posilki_20_procent: {min: 2, max: 3}   # posiłki z puli 20% i przekąski z puli (lody, chipsy…) razem
+  slodkie_kolacje_max: 2        # słodka kolacja należy do puli 80%
+  na_zapas:
+    - {tag: zupa, posilek: obiad, dni: [wtorek, sroda]}   # ta sama zupa, 4 porcje
+  bez_powtorek: true            # poza daniami na zapas
+
+zakazy:
+  produkty: [rukola, platki_owsiane]
+  tagi_dan_w_posilkach:
+    sniadanie: [slodkie]
+    obiad: [slodkie]
+  # główne źródło węglowodanów w posiłkach z puli 80% — bez kasz i płatków (mąka: naleśniki, placki, kluski)
+  dozwolone_zrodla_weglowodanow: [ryz, makaron, ziemniaki, pieczywo, maka]
+  # kolacja lżejsza i nie "obiadowa" (np. ziemniaki z mięsem/rybą) — do kolacji pieczywo albo brak węglowodanów;
+  # słodka kolacja (np. ryż na mleku z owocami — przykład puli 80% z założeń) może mieć ryż albo makaron
+  kolacja_bez_weglowodanow_z: [ryz, makaron, ziemniaki]
+
+kuchnie: [polska, wloska, azjatycka, miedzynarodowa, wege, hiszpanska, indyjska, meksykanska, grecka, amerykanska, turecka, francuska, bliskowschodnia]

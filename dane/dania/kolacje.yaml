@@ -1,0 +1,187 @@
+# Kolacje: lżejsze niż obiad — sałatki białkowe, kanapki, serki, omlety, szakszuka.
+# Słodkie kolacje (tag slodkie) należą do puli 80%, maks. 2 w tygodniu.
+
+- id: salatka_grecka_z_kurczakiem
+  nazwa: Sałatka grecka z grillowanym kurczakiem
+  opis: Kurczak, feta, pomidor, ogórek, papryka i oliwki z oliwą, kromka pieczywa.
+  posilki: [kolacja]
+  kuchnia: miedzynarodowa
+  tagi: []
+  skladniki:
+  - {produkt: piers_z_kurczaka, rola: bialko, typowo_g: 140}
+  - {produkt: feta, rola: bialko, typowo_g: 35}
+  - {produkt: pomidor, rola: warzywa, typowo_g: 120}
+  - {produkt: ogorek, rola: warzywa, typowo_g: 120}
+  - {produkt: papryka_czerwona, rola: warzywa, typowo_g: 80}
+  - {produkt: oliwki_zielone, rola: dodatek, typowo_g: 15, opcjonalny: true}
+  - {produkt: oliwa_z_oliwek, rola: tluszcz, typowo_g: 7}
+  - {produkt: chleb_mieszany, rola: weglowodany, typowo_g: 60}
+  - {produkt: oregano_suszone, rola: przyprawa, typowo_g: 1}
+  przygotowanie:
+  - Kurczaka posól, posyp oregano i grilluj 6–7 minut z każdej strony, pokrój w paski.
+  - Warzywa pokrój, wymieszaj z oliwkami i fetą, skrop oliwą. Podawaj z pieczywem.
+  czas_min: 25
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: salatka_z_tunczykiem_i_jajkiem
+  nazwa: Sałatka z tuńczykiem, jajkiem i kukurydzą
+  opis: Tuńczyk w sosie własnym, jajko, kukurydza i warzywa z dressingiem jogurtowym.
+  posilki: [kolacja]
+  kuchnia: miedzynarodowa
+  tagi: [szybkie]
+  skladniki:
+  - {produkt: tunczyk_w_sosie_wlasnym, rola: bialko, typowo_g: 120}
+  - {produkt: jajko_kurze, rola: bialko, typowo_g: 50, jednostka: szt}
+  - {produkt: kukurydza_konserwowa, rola: warzywa, typowo_g: 50}
+  - {produkt: salata_maslowa, rola: warzywa, typowo_g: 80}
+  - {produkt: pomidor, rola: warzywa, typowo_g: 100}
+  - {produkt: jogurt_naturalny_1_5, rola: sos, typowo_g: 40}
+  - {produkt: oliwa_z_oliwek, rola: tluszcz, typowo_g: 5}
+  - {produkt: chleb_mieszany, rola: weglowodany, typowo_g: 60}
+  przygotowanie:
+  - Jajko ugotuj na twardo. Sałatę porwij, pomidor pokrój.
+  - Wymieszaj z tuńczykiem i kukurydzą, polej jogurtem z oliwą. Podawaj z pieczywem.
+  czas_min: 15
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: caprese_z_wedlina_i_pieczywem
+  nazwa: Caprese z mozzarellą light, wędliną z indyka i pieczywem
+  opis: Mozzarella z pomidorami i bazylią skropiona oliwą, plastry wędliny i pieczywo.
+  posilki: [kolacja]
+  kuchnia: wloska
+  tagi: [szybkie]
+  skladniki:
+  - {produkt: mozzarella_light, rola: bialko, typowo_g: 110}
+  - {produkt: wedlina_z_indyka, rola: bialko, typowo_g: 40}
+  - {produkt: pomidor, rola: warzywa, typowo_g: 200}
+  - {produkt: bazylia_swieza, rola: dodatek, typowo_g: 5, opcjonalny: true}
+  - {produkt: oliwa_z_oliwek, rola: tluszcz, typowo_g: 5}
+  - {produkt: chleb_pszenny, rola: weglowodany, typowo_g: 70}
+  przygotowanie:
+  - Mozzarellę i pomidory pokrój w plastry, ułóż na talerzu na zakładkę z bazylią.
+  - Skrop oliwą, posól. Podawaj z wędliną i pieczywem.
+  czas_min: 10
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: szakszuka_z_feta
+  nazwa: Szakszuka z fetą i pieczywem
+  opis: Jajka duszone w sosie pomidorowym z papryką i cebulą, posypane fetą.
+  posilki: [kolacja, sniadanie]
+  kuchnia: miedzynarodowa
+  tagi: [na_cieplo, wege]
+  skladniki:
+  - {produkt: jajko_kurze, rola: bialko, typowo_g: 150, jednostka: szt}
+  - {produkt: pomidory_z_puszki, rola: sos, porcjowanie: z_garnka, typowo_g: 220}
+  - {produkt: papryka_czerwona, rola: warzywa, porcjowanie: z_garnka, typowo_g: 80}
+  - {produkt: cebula, rola: warzywa, porcjowanie: z_garnka, typowo_g: 40}
+  - {produkt: oliwa_z_oliwek, rola: tluszcz, porcjowanie: z_garnka, typowo_g: 5}
+  - {produkt: feta, rola: bialko, typowo_g: 30}
+  - {produkt: chleb_mieszany, rola: weglowodany, typowo_g: 60}
+  - {produkt: papryka_slodka_mielona, rola: przyprawa, typowo_g: 1}
+  przygotowanie:
+  - Na oliwie podsmaż cebulę i paprykę, dodaj pomidory i przyprawy, duś 8 minut.
+  - Zrób wgłębienia, wbij jajka, przykryj i duś do ścięcia białek. Posyp fetą, podawaj z pieczywem.
+  czas_min: 25
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: wrap_z_kurczakiem_i_warzywami
+  nazwa: Wrap z kurczakiem, warzywami i sosem jogurtowym
+  opis: Tortilla z pieczonym kurczakiem, sałatą, pomidorem, ogórkiem i sosem czosnkowym na skyrze.
+  posilki: [kolacja]
+  kuchnia: miedzynarodowa
+  tagi: [szybkie]
+  skladniki:
+  - {produkt: tortilla_pszenna, rola: weglowodany, typowo_g: 70}
+  - {produkt: piers_z_kurczaka, rola: bialko, typowo_g: 140}
+  - {produkt: salata_lodowa, rola: warzywa, typowo_g: 40}
+  - {produkt: pomidor, rola: warzywa, typowo_g: 80}
+  - {produkt: ogorek, rola: warzywa, typowo_g: 60}
+  - {produkt: skyr_naturalny, rola: sos, typowo_g: 50}
+  - {produkt: czosnek, rola: dodatek, typowo_g: 2}
+  - {produkt: olej_rzepakowy, rola: tluszcz, typowo_g: 4}
+  przygotowanie:
+  - Kurczaka przypraw i usmaż na oleju, pokrój w paski.
+  - Skyr wymieszaj z przeciśniętym czosnkiem. Na tortilli ułóż warzywa, kurczaka i sos, zawiń.
+  czas_min: 20
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: skyr_z_malinami_i_orzechami
+  nazwa: Skyr z malinami, orzechami i miodem
+  opis: Gęsty skyr z malinami, orzechami włoskimi i odrobiną miodu — słodka kolacja z puli 80%.
+  posilki: [kolacja]
+  kuchnia: miedzynarodowa
+  tagi: [slodkie, szybkie, wege]
+  skladniki:
+  - {produkt: skyr_naturalny, rola: nabial, typowo_g: 280}
+  - {produkt: maliny, rola: owoce, typowo_g: 120}
+  - {produkt: orzechy_wloskie, rola: tluszcz, typowo_g: 20}
+  - {produkt: miod, rola: dodatek, typowo_g: 12}
+  przygotowanie:
+  - Skyr przełóż do miski, dodaj maliny i posiekane orzechy, polej miodem.
+  czas_min: 5
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: placuszki_proteinowe_z_malinami
+  nazwa: Placuszki białkowe z twarożkiem i malinami
+  opis: Placuszki z twarogu, jajek i odrobiny mąki, podane z malinami i miodem — słodka kolacja.
+  posilki: [kolacja]
+  kuchnia: polska
+  tagi: [slodkie, na_cieplo, wege]
+  skladniki:
+  - {produkt: twarog_poltlusty, rola: bialko, typowo_g: 160}
+  - {produkt: jajko_kurze, rola: bialko, typowo_g: 100, jednostka: szt}
+  - {produkt: maka_pszenna, rola: dodatek, typowo_g: 40}
+  - {produkt: olej_rzepakowy, rola: tluszcz, typowo_g: 6}
+  - {produkt: maliny, rola: owoce, typowo_g: 120}
+  - {produkt: miod, rola: dodatek, typowo_g: 10}
+  przygotowanie:
+  - Twarożek zmiksuj z jajkami i mąką na gęste ciasto.
+  - Smaż małe placuszki na oleju po 2 minuty z każdej strony. Podawaj z malinami i miodem.
+  czas_min: 25
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: salatka_z_halloumi_i_ciecierzyca
+  nazwa: Ciepła sałatka z grillowanym halloumi i ciecierzycą
+  opis: Grillowany ser halloumi z ciecierzycą, sałatą, pomidorem i papryką, z kromką pieczywa.
+  posilki: [kolacja]
+  kuchnia: miedzynarodowa
+  tagi: [wege]
+  skladniki:
+  - {produkt: halloumi, rola: bialko, typowo_g: 90}
+  - {produkt: ciecierzyca_konserwowa, rola: bialko, typowo_g: 100}
+  - {produkt: salata_maslowa, rola: warzywa, typowo_g: 70}
+  - {produkt: pomidor, rola: warzywa, typowo_g: 100}
+  - {produkt: papryka_czerwona, rola: warzywa, typowo_g: 70}
+  - {produkt: oliwa_z_oliwek, rola: tluszcz, typowo_g: 4, opcjonalny: true}
+  - {produkt: chleb_pszenny, rola: weglowodany, typowo_g: 50}
+  przygotowanie:
+  - Halloumi pokrój w plastry i grilluj na suchej patelni po 2 minuty z każdej strony.
+  - Wymieszaj warzywa z odsączoną ciecierzycą, ułóż ser, skrop oliwą. Podawaj z pieczywem.
+  czas_min: 15
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: tosty_z_serem_i_ketchupem
+  nazwa: Tosty z żółtym serem, szynką i ketchupem
+  opis: Opiekane tosty z żółtym serem i szynką, podane z ketchupem — posiłek z puli 20%.
+  posilki: [kolacja]
+  kuchnia: miedzynarodowa
+  tagi: [pula_20, na_cieplo]
+  skladniki:
+  - {produkt: chleb_tostowy, rola: weglowodany, typowo_g: 120}
+  - {produkt: gouda, rola: bialko, typowo_g: 60}
+  - {produkt: szynka_gotowana, rola: bialko, typowo_g: 40, opcjonalny: false}
+  - {produkt: ketchup, rola: sos, typowo_g: 25}
+  przygotowanie:
+  - Na kromki połóż ser i szynkę, przykryj drugą kromką i opiekaj do rozpuszczenia sera.
+  - Podawaj z ketchupem.
+  czas_min: 10
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone

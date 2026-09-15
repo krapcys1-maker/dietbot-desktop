@@ -1,0 +1,272 @@
+# Jedzenie na wynos i szybkie „brudne” posiłki z puli 20%. Gotowe produkty mają wartości BLS dla typowego produktu —
+# w lokalu mogą różnić się o ok. 20%, dlatego silnik porcjuje je jak każdy składnik (np. 5 z 8 kawałków pizzy).
+
+- id: pizza_margherita_zamowiona
+  nazwa: Pizza margherita z pizzerii
+  opis: Zamówiona pizza margherita — zjadasz odmierzoną liczbę kawałków, resztę chowasz na później.
+  posilki: [obiad, kolacja]
+  kuchnia: wloska
+  tagi: [pula_20, wege]
+  skladniki:
+    - {produkt: pizza_margherita_z_pizzerii, rola: weglowodany, typowo_g: 350}
+  przygotowanie:
+    - Zamów pizzę margheritę 32 cm (jedna na dwie osoby wystarcza zwykle z zapasem).
+    - Zjedz liczbę kawałków z planu; pozostałe kawałki schowaj do lodówki.
+  czas_min: 5
+  zrodlo: DietBot — jedzenie na wynos (BLS 4.0)
+  status: zatwierdzone
+
+- id: pizza_salami_zamowiona
+  nazwa: Pizza z salami z pizzerii
+  opis: Zamówiona pizza z salami — porcja odmierzona w kawałkach.
+  posilki: [obiad, kolacja]
+  kuchnia: wloska
+  tagi: [pula_20]
+  skladniki:
+    - {produkt: pizza_salami_z_pizzerii, rola: weglowodany, typowo_g: 350}
+  przygotowanie:
+    - Zamów pizzę z salami 32 cm.
+    - Zjedz liczbę kawałków z planu; pozostałe kawałki schowaj do lodówki.
+  czas_min: 5
+  zrodlo: DietBot — jedzenie na wynos (BLS 4.0)
+  status: zatwierdzone
+
+- id: pizza_z_szynka_zamowiona
+  nazwa: Pizza z szynką z pizzerii
+  opis: Zamówiona pizza z szynką i mozzarellą — porcja odmierzona w kawałkach.
+  posilki: [obiad, kolacja]
+  kuchnia: wloska
+  tagi: [pula_20]
+  skladniki:
+    - {produkt: pizza_z_szynka_z_pizzerii, rola: weglowodany, typowo_g: 350}
+  przygotowanie:
+    - Zamów pizzę z szynką 32 cm.
+    - Zjedz liczbę kawałków z planu; pozostałe kawałki schowaj do lodówki.
+  czas_min: 5
+  zrodlo: DietBot — jedzenie na wynos (BLS 4.0)
+  status: zatwierdzone
+
+- id: pizza_z_pieczarkami_zamowiona
+  nazwa: Pizza z pieczarkami z pizzerii
+  opis: Zamówiona pizza z pieczarkami i mozzarellą — porcja odmierzona w kawałkach.
+  posilki: [obiad, kolacja]
+  kuchnia: wloska
+  tagi: [pula_20, wege]
+  skladniki:
+    - {produkt: pizza_z_pieczarkami_z_pizzerii, rola: weglowodany, typowo_g: 380}
+  przygotowanie:
+    - Zamów pizzę z pieczarkami 32 cm.
+    - Zjedz liczbę kawałków z planu; pozostałe kawałki schowaj do lodówki.
+  czas_min: 5
+  zrodlo: DietBot — jedzenie na wynos (BLS 4.0)
+  status: zatwierdzone
+
+- id: cheeseburger_z_frytkami_zamowiony
+  nazwa: Cheeseburgery z frytkami z fast foodu
+  opis: Zamówione cheeseburgery z porcją frytek i ketchupem.
+  posilki: [obiad, kolacja]
+  kuchnia: amerykanska
+  tagi: [pula_20]
+  skladniki:
+    - {produkt: cheeseburger_z_fast_foodu, rola: weglowodany, typowo_g: 240}
+    - {produkt: frytki_smazone, rola: weglowodany, typowo_g: 110}
+    - {produkt: ketchup, rola: sos, typowo_g: 15}
+  przygotowanie:
+    - Zamów cheeseburgery i małe frytki według gramatur z planu.
+    - Frytki jedz z ketchupem.
+  czas_min: 5
+  zrodlo: DietBot — jedzenie na wynos (BLS 4.0)
+  status: zatwierdzone
+
+- id: kebab_z_kurczakiem_zamowiony
+  nazwa: Kebab z kurczakiem w chlebku
+  opis: Kebab z grillowanym kurczakiem, surówką i sosem w chlebku, kupiony na mieście.
+  posilki: [obiad, kolacja]
+  kuchnia: turecka
+  tagi: [pula_20]
+  skladniki:
+    - {produkt: kebab_z_kurczakiem_w_picie, rola: weglowodany, typowo_g: 400}
+  przygotowanie:
+    - Kup kebab z kurczakiem w chlebku; przy mniejszej porcji z planu zjedz odpowiednią część.
+  czas_min: 5
+  zrodlo: DietBot — jedzenie na wynos (BLS 4.0)
+  status: zatwierdzone
+
+- id: hot_dogi_z_budki
+  nazwa: Hot dogi z budki
+  opis: Dwa hot dogi z parówką w bułce, z budki albo ze stacji.
+  posilki: [obiad, kolacja]
+  kuchnia: amerykanska
+  tagi: [pula_20]
+  skladniki:
+    - {produkt: hot_dog_z_budki, rola: weglowodany, typowo_g: 260}
+    - {produkt: musztarda, rola: sos, typowo_g: 10}
+  przygotowanie:
+    - Kup hot dogi w liczbie z planu i dodaj musztardę.
+  czas_min: 5
+  zrodlo: DietBot — jedzenie na wynos (BLS 4.0)
+  status: zatwierdzone
+
+- id: zapiekanka_z_budki_z_ketchupem
+  nazwa: Zapiekanka z szynką i serem z budki
+  opis: Połówka bagietki zapiekana z szynką i serem, polana ketchupem.
+  posilki: [obiad, kolacja]
+  kuchnia: polska
+  tagi: [pula_20]
+  skladniki:
+    - {produkt: zapiekanka_z_szynka_i_serem, rola: weglowodany, typowo_g: 280}
+    - {produkt: ketchup, rola: sos, typowo_g: 20}
+  przygotowanie:
+    - Kup zapiekankę z szynką i serem i polej ją ketchupem.
+  czas_min: 5
+  zrodlo: DietBot — jedzenie na wynos (BLS 4.0)
+  status: zatwierdzone
+
+- id: sushi_z_lososiem_zamowione
+  nazwa: Sushi z łososiem z dostawy
+  opis: Zestaw sushi z łososiem z sosem sojowym — porcja odmierzona w kawałkach.
+  posilki: [obiad, kolacja]
+  kuchnia: azjatycka
+  tagi: [pula_20]
+  skladniki:
+    - {produkt: sushi_z_lososiem, rola: weglowodany, typowo_g: 350}
+    - {produkt: sos_sojowy, rola: sos, typowo_g: 15}
+  przygotowanie:
+    - Zamów zestaw sushi z łososiem.
+    - Zjedz liczbę kawałków z planu, maczając w sosie sojowym.
+  czas_min: 5
+  zrodlo: DietBot — jedzenie na wynos (BLS 4.0)
+  status: zatwierdzone
+
+- id: sajgonki_z_ryzem_i_sosem_slodko_kwasnym
+  nazwa: Sajgonki z ryżem i sosem słodko-kwaśnym
+  opis: Chrupiące sajgonki z mięsem i warzywami, ryż i sos słodko-kwaśny — jak z baru azjatyckiego.
+  posilki: [obiad]
+  kuchnia: azjatycka
+  tagi: [pula_20]
+  skladniki:
+    - {produkt: sajgonki_smazone, rola: weglowodany, typowo_g: 210}
+    - {produkt: ryz_bialy, rola: weglowodany, typowo_g: 60}
+    - {produkt: sos_slodko_kwasny, rola: sos, typowo_g: 40}
+  przygotowanie:
+    - Sajgonki kup w barze albo upiecz mrożone według opakowania.
+    - Ryż ugotuj w osolonej wodzie i podawaj z sajgonkami i sosem słodko-kwaśnym.
+  czas_min: 25
+  zrodlo: DietBot — jedzenie na wynos (BLS 4.0)
+  status: zatwierdzone
+
+- id: lasagne_z_restauracji
+  nazwa: Lasagne bolognese z restauracji
+  opis: Porcja zapiekanej lasagne z sosem bolognese i beszamelem, z restauracji albo gotowa ze sklepu.
+  posilki: [obiad]
+  kuchnia: wloska
+  tagi: [pula_20]
+  skladniki:
+    - {produkt: lasagne_gotowa, rola: weglowodany, typowo_g: 400}
+  przygotowanie:
+    - Zamów lasagne albo odgrzej gotową ze sklepu; zjedz porcję z planu.
+  czas_min: 10
+  zrodlo: DietBot — jedzenie na wynos (BLS 4.0)
+  status: zatwierdzone
+
+- id: burrito_z_wolowina_zamowione
+  nazwa: Burrito z wołowiną i serem
+  opis: Burrito z mieloną wołowiną, warzywami i serem — z baru meksykańskiego albo gotowe do odgrzania.
+  posilki: [obiad, kolacja]
+  kuchnia: meksykanska
+  tagi: [pula_20]
+  skladniki:
+    - {produkt: burrito_z_wolowina, rola: weglowodany, typowo_g: 280}
+  przygotowanie:
+    - Kup burrito albo odgrzej gotowe; przy mniejszej porcji z planu zjedz odpowiednią część.
+  czas_min: 10
+  zrodlo: DietBot — jedzenie na wynos (BLS 4.0)
+  status: zatwierdzone
+
+- id: falafel_w_picie_zamowiony
+  nazwa: Falafel w chlebku pita
+  opis: Smażone kulki z ciecierzycy w chlebku pita z warzywami i sosem, z budki.
+  posilki: [obiad, kolacja]
+  kuchnia: bliskowschodnia
+  tagi: [pula_20, wege]
+  skladniki:
+    - {produkt: falafel_w_picie, rola: weglowodany, typowo_g: 320}
+  przygotowanie:
+    - Kup falafel w chlebku pita; przy mniejszej porcji z planu zjedz odpowiednią część.
+  czas_min: 5
+  zrodlo: DietBot — jedzenie na wynos (BLS 4.0)
+  status: zatwierdzone
+
+- id: paluszki_rybne_z_frytkami_i_surowka
+  nazwa: Paluszki rybne z frytkami z piekarnika i surówką z marchewki
+  opis: Szybki obiad z mrożonek — paluszki rybne i frytki z piekarnika, do tego surówka z marchewki i jabłka.
+  posilki: [obiad]
+  kuchnia: polska
+  tagi: [pula_20, szybkie]
+  skladniki:
+    - {produkt: paluszki_rybne_pieczone, rola: bialko, typowo_g: 180}
+    - {produkt: frytki_mrozone, rola: weglowodany, typowo_g: 200}
+    - {produkt: marchew, rola: warzywa, typowo_g: 100}
+    - {produkt: jablko, rola: owoce, typowo_g: 50}
+    - {produkt: sok_z_cytryny, rola: sos, typowo_g: 5}
+    - {produkt: ketchup, rola: sos, typowo_g: 15}
+  grupy:
+    - {nazwa: surówka z marchewki, skladniki: [marchew, jablko, sok_z_cytryny]}
+  przygotowanie:
+    - Paluszki rybne i frytki upiecz w piekarniku według opakowania.
+    - Marchew i jabłko zetrzyj, wymieszaj z sokiem z cytryny.
+    - Podawaj z ketchupem.
+  czas_min: 25
+  zrodlo: DietBot — jedzenie na wynos (BLS 4.0)
+  status: zatwierdzone
+
+- id: burger_z_kurczakiem_w_panierce_z_frytkami
+  nazwa: Domowy burger z kurczakiem w panierce i frytkami z piekarnika
+  opis: Chrupiący kotlet z kurczaka w bułce z sałatą, pomidorem i lekkim majonezem, do tego frytki z piekarnika.
+  posilki: [obiad]
+  kuchnia: amerykanska
+  tagi: [pula_20, na_cieplo]
+  skladniki:
+    - {produkt: piers_z_kurczaka, rola: bialko, typowo_g: 130}
+    - {produkt: jajko_kurze, rola: dodatek, typowo_g: 15}
+    - {produkt: bulka_tarta, rola: dodatek, typowo_g: 20}
+    - {produkt: maka_pszenna, rola: dodatek, typowo_g: 8}
+    - {produkt: olej_rzepakowy, rola: tluszcz, typowo_g: 8}
+    - {produkt: bulka_pszenna, rola: weglowodany, typowo_g: 90}
+    - {produkt: salata_lodowa, rola: warzywa, typowo_g: 20}
+    - {produkt: pomidor, rola: warzywa, typowo_g: 50}
+    - {produkt: majonez_lekki, rola: sos, typowo_g: 15}
+    - {produkt: frytki_mrozone, rola: weglowodany, typowo_g: 150}
+    - {produkt: sol, rola: przyprawa, typowo_g: 1}
+    - {produkt: papryka_slodka_mielona, rola: przyprawa, typowo_g: 1}
+  grupy:
+    - {nazwa: kotlet w panierce, skladniki: [piers_z_kurczaka, jajko_kurze, bulka_tarta, maka_pszenna]}
+  przygotowanie:
+    - Pierś rozbij na płaski kotlet, posól i oprósz papryką.
+    - Obtocz w mące, jajku i bułce tartej, smaż na oleju po 4 minuty z każdej strony.
+    - Frytki upiecz w piekarniku według opakowania.
+    - Bułkę przekrój, posmaruj majonezem, ułóż sałatę, pomidora i kotlet.
+  czas_min: 35
+  zrodlo: DietBot — jedzenie na wynos (BLS 4.0)
+  status: zatwierdzone
+
+- id: pizza_domowa_z_szynka_i_pieczarkami
+  nazwa: Pizza domowa z szynką, pieczarkami i mozzarellą
+  opis: Pizza na gotowym cieście z sosem pomidorowym, szynką, pieczarkami, mozzarellą i oregano.
+  posilki: [obiad, kolacja]
+  kuchnia: wloska
+  tagi: [pula_20, na_cieplo]
+  skladniki:
+    - {produkt: ciasto_na_pizze, rola: weglowodany, porcjowanie: z_garnka, typowo_g: 150}
+    - {produkt: passata, rola: sos, porcjowanie: z_garnka, typowo_g: 60}
+    - {produkt: mozzarella, rola: bialko, porcjowanie: z_garnka, typowo_g: 70}
+    - {produkt: szynka_gotowana, rola: bialko, porcjowanie: z_garnka, typowo_g: 50}
+    - {produkt: pieczarki, rola: warzywa, porcjowanie: z_garnka, typowo_g: 60}
+    - {produkt: oregano_suszone, rola: przyprawa, typowo_g: 1}
+  przygotowanie:
+    - Rozgrzej piekarnik do 230°C, rozwałkuj ciasto na blasze.
+    - Posmaruj passatą, ułóż szynkę, plasterki pieczarek i porwaną mozzarellę, posyp oregano.
+    - Piecz 12–15 minut, aż brzegi się zarumienią; podziel pizzę według porcji z planu.
+  czas_min: 30
+  zrodlo: DietBot — jedzenie na wynos (BLS 4.0)
+  status: zatwierdzone

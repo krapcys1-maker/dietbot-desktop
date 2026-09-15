@@ -1,0 +1,28 @@
+# Sekrety — nigdy do gita
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# Node (aplikacja web)
+node_modules/
+web/dist/
+
+# Dane robocze: pobrane surowe bazy (duże, licencje zewnętrzne), wyniki, lokalne bazy SQLite
+dane/raw/
+wyniki/*
+!wyniki/.gitkeep
+*.db
+*.sqlite
+*.sqlite3
+*.lnk

@@ -1,0 +1,94 @@
+# Katalog sklepowy — Rumunia. Nazwy i opakowania z półek sprawdzone 13.09.2026 w serwisie
+# Monitorul Prețurilor (Consiliul Concurenței, sklepy Lidl w Bukareszcie) — patrz docs/RESEARCH.md.
+# Wartości odżywcze: dopóki nie wpiszemy etykiety (pole na_100g), silnik używa wartości produktu ogólnego.
+# preferowany: true = ten produkt pokazujemy na liście zakupów. opakowanie_g dla płynów przeliczone gęstością.
+
+- {id: lidl_skyr_pilos_500, produkt: skyr_naturalny, sklep: Lidl RO, nazwa_w_sklepie: "Skyr natur", marka: Pilos, 
+    opakowanie_g: 500, preferowany: true, sprawdzono: 2026-09-13}
+- {id: lidl_iaurt_pilos_15_400, produkt: jogurt_naturalny_1_5, sklep: Lidl RO, nazwa_w_sklepie: "Iaurt natur 1,5%", 
+    marka: Pilos, opakowanie_g: 400, preferowany: true, sprawdzono: 2026-09-13}
+- {id: lidl_iaurt_pilos_35_400, produkt: jogurt_naturalny_3_5, sklep: Lidl RO, nazwa_w_sklepie: "Iaurt natur 3,5%", 
+    marka: Pilos, opakowanie_g: 400, preferowany: true, sprawdzono: 2026-09-13}
+- {id: lidl_kefir_pilos_400, produkt: kefir, sklep: Lidl RO, nazwa_w_sklepie: "Kefir 1,5%", marka: Pilos, opakowanie_g: 
+    400, preferowany: true, sprawdzono: 2026-09-13}
+- {id: kaufland_cottage_olympus_4, produkt: serek_wiejski, sklep: Kaufland RO, nazwa_w_sklepie: "Brânză cottage 4%", 
+    marka: Olympus, opakowanie_g: 180, preferowany: true, sprawdzono: 2026-09-13, uwagi: "brak w Lidlu; także Carrefour, Mega
+    Image, Auchan"}
+- {id: kaufland_cottage_olympus_2, produkt: serek_wiejski_lekki, sklep: Kaufland RO, nazwa_w_sklepie: "Brânză cottage light
+    2%", marka: Olympus, opakowanie_g: 180, preferowany: true, sprawdzono: 2026-09-13, uwagi: "brak w Lidlu; także Carrefour,
+    Mega Image, Auchan"}
+- {id: lidl_crenvursti_pikok_pui_250, produkt: parowki_drobiowe, sklep: Lidl RO, nazwa_w_sklepie: "Crenvurști din piept de
+    pui", marka: Pikok, opakowanie_g: 250, preferowany: true, sprawdzono: 2026-09-13}
+- {id: lidl_polonezi_pikok_500, produkt: parowki, sklep: Lidl RO, nazwa_w_sklepie: "Crenvurști Polonezi", marka: Pikok, 
+    opakowanie_g: 500, preferowany: true, sprawdzono: 2026-09-13}
+- {id: lidl_sunca_pui_pikok_100, produkt: wedlina_z_indyka, sklep: Lidl RO, nazwa_w_sklepie: "Șuncă din piept de pui", 
+    marka: Pikok, opakowanie_g: 100, preferowany: true, sprawdzono: 2026-09-13, uwagi: "wędlina drobiowa (kurczak) — wartości
+    zbliżone do wędliny z indyka"}
+- {id: lidl_piept_pui_650, produkt: piers_z_kurczaka, sklep: Lidl RO, nazwa_w_sklepie: "Piept de pui dezosat fără piele",
+  opakowanie_g: 650, preferowany: true, sprawdzono: 2026-09-13, uwagi: "także tacka 500 g"}
+- {id: lidl_carne_tocata_vita_500, produkt: mieso_mielone_wolowe, sklep: Lidl RO, nazwa_w_sklepie: "Carne tocată de vită",
+  opakowanie_g: 500, preferowany: true, sprawdzono: 2026-09-13, uwagi: "zawartość tłuszczu nie podana na liście — sprawdź
+    etykietę (w bazie ok. 16%)"}
+- {id: lidl_bacon_pikok_200, produkt: boczek_wedzony, sklep: Lidl RO, nazwa_w_sklepie: "Bacon afumat feliat", marka: 
+    Pikok, opakowanie_g: 200, preferowany: true, sprawdzono: 2026-09-13, uwagi: "także 100 g"}
+- {id: lidl_somon_afumat_nautica_100, produkt: losos_wedzony, sklep: Lidl RO, nazwa_w_sklepie: "Somon afumat", marka: 
+    Nautica, opakowanie_g: 100, preferowany: true, sprawdzono: 2026-09-13, uwagi: "także 200 g"}
+- {id: lidl_macrou_afumat_nautica, produkt: makrela_wedzona, sklep: Lidl RO, nazwa_w_sklepie: "File de macrou afumat", 
+    marka: Nautica, opakowanie_g: 160, preferowany: true, sprawdzono: 2026-09-13, uwagi: "waga zmienna ok. 150–165 g"}
+- {id: lidl_ton_suc_propriu_nixe_145, produkt: tunczyk_w_sosie_wlasnym, sklep: Lidl RO, nazwa_w_sklepie: "Ton în suc propriu",
+  marka: Nixe, opakowanie_g: 145, preferowany: true, sprawdzono: 2026-09-13, uwagi: "masa netto puszki; po odsączeniu mniej
+    — w planie liczymy wagę odsączoną"}
+- {id: lidl_mozzarella_light_lovilio_125, produkt: mozzarella_light, sklep: Lidl RO, nazwa_w_sklepie: "Mozzarella light",
+  marka: Lovilio, opakowanie_g: 125, preferowany: true, sprawdzono: 2026-09-13}
+- {id: lidl_mozzarella_lovilio_125, produkt: mozzarella, sklep: Lidl RO, nazwa_w_sklepie: "Mozzarella", marka: Lovilio, 
+    opakowanie_g: 125, preferowany: true, sprawdzono: 2026-09-13}
+- {id: lidl_halloumi_milbona_225, produkt: halloumi, sklep: Lidl RO, nazwa_w_sklepie: "Halloumi", marka: Milbona, 
+    opakowanie_g: 225, preferowany: true, sprawdzono: 2026-09-13}
+- {id: lidl_feta_milbona_200, produkt: feta, sklep: Lidl RO, nazwa_w_sklepie: "Brânză feta", marka: Milbona, 
+    opakowanie_g: 200, preferowany: true, sprawdzono: 2026-09-13}
+- {id: lidl_gouda_pilos_felii_200, produkt: gouda, sklep: Lidl RO, nazwa_w_sklepie: "Gouda felii", marka: Pilos, 
+    opakowanie_g: 200, preferowany: true, sprawdzono: 2026-09-13}
+- {id: lidl_cheddar_milbona_250, produkt: cheddar, sklep: Lidl RO, nazwa_w_sklepie: "Cheddar", marka: Milbona, 
+    opakowanie_g: 250, preferowany: true, sprawdzono: 2026-09-13}
+- {id: lidl_crema_branza_milbona_150, produkt: serek_smietankowy, sklep: Lidl RO, nazwa_w_sklepie: "Cremă de brânză", 
+    marka: Milbona, opakowanie_g: 150, preferowany: true, sprawdzono: 2026-09-13, uwagi: "także 300 g"}
+- {id: lidl_chifla_kaiser_60, produkt: bulka_pszenna, sklep: Lidl RO, nazwa_w_sklepie: "Chiflă Kaiser (piekarnia)", 
+    opakowanie_g: 60, preferowany: true, sprawdzono: 2026-09-13, uwagi: "sprzedawana na sztuki; chiflă 55 g"}
+- {id: lidl_toast_tastino_600, produkt: chleb_tostowy, sklep: Lidl RO, nazwa_w_sklepie: "Pâine toast", marka: Tastino, 
+    opakowanie_g: 600, preferowany: true, sprawdzono: 2026-09-13, uwagi: "także 375 g"}
+- {id: lidl_toast_secara_tastino_600, produkt: chleb_zytni, sklep: Lidl RO, nazwa_w_sklepie: "Pâine toast cu secară", 
+    marka: Tastino, opakowanie_g: 600, preferowany: false, sprawdzono: 2026-09-13, uwagi: "jedyne pieczywo żytnie w Lidlu
+    (tostowe)"}
+- {id: kaufland_paine_secara_boromir_500, produkt: chleb_zytni, sklep: Kaufland RO, nazwa_w_sklepie: "Pâine de secară", 
+    marka: Boromir, opakowanie_g: 500, preferowany: true, sprawdzono: 2026-09-13, uwagi: "także Dobrogea 400 g"}
+- {id: lidl_paste_combino_500, produkt: makaron_pszenny, sklep: Lidl RO, nazwa_w_sklepie: "Spaghete / Penne / Fusilli", 
+    marka: Combino, opakowanie_g: 500, preferowany: true, sprawdzono: 2026-09-13}
+- {id: lidl_orez_golden_sun_1000, produkt: ryz_bialy, sklep: Lidl RO, nazwa_w_sklepie: "Orez bob lung", marka: Golden 
+    Sun, opakowanie_g: 1000, preferowany: true, sprawdzono: 2026-09-13}
+- {id: lidl_cartofi_albi_2000, produkt: ziemniaki, sklep: Lidl RO, nazwa_w_sklepie: "Cartofi albi", opakowanie_g: 2000, 
+    preferowany: true, sprawdzono: 2026-09-13, uwagi: "także na wagę i 10 kg; w planie waga po obraniu"}
+- {id: kaufland_linte_rosie_kclassic_500, produkt: soczewica_czerwona, sklep: Kaufland RO, nazwa_w_sklepie: "Linte roșie",
+  marka: K-Classic, opakowanie_g: 500, preferowany: true, sprawdzono: 2026-09-13, uwagi: "brak w Lidlu (tylko zielona); także
+    Auchan, Deroni"}
+- {id: lidl_rosii_tocate_baresa_400, produkt: pomidory_z_puszki, sklep: Lidl RO, nazwa_w_sklepie: "Roșii tocate", marka: 
+    Baresa, opakowanie_g: 400, preferowany: true, sprawdzono: 2026-09-13}
+- {id: lidl_ulei_masline_primadonna_750, produkt: oliwa_z_oliwek, sklep: Lidl RO, nazwa_w_sklepie: "Ulei de măsline extravirgin",
+  marka: Primadonna, opakowanie_g: 683, preferowany: true, sprawdzono: 2026-09-13, uwagi: "butelka 750 ml (× 0,91 g/ml); także
+    1 l"}
+- {id: lidl_unt_pilos_250, produkt: maslo, sklep: Lidl RO, nazwa_w_sklepie: "Unt 82%", marka: Pilos, opakowanie_g: 250, 
+    preferowany: true, sprawdzono: 2026-09-13, uwagi: "unikaj 'unt 65%'"}
+- {id: lidl_ketchup_kania_560, produkt: ketchup, sklep: Lidl RO, nazwa_w_sklepie: "Ketchup dulce", marka: Kania, 
+    opakowanie_g: 560, preferowany: true, sprawdzono: 2026-09-13}
+- {id: lidl_pesto_baresa_190, produkt: pesto_bazyliowe, sklep: Lidl RO, nazwa_w_sklepie: "Pesto alla Genovese", marka: 
+    Baresa, opakowanie_g: 190, preferowany: true, sprawdzono: 2026-09-13}
+- {id: kaufland_seminte_in_kclassic_250, produkt: siemie_lniane, sklep: Kaufland RO, nazwa_w_sklepie: "Semințe de in", 
+    marka: K-Classic, opakowanie_g: 250, preferowany: true, sprawdzono: 2026-09-13, uwagi: "brak w Lidlu; także K-Bio 500
+    g"}
+- {id: lidl_miez_nuca_alesto_200, produkt: orzechy_wloskie, sklep: Lidl RO, nazwa_w_sklepie: "Miez de nucă", marka: 
+    Alesto Selection, opakowanie_g: 200, preferowany: true, sprawdzono: 2026-09-13}
+- {id: lidl_fasole_sos_rosii_freshona_425, produkt: fasolka_w_sosie_pomidorowym, sklep: Lidl RO, nazwa_w_sklepie: "Fasole
+    albă în sos de roșii", marka: Freshona, opakowanie_g: 425, preferowany: true, sprawdzono: 2026-09-13, uwagi: "opakowanie
+    425 ml"}
+- {id: lidl_branza_vaci_pilos_275, produkt: twarog_poltlusty, sklep: Lidl RO, nazwa_w_sklepie: 'Brânză de vaci 4,2%', 
+    marka: Pilos, ean: '20223281', opakowanie_g: 275, preferowany: true, sprawdzono: '2026-09-13', uwagi: także 1 kg; 
+    wariant 9% ma inne wartości}

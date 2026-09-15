@@ -1,0 +1,118 @@
+# Klasyki kuchni polskiej dopisane ręcznie na prośbę domowników (14.09.2026) — tych dań generator nie przepuścił
+# (reguły rozkładu makro zamówienia albo zła rola składnika), a domownicy wprost o nie prosili. Przeszły test silnika.
+
+- id: jajka_na_miekko_z_pieczywem_i_szynka
+  nazwa: Jajka na miękko z pieczywem, szynką i szczypiorkiem
+  opis: Jajka gotowane na miękko, kromki pieczywa z masłem, szynka i pomidor ze szczypiorkiem.
+  posilki: [sniadanie]
+  kuchnia: polska
+  tagi: [szybkie, na_cieplo]
+  skladniki:
+    - {produkt: jajko_kurze, rola: bialko, typowo_g: 150, jednostka: szt}
+    - {produkt: szynka_gotowana, rola: bialko, typowo_g: 50}
+    - {produkt: chleb_mieszany, rola: weglowodany, typowo_g: 100}
+    - {produkt: maslo, rola: tluszcz, typowo_g: 5}
+    - {produkt: pomidor, rola: warzywa, typowo_g: 100}
+    - {produkt: szczypiorek, rola: warzywa, typowo_g: 5}
+    - {produkt: sol, rola: przyprawa, typowo_g: 1}
+    - {produkt: pieprz_czarny, rola: przyprawa, typowo_g: 1}
+  przygotowanie:
+    - Jajka włóż do wrzącej wody i gotuj 4–5 minut (żółtko zostaje płynne), przełóż do zimnej wody.
+    - Pieczywo posmaruj cienko masłem, połóż szynkę.
+    - Pomidora pokrój w plastry, posyp solą, pieprzem i posiekanym szczypiorkiem.
+    - Jajka podawaj w kieliszkach, oprószone solą i szczypiorkiem.
+  czas_min: 10
+  zrodlo: klasyk kuchni polskiej — prośba domowników (DietBot)
+  status: zatwierdzone
+
+- id: fasolka_po_bretonsku_z_pieczywem
+  nazwa: Fasolka po bretońsku z kiełbasą i pieczywem
+  opis: Fasola w gęstym sosie pomidorowym z kiełbasą, boczkiem, cebulą i majerankiem, podana z pieczywem.
+  posilki: [obiad]
+  kuchnia: polska
+  tagi: [na_cieplo]
+  skladniki:
+    - {produkt: fasolka_w_sosie_pomidorowym, rola: bialko, porcjowanie: z_garnka, typowo_g: 250}
+    - {produkt: kielbasa_krakowska, rola: bialko, porcjowanie: z_garnka, typowo_g: 80}
+    - {produkt: boczek_wedzony, rola: tluszcz, porcjowanie: z_garnka, typowo_g: 15}
+    - {produkt: cebula, rola: warzywa, porcjowanie: z_garnka, typowo_g: 60}
+    - {produkt: koncentrat_pomidorowy, rola: sos, porcjowanie: z_garnka, typowo_g: 15}
+    - {produkt: olej_rzepakowy, rola: tluszcz, porcjowanie: z_garnka, typowo_g: 5}
+    - {produkt: chleb_mieszany, rola: weglowodany, typowo_g: 100}
+    - {produkt: majeranek, rola: przyprawa, typowo_g: 1}
+    - {produkt: pieprz_czarny, rola: przyprawa, typowo_g: 1}
+  przygotowanie:
+    - Boczek i kiełbasę pokrój w kostkę, podsmaż na oleju razem z posiekaną cebulą.
+    - Dodaj fasolkę w sosie pomidorowym i koncentrat, duś 10 minut na małym ogniu.
+    - Dopraw majerankiem i pieprzem.
+    - Podawaj z pieczywem.
+  czas_min: 25
+  zrodlo: klasyk kuchni polskiej — prośba domowników (DietBot)
+  status: zatwierdzone
+
+- id: bigos_z_pieczywem
+  nazwa: Bigos z kiełbasą i schabem z pieczywem żytnim
+  opis: Duszona kapusta kiszona i biała z kiełbasą, chudą wieprzowiną i odrobiną boczku, podana z pieczywem żytnim.
+  posilki: [obiad]
+  kuchnia: polska
+  tagi: [na_cieplo]
+  skladniki:
+    - {produkt: kapusta_kiszona, rola: warzywa, porcjowanie: z_garnka, typowo_g: 200}
+    - {produkt: kapusta_biala, rola: warzywa, porcjowanie: z_garnka, typowo_g: 100}
+    - {produkt: poledwiczka_wieprzowa, rola: bialko, porcjowanie: z_garnka, typowo_g: 90}
+    - {produkt: kielbasa_krakowska, rola: bialko, porcjowanie: z_garnka, typowo_g: 70}
+    - {produkt: boczek_wedzony, rola: tluszcz, porcjowanie: z_garnka, typowo_g: 15}
+    - {produkt: cebula, rola: warzywa, porcjowanie: z_garnka, typowo_g: 40}
+    - {produkt: koncentrat_pomidorowy, rola: sos, porcjowanie: z_garnka, typowo_g: 15}
+    - {produkt: chleb_zytni, rola: weglowodany, typowo_g: 100}
+    - {produkt: lisc_laurowy, rola: przyprawa, typowo_g: 1}
+    - {produkt: ziele_angielskie, rola: przyprawa, typowo_g: 1}
+    - {produkt: pieprz_czarny, rola: przyprawa, typowo_g: 1}
+  przygotowanie:
+    - Boczek i cebulę podsmaż w garnku, dodaj pokrojoną w kostkę polędwiczkę i obsmaż.
+    - Dodaj odciśniętą kapustę kiszoną, poszatkowaną kapustę białą, liść laurowy i ziele angielskie, podlej wodą.
+    - Duś pod przykryciem ok. 40 minut, dodaj pokrojoną kiełbasę i koncentrat, duś jeszcze 15 minut.
+    - Dopraw pieprzem i podawaj z pieczywem żytnim.
+  czas_min: 70
+  zrodlo: klasyk kuchni polskiej — prośba domowników (DietBot)
+  status: zatwierdzone
+
+- id: ryz_na_mleku_z_jablkami_i_skyrem
+  nazwa: Ryż na mleku z jabłkami, cynamonem i skyrem
+  opis: Ryż ugotowany na mleku, z pieczonym jabłkiem, cynamonem, odrobiną miodu i skyrem.
+  posilki: [kolacja]
+  kuchnia: polska
+  tagi: [slodkie, na_cieplo]
+  skladniki:
+    - {produkt: ryz_bialy, rola: weglowodany, typowo_g: 55}
+    - {produkt: mleko_1_5, rola: nabial, typowo_g: 250}
+    - {produkt: skyr_naturalny, rola: bialko, typowo_g: 200}
+    - {produkt: jablko, rola: owoce, typowo_g: 150}
+    - {produkt: miod, rola: dodatek, typowo_g: 8}
+    - {produkt: cynamon, rola: przyprawa, typowo_g: 1}
+  przygotowanie:
+    - Ryż wypłucz i gotuj na mleku na małym ogniu ok. 20 minut, często mieszając.
+    - Jabłko pokrój w kostkę i podduś chwilę z cynamonem.
+    - Ryż wymieszaj z miodem, na wierzch nałóż skyr i jabłka, posyp cynamonem.
+  czas_min: 25
+  zrodlo: przykład puli 80% z założeń domowników („ryż na mleku z owocami”) — DietBot
+  status: zatwierdzone
+
+- id: budyn_czekoladowy_z_malinami_i_skyrem
+  nazwa: Budyń czekoladowy z malinami, skyrem i waflami ryżowymi
+  opis: Budyń czekoladowy na mleku z kremowym skyrem, malinami i chrupiącymi waflami ryżowymi.
+  posilki: [kolacja]
+  kuchnia: polska
+  tagi: [slodkie, szybkie]
+  skladniki:
+    - {produkt: budyn_czekoladowy, rola: dodatek, typowo_g: 150}
+    - {produkt: skyr_naturalny, rola: bialko, typowo_g: 220}
+    - {produkt: maliny, rola: owoce, typowo_g: 100}
+    - {produkt: wafle_ryzowe, rola: weglowodany, typowo_g: 27, jednostka: szt}
+  przygotowanie:
+    - Ugotuj budyń na mleku według przepisu z opakowania i przestudź.
+    - Do miseczki nałóż budyń, na wierzch skyr i maliny.
+    - Podawaj z waflami ryżowymi.
+  czas_min: 15
+  zrodlo: słodka kolacja z kupnym deserem — prośba domowników (DietBot)
+  status: zatwierdzone

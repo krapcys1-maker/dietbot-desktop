@@ -1,0 +1,119 @@
+// Klient API — wszystkie błędy zamieniane na czytelne komunikaty po polsku.
+import type {
+  AssumptionsData,
+  AssumptionsResponse,
+  ChatMessage,
+  Costs,
+  DishDetail,
+  DishListItem,
+  Job,
+  MatchResult,
+  PlanSummary,
+  PlanView,
+  ProductDetail,
+  ProductListItem,
+  Shopping,
+  Status,
+  SwapOptions,
+} from "./types";
+
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
+async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+  let res: Response;
+  try {
+    res = await fetch(path, {
+      method,
+      headers: body === undefined ? undefined : { "Content-Type": "application/json" },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+  } catch {
+    throw new ApiError("Brak połączenia z aplikacją DietBot (serwer nie odpowiada).", 0);
+  }
+  const text = await res.text();
+  let data: unknown = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = text;
+  }
+  if (!res.ok) {
+    let msg = `Błąd ${res.status}`;
+    if (data && typeof data === "object" && "detail" in data) {
+      const detail = (data as { detail: unknown }).detail;
+      if (typeof detail === "string") msg = detail;
+      else if (Array.isArray(detail)) msg = detail.map((d) => (d && typeof d === "object" && "msg" in d ? String(d.msg) : String(d))).join("; ");
+    }
+    throw new ApiError(msg, res.status);
+  }
+  return data as T;
+}
+
+const q = (params: Record<string, string | undefined>) => {
+  const s = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) if (v) s.set(k, v);
+  const str = s.toString();
+  return str ? `?${str}` : "";
+};
+
+export const api = {
+  status: () => request<Status>("GET", "/api/status"),
+  job: (id: string, since = 0) => request<Job>("GET", `/api/zadania/${id}?od=${since}`),
+
+  generate: (body: { wishes?: string; days?: number[]; avoid_recent: boolean; use_llm: boolean; week_start?: string; invent?: boolean }) =>
+    request<Job>("POST", "/api/plany/generuj", body),
+  plans: () => request<PlanSummary[]>("GET", "/api/plany"),
+  activePlan: () => request<PlanView>("GET", "/api/plany/aktywny"),
+  plan: (id: string) => request<PlanView>("GET", `/api/plany/${id}`),
+  patchPlan: (id: string, body: { title?: string; active?: boolean }) => request<PlanView>("PATCH", `/api/plany/${id}`, body),
+  deletePlan: (id: string) => request<{ ok: boolean }>("DELETE", `/api/plany/${id}`),
+  swapOptions: (id: string, slot: string) => request<SwapOptions>("GET", `/api/plany/${id}/zamienniki${q({ slot })}`),
+  swap: (id: string, slot_key: string, dish_id: string) => request<Job>("POST", `/api/plany/${id}/zamien`, { slot_key, dish_id }),
+  recompute: (id: string, repair: boolean) => request<Job>("POST", `/api/plany/${id}/przelicz`, { repair }),
+  shopping: (id: string) => request<Shopping>("GET", `/api/plany/${id}/zakupy`),
+  exportPlan: (id: string) =>
+    request<{ plan_path: string; shopping_path: string; plan_md: string; shopping_md: string }>("POST", `/api/plany/${id}/eksport`),
+
+  assumptions: () => request<AssumptionsResponse>("GET", "/api/zalozenia"),
+  checkAssumptions: (data: AssumptionsData) =>
+    request<{ ok: boolean; errors: string[]; warnings: string[] }>("POST", "/api/zalozenia/sprawdz", { data }),
+  saveAssumptions: (data: AssumptionsData) =>
+    request<{ ok: boolean; errors: string[]; warnings: string[] }>("PUT", "/api/zalozenia", { data }),
+
+  dishes: (params: { posilek?: string; q?: string; status?: string }) => request<DishListItem[]>("GET", `/api/dania${q(params)}`),
+  dish: (id: string) => request<DishDetail>("GET", `/api/dania/${id}`),
+  setDishStatus: (id: string, status: string) => request<DishDetail>("PATCH", `/api/dania/${id}`, { status }),
+  inventDishes: (requestText: string, count: number) => request<Job>("POST", "/api/dania/wymysl", { request: requestText, count }),
+
+  products: (params: { q?: string; kategoria?: string }) => request<ProductListItem[]>("GET", `/api/produkty${q(params)}`),
+  product: (id: string) => request<ProductDetail>("GET", `/api/produkty/${id}`),
+  matchProduct: (tekst: string) => request<MatchResult>("GET", `/api/produkty/dopasuj${q({ tekst })}`),
+  addProduct: (body: Record<string, unknown>) => request<ProductDetail>("POST", "/api/produkty", body),
+
+  chatHistory: () => request<ChatMessage[]>("GET", "/api/czat"),
+  chat: (text: string, plan_id?: string) => request<ChatMessage>("POST", "/api/czat", { text, plan_id }),
+  chatConfirm: (proposal_id: string) => request<ChatMessage>("POST", "/api/czat/potwierdz", { proposal_id }),
+  chatReject: (proposal_id: string) => request<{ ok: boolean }>("POST", "/api/czat/odrzuc", { proposal_id }),
+
+  costs: () => request<Costs>("GET", "/api/koszty"),
+  openResults: () => request<{ ok: boolean; path: string }>("POST", "/api/system/otworz-wyniki"),
+};
+
+/** Czeka na koniec zadania, przekazując nowe wpisy dziennika. */
+export async function followJob(id: string, onLog: (lines: string[], job: Job) => void, signal?: AbortSignal): Promise<Job> {
+  let since = 0;
+  for (;;) {
+    if (signal?.aborted) throw new ApiError("Przerwano", 0);
+    const job = await api.job(id, since);
+    if (job.log.length) onLog(job.log, job);
+    since += job.log.length; // nie log_size: linia dopisana między wycięciem a policzeniem dziennika by przepadła
+    if (job.status === "gotowe" || job.status === "blad") return job;
+    await new Promise((r) => setTimeout(r, 600));
+  }
+}

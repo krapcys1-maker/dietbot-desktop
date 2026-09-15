@@ -1,0 +1,278 @@
+# Obiady. "z_garnka" = jednorodna masa z jednego garnka/patelni (dzielona proporcjonalnie między osoby),
+# "osobno" = porcjowane na talerz niezależnie (mięso w kawałkach, ryż, pieczywo).
+
+- id: kurczak_curry_z_ryzem
+  nazwa: Kurczak curry z mleczkiem kokosowym i ryżem
+  opis: Kawałki kurczaka w sosie pomidorowo-kokosowym z curry, podane z ryżem.
+  posilki: [obiad]
+  kuchnia: indyjska
+  tagi: [na_cieplo]
+  skladniki:
+    - {produkt: piers_z_kurczaka, rola: bialko, typowo_g: 170}
+    - {produkt: ryz_bialy, rola: weglowodany, typowo_g: 80}
+    - {produkt: mleczko_kokosowe, rola: sos, porcjowanie: z_garnka, typowo_g: 50}
+    - {produkt: pomidory_z_puszki, rola: sos, porcjowanie: z_garnka, typowo_g: 150}
+    - {produkt: cebula, rola: warzywa, porcjowanie: z_garnka, typowo_g: 50}
+    - {produkt: czosnek, rola: dodatek, porcjowanie: z_garnka, typowo_g: 5}
+    - {produkt: olej_rzepakowy, rola: tluszcz, porcjowanie: z_garnka, typowo_g: 6}
+    - {produkt: curry_przyprawa, rola: przyprawa, typowo_g: 3}
+    - {produkt: sol, rola: przyprawa, typowo_g: 1}
+  przygotowanie:
+    - Ryż ugotuj w osolonej wodzie.
+    - Na oleju zeszklij cebulę i czosnek, dodaj curry i pokrojonego kurczaka, smaż 5 minut.
+    - Wlej pomidory i mleczko kokosowe, duś 10 minut. Podawaj z ryżem.
+  czas_min: 30
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: zupa_z_kurczakiem_i_soczewica
+  nazwa: Rozgrzewająca zupa z kurczakiem i czerwoną soczewicą
+  opis: Gęsta zupa pomidorowa z czerwoną soczewicą i kawałkami kurczaka — gotowana na dwa dni.
+  posilki: [obiad]
+  kuchnia: miedzynarodowa
+  tagi: [zupa, na_zapas, na_cieplo]
+  na_ile_dni: 2
+  skladniki:
+    - {produkt: piers_z_kurczaka, rola: bialko, typowo_g: 140}
+    - {produkt: soczewica_czerwona, rola: bialko, porcjowanie: z_garnka, typowo_g: 50}
+    - {produkt: pomidory_z_puszki, rola: sos, porcjowanie: z_garnka, typowo_g: 150}
+    - {produkt: marchew, rola: warzywa, porcjowanie: z_garnka, typowo_g: 60}
+    - {produkt: cebula, rola: warzywa, porcjowanie: z_garnka, typowo_g: 50}
+    - {produkt: oliwa_z_oliwek, rola: tluszcz, porcjowanie: z_garnka, typowo_g: 8}
+    - {produkt: chleb_mieszany, rola: weglowodany, typowo_g: 60, opcjonalny: true}
+    - {produkt: papryka_slodka_mielona, rola: przyprawa, typowo_g: 2}
+    - {produkt: sol, rola: przyprawa, typowo_g: 2}
+  przygotowanie:
+    - Na oliwie podsmaż pokrojoną cebulę i marchew, dodaj paprykę.
+    - Dodaj soczewicę, pomidory i ok. 1,5 l wody, gotuj 20 minut.
+    - Kurczaka pokrój w kostkę, gotuj w zupie 10 minut. Porcje z kawałkami kurczaka nakładaj według planu.
+  czas_min: 45
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: zupa_gulaszowa_z_ziemniakami
+  nazwa: Zupa gulaszowa z wołowiną i ziemniakami
+  opis: Sycąca zupa gulaszowa z wołowiną, papryką i ziemniakami — gotowana na dwa dni.
+  posilki: [obiad]
+  kuchnia: polska
+  tagi: [zupa, na_zapas, na_cieplo]
+  na_ile_dni: 2
+  skladniki:
+    - {produkt: wolowina_gulaszowa, rola: bialko, typowo_g: 170}
+    - {produkt: ziemniaki, rola: weglowodany, porcjowanie: z_garnka, typowo_g: 200}
+    - {produkt: papryka_czerwona, rola: warzywa, porcjowanie: z_garnka, typowo_g: 80}
+    - {produkt: cebula, rola: warzywa, porcjowanie: z_garnka, typowo_g: 50}
+    - {produkt: koncentrat_pomidorowy, rola: sos, porcjowanie: z_garnka, typowo_g: 20}
+    - {produkt: olej_rzepakowy, rola: tluszcz, porcjowanie: z_garnka, typowo_g: 7}
+    - {produkt: chleb_mieszany, rola: weglowodany, typowo_g: 50, opcjonalny: true}
+    - {produkt: papryka_slodka_mielona, rola: przyprawa, typowo_g: 3}
+    - {produkt: sol, rola: przyprawa, typowo_g: 2}
+  przygotowanie:
+    - Wołowinę pokrój w kostkę i obsmaż na oleju, dodaj cebulę i paprykę w proszku.
+    - Zalej 1,5 l wody, duś pod przykryciem 60 minut.
+    - Dodaj ziemniaki, paprykę i koncentrat, gotuj 20 minut.
+  czas_min: 100
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: spaghetti_bolognese
+  nazwa: Spaghetti bolognese
+  opis: Makaron z sosem pomidorowym z mięsem wołowym i parmezanem.
+  posilki: [obiad]
+  kuchnia: wloska
+  tagi: [na_cieplo]
+  skladniki:
+    - {produkt: makaron_pszenny, rola: weglowodany, typowo_g: 90}
+    - {produkt: mieso_mielone_wolowe, rola: bialko, typowo_g: 130}
+    - {produkt: passata, rola: sos, porcjowanie: z_garnka, typowo_g: 160}
+    - {produkt: cebula, rola: warzywa, porcjowanie: z_garnka, typowo_g: 40}
+    - {produkt: czosnek, rola: dodatek, porcjowanie: z_garnka, typowo_g: 5}
+    - {produkt: oliwa_z_oliwek, rola: tluszcz, porcjowanie: z_garnka, typowo_g: 5}
+    - {produkt: parmezan, rola: dodatek, typowo_g: 10}
+    - {produkt: oregano_suszone, rola: przyprawa, typowo_g: 1}
+    - {produkt: sol, rola: przyprawa, typowo_g: 1}
+  proporcje:
+    - {licznik: [passata], mianownik: [makaron_pszenny], min: 1.2, max: 3.0, opis: "sos do makaronu"}
+  przygotowanie:
+    - Makaron ugotuj al dente.
+    - Na oliwie zeszklij cebulę z czosnkiem, dodaj mięso i smaż do zrumienienia.
+    - Wlej passatę, dopraw oregano, duś 15 minut. Podawaj z makaronem i parmezanem.
+  czas_min: 30
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: pieczony_kurczak_w_panierce_z_ziemniakami_i_mizeria
+  nazwa: Pieczony kurczak w panierce z ziemniakami i mizerią
+  opis: Filet z kurczaka w panierce pieczony w piekarniku, ziemniaki i mizeria na jogurcie.
+  posilki: [obiad]
+  kuchnia: polska
+  tagi: [na_cieplo]
+  skladniki:
+    - {produkt: piers_z_kurczaka, rola: bialko, typowo_g: 170}
+    - {produkt: jajko_kurze, rola: dodatek, typowo_g: 25}
+    - {produkt: maka_pszenna, rola: dodatek, typowo_g: 10}
+    - {produkt: bulka_tarta, rola: dodatek, typowo_g: 20}
+    - {produkt: ziemniaki, rola: weglowodany, typowo_g: 300}
+    - {produkt: ogorek, rola: warzywa, typowo_g: 150}
+    - {produkt: jogurt_naturalny_1_5, rola: sos, typowo_g: 60}
+    - {produkt: olej_rzepakowy, rola: tluszcz, typowo_g: 8}
+    - {produkt: sol, rola: przyprawa, typowo_g: 2}
+  przygotowanie:
+    - Kurczaka rozbij, obtocz w mące, jajku i bułce tartej, skrop olejem. Piecz 25 minut w 200°C.
+    - Ziemniaki ugotuj w osolonej wodzie.
+    - Ogórka pokrój w plasterki, wymieszaj z jogurtem, solą i pieprzem.
+  czas_min: 45
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: losos_z_ziemniakami_i_brokulem
+  nazwa: Łosoś pieczony z ziemniakami i brokułem
+  opis: Filet z łososia pieczony z cytryną, gotowane ziemniaki i brokuł na parze.
+  posilki: [obiad]
+  kuchnia: miedzynarodowa
+  tagi: [na_cieplo]
+  skladniki:
+    - {produkt: losos_surowy, rola: bialko, typowo_g: 150}
+    - {produkt: ziemniaki, rola: weglowodany, typowo_g: 280}
+    - {produkt: brokul, rola: warzywa, typowo_g: 200}
+    - {produkt: oliwa_z_oliwek, rola: tluszcz, typowo_g: 4, opcjonalny: true}
+    - {produkt: sok_z_cytryny, rola: dodatek, typowo_g: 10}
+    - {produkt: sol, rola: przyprawa, typowo_g: 1}
+  przygotowanie:
+    - Łososia skrop cytryną, posól i piecz 15–18 minut w 200°C.
+    - Ziemniaki ugotuj, brokuł gotuj na parze 6 minut. Skrop oliwą.
+  czas_min: 35
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: indyk_stir_fry_z_ryzem
+  nazwa: Stir-fry z indykiem, papryką i cukinią z ryżem
+  opis: Szybko smażony indyk z warzywami w sosie sojowym z imbirem, podany z ryżem.
+  posilki: [obiad]
+  kuchnia: azjatycka
+  tagi: [na_cieplo, szybkie]
+  skladniki:
+    - {produkt: piers_z_indyka, rola: bialko, typowo_g: 170}
+    - {produkt: ryz_bialy, rola: weglowodany, typowo_g: 80}
+    - {produkt: papryka_czerwona, rola: warzywa, porcjowanie: z_garnka, typowo_g: 100}
+    - {produkt: cukinia, rola: warzywa, porcjowanie: z_garnka, typowo_g: 100}
+    - {produkt: sos_sojowy, rola: sos, porcjowanie: z_garnka, typowo_g: 15}
+    - {produkt: imbir_swiezy, rola: dodatek, porcjowanie: z_garnka, typowo_g: 5}
+    - {produkt: czosnek, rola: dodatek, porcjowanie: z_garnka, typowo_g: 5}
+    - {produkt: olej_rzepakowy, rola: tluszcz, porcjowanie: z_garnka, typowo_g: 8}
+  przygotowanie:
+    - Ryż ugotuj.
+    - Indyka pokrój w paski, smaż na mocno rozgrzanym oleju 4 minuty.
+    - Dodaj warzywa, czosnek i imbir, smaż 3 minuty, wlej sos sojowy. Podawaj z ryżem.
+  czas_min: 25
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: chili_con_carne_z_ryzem
+  nazwa: Chili con carne z ryżem
+  opis: Wołowina z czerwoną fasolą, kukurydzą i pomidorami, podana z ryżem.
+  posilki: [obiad]
+  kuchnia: miedzynarodowa
+  tagi: [na_cieplo]
+  skladniki:
+    - {produkt: mieso_mielone_wolowe, rola: bialko, typowo_g: 130}
+    - {produkt: fasola_czerwona_konserwowa, rola: bialko, porcjowanie: z_garnka, typowo_g: 80}
+    - {produkt: pomidory_z_puszki, rola: sos, porcjowanie: z_garnka, typowo_g: 150}
+    - {produkt: kukurydza_konserwowa, rola: warzywa, porcjowanie: z_garnka, typowo_g: 50}
+    - {produkt: cebula, rola: warzywa, porcjowanie: z_garnka, typowo_g: 50}
+    - {produkt: ryz_bialy, rola: weglowodany, typowo_g: 70}
+    - {produkt: papryka_slodka_mielona, rola: przyprawa, typowo_g: 2}
+    - {produkt: sol, rola: przyprawa, typowo_g: 1}
+  przygotowanie:
+    - Ryż ugotuj.
+    - Mięso podsmaż z cebulą, dodaj pomidory i przyprawy, duś 15 minut.
+    - Dodaj odsączoną fasolę i kukurydzę, gotuj 5 minut.
+  czas_min: 35
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: dorsz_pieczony_z_ziemniakami_i_fasolka
+  nazwa: Dorsz pieczony z ziemniakami i fasolką szparagową
+  opis: Delikatny dorsz z piekarnika z masłem i koperkiem, ziemniaki i fasolka szparagowa.
+  posilki: [obiad]
+  kuchnia: polska
+  tagi: [na_cieplo]
+  skladniki:
+    - {produkt: dorsz_surowy, rola: bialko, typowo_g: 200}
+    - {produkt: ziemniaki, rola: weglowodany, typowo_g: 300}
+    - {produkt: fasolka_szparagowa, rola: warzywa, typowo_g: 150}
+    - {produkt: maslo, rola: tluszcz, typowo_g: 8}
+    - {produkt: sok_z_cytryny, rola: dodatek, typowo_g: 10}
+    - {produkt: sol, rola: przyprawa, typowo_g: 1}
+  przygotowanie:
+    - Dorsza posól, skrop cytryną, połóż na nim masło i piecz 15 minut w 190°C.
+    - Ziemniaki i fasolkę ugotuj w osolonej wodzie.
+  czas_min: 30
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: makaron_z_kurczakiem_i_szpinakiem
+  nazwa: Makaron z kurczakiem i szpinakiem w lekkim sosie śmietanowym
+  opis: Penne z kurczakiem, szpinakiem i czosnkiem w sosie z lekkiej śmietany, z parmezanem.
+  posilki: [obiad]
+  kuchnia: wloska
+  tagi: [na_cieplo]
+  skladniki:
+    - {produkt: makaron_pszenny, rola: weglowodany, typowo_g: 85}
+    - {produkt: piers_z_kurczaka, rola: bialko, typowo_g: 150}
+    - {produkt: szpinak, rola: warzywa, porcjowanie: z_garnka, typowo_g: 80}
+    - {produkt: smietana_10, rola: sos, porcjowanie: z_garnka, typowo_g: 50}
+    - {produkt: czosnek, rola: dodatek, porcjowanie: z_garnka, typowo_g: 5}
+    - {produkt: oliwa_z_oliwek, rola: tluszcz, porcjowanie: z_garnka, typowo_g: 5}
+    - {produkt: parmezan, rola: dodatek, typowo_g: 10}
+    - {produkt: sol, rola: przyprawa, typowo_g: 1}
+  przygotowanie:
+    - Makaron ugotuj al dente.
+    - Kurczaka pokrój i usmaż na oliwie z czosnkiem, dodaj szpinak.
+    - Wlej śmietanę, podgrzej, wymieszaj z makaronem i posyp parmezanem.
+  czas_min: 25
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: burger_wolowy_z_frytkami
+  nazwa: Domowy burger wołowy z frytkami z piekarnika
+  opis: Soczysty burger z wołowiny z cheddarem, pomidorem i sałatą, frytki z piekarnika.
+  posilki: [obiad]
+  kuchnia: miedzynarodowa
+  tagi: [pula_20, na_cieplo]
+  skladniki:
+    - {produkt: bulka_pszenna, rola: weglowodany, typowo_g: 90}
+    - {produkt: mieso_mielone_wolowe, rola: bialko, typowo_g: 150}
+    - {produkt: cheddar, rola: dodatek, typowo_g: 20}
+    - {produkt: pomidor, rola: warzywa, typowo_g: 50}
+    - {produkt: salata_lodowa, rola: warzywa, typowo_g: 20}
+    - {produkt: ketchup, rola: sos, typowo_g: 15}
+    - {produkt: frytki_mrozone, rola: weglowodany, typowo_g: 180}
+    - {produkt: sol, rola: przyprawa, typowo_g: 1}
+  przygotowanie:
+    - Frytki upiecz w piekarniku według opakowania.
+    - Z mięsa uformuj kotlet, posól i smaż 3–4 minuty z każdej strony, pod koniec połóż cheddar.
+    - Złóż burgera z ketchupem, sałatą i pomidorem.
+  czas_min: 30
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
+
+- id: carbonara_z_boczkiem
+  nazwa: Spaghetti carbonara z boczkiem
+  opis: Klasyczna carbonara z boczkiem, jajkiem i parmezanem — bez śmietany.
+  posilki: [obiad]
+  kuchnia: wloska
+  tagi: [pula_20, na_cieplo]
+  skladniki:
+    - {produkt: makaron_pszenny, rola: weglowodany, typowo_g: 100}
+    - {produkt: boczek_wedzony, rola: bialko, typowo_g: 40}
+    - {produkt: jajko_kurze, rola: sos, typowo_g: 50, jednostka: szt}
+    - {produkt: parmezan, rola: dodatek, typowo_g: 20}
+    - {produkt: pieprz_czarny, rola: przyprawa, typowo_g: 1}
+  przygotowanie:
+    - Makaron ugotuj al dente, zachowaj pół szklanki wody z gotowania.
+    - Boczek podsmaż na suchej patelni. Jajko roztrzep z parmezanem.
+    - Zdejmij patelnię z ognia, dodaj makaron, masę jajeczną i trochę wody, mieszaj do kremowego sosu.
+  czas_min: 20
+  zrodlo: DietBot — biblioteka startowa
+  status: zatwierdzone
