@@ -7,6 +7,7 @@ import os
 import sys
 from datetime import date
 from pathlib import Path
+from typing import Literal
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
@@ -15,6 +16,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+from .file_dialogs import save_text_as
 from .jobs import UserError
 from .service import DietService
 from .validation import polish_error_list
@@ -69,6 +71,10 @@ class ConfirmIn(BaseModel):
 
 class ApiKeyIn(BaseModel):
     key: str = Field(min_length=20, max_length=256)
+
+
+class SaveTextIn(BaseModel):
+    kind: Literal["plan", "shopping"]
 
 
 def web_dist_dir() -> Path | None:
@@ -184,6 +190,17 @@ def create_app(service: DietService) -> FastAPI:
     @app.post("/api/plany/{plan_id}/eksport")
     def export(plan_id: str) -> dict:
         return s.export(plan_id)
+
+    @app.post("/api/plany/{plan_id}/zapisz-plik")
+    def save_plan_file(plan_id: str, body: SaveTextIn) -> dict:
+        exported = s.text_export(plan_id, body.kind)
+        title = "Zapisz cały jadłospis" if body.kind == "plan" else "Zapisz listę zakupów"
+        path = save_text_as(exported["filename"], title, exported["content"])
+        return {
+            "saved": path is not None,
+            "path": str(path) if path else None,
+            "filename": path.name if path else exported["filename"],
+        }
 
     # ---------------------------------------------------------------- założenia
     @app.get("/api/zalozenia")

@@ -208,6 +208,37 @@ def test_api_validation_errors_are_polish(service):
     assert "should" not in detail and "Input" not in detail
 
 
+def test_save_entire_week_and_shopping_as_text(service, generated, tmp_path, monkeypatch):
+    import dietbot.app.api as api_module
+
+    plan_id = generated["plan_id"]
+    plan_export = service.text_export(plan_id, "plan")
+    shopping_export = service.text_export(plan_id, "shopping")
+    assert plan_export["filename"].endswith(".txt")
+    assert shopping_export["filename"].endswith(".txt")
+    assert all(label in plan_export["content"] for label in (
+        "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota", "Niedziela",
+    ))
+    assert "Przygotowanie" in plan_export["content"]
+    assert "Lista zakupów" in shopping_export["content"]
+
+    saved_paths: list[Path] = []
+
+    def fake_save(default_name: str, title: str, content: str) -> Path:
+        assert title and content
+        path = tmp_path / default_name
+        path.write_text(content, encoding="utf-8-sig")
+        saved_paths.append(path)
+        return path
+
+    monkeypatch.setattr(api_module, "save_text_as", fake_save)
+    client = TestClient(create_app(service))
+    for kind in ("plan", "shopping"):
+        response = client.post(f"/api/plany/{plan_id}/zapisz-plik", json={"kind": kind})
+        assert response.status_code == 200 and response.json()["saved"] is True
+    assert len(saved_paths) == 2 and all(path.exists() for path in saved_paths)
+
+
 def test_api_key_is_saved_locally_and_never_returned(service, monkeypatch):
     settings = LLMSettings.load(service.paths)
     monkeypatch.delenv(settings.api_key_env, raising=False)

@@ -19,4 +19,4 @@ if (-not $Compiler) {
 }
 
 & $Compiler (Join-Path $PSScriptRoot "DietBot.iss")
-Write-Host "Gotowe: release\DietBot-Setup-0.1.0.exe"
+Write-Host "Gotowe: release\DietBot-Setup-0.1.1.exe"

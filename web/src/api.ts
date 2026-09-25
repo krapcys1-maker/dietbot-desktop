@@ -79,6 +79,8 @@ export const api = {
   shopping: (id: string) => request<Shopping>("GET", `/api/plany/${id}/zakupy`),
   exportPlan: (id: string) =>
     request<{ plan_path: string; shopping_path: string; plan_md: string; shopping_md: string }>("POST", `/api/plany/${id}/eksport`),
+  savePlanFile: (id: string, kind: "plan" | "shopping") =>
+    request<{ saved: boolean; path: string | null; filename: string }>("POST", `/api/plany/${id}/zapisz-plik`, { kind }),
 
   assumptions: () => request<AssumptionsResponse>("GET", "/api/zalozenia"),
   checkAssumptions: (data: AssumptionsData) =>

@@ -27,6 +27,7 @@ from ..planner.pipeline import LiveLog, WeekPlanner
 from ..planner.pools import Pools, build_pools
 from ..planner.repair import apply_swaps
 from ..report.markdown import render_plan, render_shopping_list
+from ..report.text import markdown_to_text
 from ..shopping import build_shopping_list
 from ..storage.paths import Paths
 from ..storage.repository import Repository, check_consistency
@@ -631,6 +632,23 @@ class DietService:
         shop_path.write_text(shop_md, encoding="utf-8-sig")
         return {"plan_path": str(plan_path), "shopping_path": str(shop_path), "plan_md": plan_md,
                 "shopping_md": shop_md}
+
+    def text_export(self, plan_id: str, kind: str) -> dict:
+        """Treść całego tygodnia albo zakupów do zapisania w wybranym przez użytkownika miejscu."""
+        rec = self._record(plan_id)
+        repo = self.repo
+        stem = slug(rec.title) or "plan"
+        if kind == "plan":
+            report = rec.report or verify_plan(rec.plan, repo.assumptions, repo.products, repo.dishes,
+                                               group_tolerance=self.settings.group_ratio_tolerance)
+            content = render_plan(rec.plan, repo.assumptions, repo.products, repo.dishes, report, title=rec.title)
+            filename = f"jadlospis_{stem}_v{rec.version}.txt"
+        elif kind == "shopping":
+            content = render_shopping_list(rec.plan, repo.assumptions, repo.products, repo.store_products)
+            filename = f"lista_zakupow_{stem}_v{rec.version}.txt"
+        else:
+            raise UserError("Nieznany rodzaj pliku do zapisania.")
+        return {"filename": filename, "content": markdown_to_text(content)}
 
     # ------------------------------------------------------------------ założenia
     def assumptions(self) -> dict:

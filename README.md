@@ -5,12 +5,12 @@ Model językowy (DeepSeek) wybiera dania tak, żeby tydzień był smaczny i prak
 deterministyczny silnik** (OR-Tools CP-SAT) i sprawdza je **niezależny weryfikator**. Wszystko po polsku, z listą
 zakupów podpowiadającą produkty z półek Lidla (i Kauflandu) w Rumunii.
 
-> **Status projektu:** działająca aplikacja lokalna w wersji 0.1.0 dla Windows. Nie jest wyrobem medycznym ani zamiennikiem
+> **Status projektu:** działająca aplikacja lokalna w wersji 0.1.1 dla Windows. Nie jest wyrobem medycznym ani zamiennikiem
 > porady lekarza lub dietetyka. Przed użyciem sprawdź cele żywieniowe i wygenerowany plan pod kątem swoich potrzeb.
 
 ## Instalator Windows
 
-Pobierz `DietBot-Setup-0.1.0.exe` z [najnowszego wydania](https://github.com/krapcys1-maker/dietbot-desktop/releases/latest),
+Pobierz `DietBot-Setup-0.1.1.exe` z [najnowszego wydania](https://github.com/krapcys1-maker/dietbot-desktop/releases/latest),
 uruchom instalator i otwórz DietBota ze skrótu w menu Start. Instalacja nie wymaga uprawnień administratora.
 
 Po pierwszym uruchomieniu przejdź do **Ustawienia → Model językowy**, wklej swój klucz API DeepSeek i kliknij
@@ -44,7 +44,7 @@ Lokalną paczkę i instalator można zbudować poleceniem:
 powershell -ExecutionPolicy Bypass -File packaging\zbuduj_instalator.ps1
 ```
 
-Skrypt wymaga Inno Setup 6. Wynikiem jest `release\DietBot-Setup-0.1.0.exe` oraz folder `dist\DietBot`.
+Skrypt wymaga Inno Setup 6. Wynikiem jest `release\DietBot-Setup-0.1.1.exe` oraz folder `dist\DietBot`.
 Nie kopiuj samego `DietBot.exe` — potrzebuje on plików z `dist\DietBot\_internal`.
 
 ## Własny klucz API DeepSeek
@@ -89,7 +89,12 @@ Plany zapisują się w `wyniki\dietbot.sqlite3`, eksporty Markdown w `wyniki\`, 
   wskazanego dnia. Przekąski („w sobotę lody”, „popcorn do filmu”) trafiają do tego dnia jako przekąska z puli 20%. Opcja **Wymyśl nowe dania do tego tygodnia**: model wymyśla przepisy, kod, silnik
   i kucharz je sprawdzają, a nowe dania trafiają do biblioteki i od razu do planu. Liczby z życzeń („2 razy”) są
   pilnowane dokładnie.
-- **Zakupy** — lista z odhaczaniem, liczbą opakowań i nazwami z rumuńskich półek, kopiowanie do schowka, druk.
+- **Zapis do pliku** — na ekranie pełnego tygodnia przycisk **Zapisz cały jadłospis** zapisuje wszystkie 7 dni
+  (posiłki, gramatury, przygotowanie i podsumowania) do pliku TXT. Osobny przycisk **Zapisz listę zakupów**
+  zapisuje kompletną listę z całego tygodnia. W obu przypadkach standardowe okno **Zapisz jako** pozwala wybrać
+  nazwę i dowolny folder.
+- **Zakupy** — lista z odhaczaniem, liczbą opakowań i nazwami z rumuńskich półek, kopiowanie do schowka, druk
+  oraz zapis całej listy do wybranego pliku TXT.
   Jedzenie z pizzerii czy budki trafia do osobnej grupy „Na wynos — do zamówienia” (z liczbą kawałków).
 - **Czat** — „ile białka ma żona w środę?”, „zamień czwartkową kolację na coś z kurczakiem”,
   „wymyśl mi naleśniki z serem na kolację”, „zmniejsz mi kalorie o 100” (zmiany założeń zawsze wymagają

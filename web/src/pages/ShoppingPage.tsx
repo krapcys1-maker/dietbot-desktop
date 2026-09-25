@@ -47,6 +47,17 @@ export default function ShoppingPage({ planId }: { planId?: string }) {
     }
   };
 
+  const saveFile = async () => {
+    if (!activeId) return;
+    try {
+      const result = await api.savePlanFile(activeId, "shopping");
+      if (result.saved) toast(`Zapisano: ${result.path}`);
+      else toast("Anulowano zapis.");
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Nie udało się zapisać listy.", "error");
+    }
+  };
+
   if (plans.loading && !plans.data) return <div className="page"><Loading /></div>;
   if (plans.error && !plans.data) return <div className="page"><ErrorBox error={plans.error} onRetry={plans.reload} /></div>;
   if (!activeId)
@@ -85,6 +96,7 @@ export default function ShoppingPage({ planId }: { planId?: string }) {
           <label className="check">
             <input type="checkbox" checked={hideDone} onChange={(e) => setHideDone(e.target.checked)} /> Ukryj kupione
           </label>
+          <button className="btn primary" onClick={() => void saveFile()}>Zapisz listę do pliku</button>
           <button className="btn" onClick={copy}>Kopiuj</button>
           <button className="btn" onClick={() => window.print()}>Drukuj</button>
           <button className="btn" onClick={() => { setDone([]); saveLocal(storageKey, []); }}>Wyczyść odhaczenia</button>

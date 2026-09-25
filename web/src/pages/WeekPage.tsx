@@ -87,6 +87,16 @@ export default function WeekPage({ planId }: { planId?: string }) {
     }
   };
 
+  const saveFile = async (kind: "plan" | "shopping") => {
+    try {
+      const result = await api.savePlanFile(plan.id, kind);
+      if (result.saved) toast(`Zapisano: ${result.path}`);
+      else toast("Anulowano zapis.");
+    } catch (e) {
+      toast((e as Error).message, "error");
+    }
+  };
+
   const remove = async () => {
     if (!window.confirm(`Usunąć „${plan.title}” (wersja ${plan.version})?`)) return;
     try {
@@ -132,6 +142,8 @@ export default function WeekPage({ planId }: { planId?: string }) {
             </button>
           )}
           <button className="btn" onClick={() => go("zakupy", plan.id)}>🛒 Lista zakupów</button>
+          <button className="btn primary" onClick={() => void saveFile("plan")}>Zapisz cały jadłospis</button>
+          <button className="btn" onClick={() => void saveFile("shopping")}>Zapisz listę zakupów</button>
           <button className="btn" onClick={exportPlan}>Eksportuj</button>
           <button className="btn" onClick={() => window.print()}>Drukuj</button>
           <button className="btn danger" onClick={remove}>Usuń</button>
