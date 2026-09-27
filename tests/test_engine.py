@@ -71,7 +71,10 @@ def test_portions_are_multiples_of_steps_and_within_caps(repo, week_result):
                 ing = ings[item.product_id]
                 if product.negligible or ing.role.value == "przyprawa":
                     continue
-                step = product.measure(ing.unit).grams if ing.unit else (ing.step_g or product.step_g)
+                # Eggs incorporated into batter are weighed, not counted as whole
+                # eggs per plate. The group uses its own 1 g measuring step.
+                step = (ing.step_g or 1) if item.product_id in dish.grouped_products() else (
+                    product.measure(ing.unit).grams if ing.unit else (ing.step_g or product.step_g))
                 assert abs(item.grams / step - round(item.grams / step)) < 1e-6, (m.dish_id, item)
                 if product.max_portion_g:
                     assert item.grams <= product.max_portion_g + 1e-6, (m.dish_id, item)

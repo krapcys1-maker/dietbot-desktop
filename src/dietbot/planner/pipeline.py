@@ -334,6 +334,18 @@ class WeekPlanner:
             log.append(f"    sprawdzono {len(options)} zamian, w pełni działających: {len(working)}")
             swaps: dict[str, str] = {}
             block_of = {o.slot_key: tuple(o.block_days) for o in options}
+            current = {s.key: s.dish_id for s in comp.slots}
+
+            def swap_text(key: str, dish_id: str, current: dict[str, str] = current) -> str:
+                # dziennik czyta użytkownik („Jak powstał ten plan”) — nazwy dań i dni zamiast identyfikatorów
+                try:
+                    where = slot_label(key)
+                except (ValueError, KeyError):
+                    where = key
+                old = self.repo.dishes.get(current.get(key, ""))
+                new = self.repo.dishes.get(dish_id)
+                return (f"{where}: {old.name if old else current.get(key, '?')} → "
+                        f"{new.name if new else dish_id}")
             llm_blocks: set[tuple[int, ...]] = set()
             if self.llm is not None and working:
                 try:
@@ -347,16 +359,16 @@ class WeekPlanner:
                         if (sw.slot, sw.danie) in valid and block not in llm_blocks and sw.danie not in swaps.values():
                             swaps[sw.slot] = sw.danie
                             llm_blocks.add(block)
-                            log.append(f"    zamiana {sw.slot} → {sw.danie}: {sw.uzasadnienie}")
+                            log.append(f"    zamiana {swap_text(sw.slot, sw.danie)}: {sw.uzasadnienie}")
                         else:
-                            log.append(f"    pominięto propozycję modelu {sw.slot} → {sw.danie}")
+                            log.append(f"    pominięto propozycję modelu {swap_text(sw.slot, sw.danie)}")
                 except LLMError as exc:
                     log.append(f"    model językowy niedostępny przy naprawie ({exc})")
             for key, cand in select_swaps(result, options).items():
                 if block_of.get(key) in llm_blocks or cand in swaps.values():
                     continue
                 swaps[key] = cand
-                log.append(f"    zamiana {key} → {cand} (według silnika)")
+                log.append(f"    zamiana {swap_text(key, cand)} (według silnika)")
             if not swaps:
                 log.append("    żadna zamiana nie poprawia planu")
                 break

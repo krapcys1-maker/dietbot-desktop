@@ -1,0 +1,1179 @@
+[
+  {
+    "id": "roslinne_033_pasta_sojowa",
+    "nazwa": "Kanapki z pastą z granulatu sojowego i ogórkiem kiszonym",
+    "posilki": [
+      "sniadanie",
+      "kolacja"
+    ],
+    "kuchnia": "polska",
+    "tagi": [
+      "wege",
+      "wegan"
+    ],
+    "skladniki": [
+      {
+        "produkt": "granulat_sojowy",
+        "rola": "bialko",
+        "typowo_g": 55,
+        "min_g": 35,
+        "max_g": 80
+      },
+      {
+        "produkt": "chleb_zytni",
+        "rola": "weglowodany",
+        "typowo_g": 110,
+        "min_g": 60,
+        "max_g": 170
+      },
+      {
+        "produkt": "cebula",
+        "rola": "warzywa",
+        "typowo_g": 30,
+        "min_g": 20,
+        "max_g": 45
+      },
+      {
+        "produkt": "koncentrat_pomidorowy",
+        "rola": "sos",
+        "typowo_g": 15,
+        "min_g": 10,
+        "max_g": 25
+      },
+      {
+        "produkt": "olej_rzepakowy",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 4,
+        "max_g": 18
+      },
+      {
+        "produkt": "ogorek_kiszony",
+        "rola": "warzywa",
+        "typowo_g": 80,
+        "min_g": 50,
+        "max_g": 120
+      },
+      {
+        "produkt": "majeranek",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      },
+      {
+        "produkt": "pieprz_czarny",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Granulat sojowy zalej wrzątkiem na 10 minut, odcedź i dokładnie odciśnij.",
+      "Cebulę zeszklij na oleju, dodaj granulat, koncentrat, majeranek i pieprz. Smaż 3 minuty, mieszając.",
+      "Zblenduj na gładką pastę z 2–3 łyżkami wody.",
+      "Posmaruj pieczywo pastą i podaj z ogórkiem kiszonym."
+    ],
+    "czas_min": 20,
+    "zrodlo": "Porcja 0.3.3 — autorski przepis roślinny; wartości wyłącznie z bazy produktów (BLS 4.0). Pieczywo i makaron bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_033_hummus_edamame",
+    "nazwa": "Kanapki z domowym hummusem i edamame",
+    "posilki": [
+      "sniadanie"
+    ],
+    "kuchnia": "bliskowschodnia",
+    "tagi": [
+      "wege",
+      "wegan",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "ciecierzyca_konserwowa",
+        "rola": "bialko",
+        "typowo_g": 110,
+        "min_g": 70,
+        "max_g": 170
+      },
+      {
+        "produkt": "edamame",
+        "rola": "bialko",
+        "typowo_g": 150,
+        "min_g": 90,
+        "max_g": 220
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 80,
+        "min_g": 45,
+        "max_g": 130
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 4,
+        "max_g": 18
+      },
+      {
+        "produkt": "sok_z_cytryny",
+        "rola": "dodatek",
+        "typowo_g": 10,
+        "min_g": 5,
+        "max_g": 15
+      },
+      {
+        "produkt": "papryka_czerwona",
+        "rola": "warzywa",
+        "typowo_g": 80,
+        "min_g": 50,
+        "max_g": 120
+      },
+      {
+        "produkt": "czosnek",
+        "rola": "przyprawa",
+        "typowo_g": 3,
+        "min_g": 0,
+        "max_g": 6
+      },
+      {
+        "produkt": "kmin_rzymski",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Edamame gotuj 4–5 minut w osolonej wodzie, odcedź i przestudź.",
+      "Ciecierzycę opłucz i zblenduj z oliwą, sokiem z cytryny, czosnkiem, kuminem i 2–3 łyżkami wody.",
+      "Posmaruj pieczywo hummusem, ułóż edamame i paski papryki."
+    ],
+    "czas_min": 15,
+    "zrodlo": "Porcja 0.3.3 — autorski przepis roślinny; wartości wyłącznie z bazy produktów (BLS 4.0). Pieczywo i makaron bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_033_grzanki_edamame",
+    "nazwa": "Grzanki z pastą z edamame i awokado",
+    "posilki": [
+      "sniadanie",
+      "kolacja"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "edamame",
+        "rola": "bialko",
+        "typowo_g": 160,
+        "min_g": 100,
+        "max_g": 240
+      },
+      {
+        "produkt": "awokado",
+        "rola": "tluszcz",
+        "typowo_g": 50,
+        "min_g": 30,
+        "max_g": 75
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 55,
+        "max_g": 160
+      },
+      {
+        "produkt": "pestki_dyni",
+        "rola": "dodatek",
+        "typowo_g": 15,
+        "min_g": 8,
+        "max_g": 25
+      },
+      {
+        "produkt": "rzodkiewka",
+        "rola": "warzywa",
+        "typowo_g": 60,
+        "min_g": 35,
+        "max_g": 90
+      },
+      {
+        "produkt": "sok_z_cytryny",
+        "rola": "dodatek",
+        "typowo_g": 10,
+        "min_g": 5,
+        "max_g": 15
+      },
+      {
+        "produkt": "pieprz_czarny",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Edamame gotuj 4–5 minut w osolonej wodzie, odcedź.",
+      "Rozgnieć edamame z awokado i sokiem z cytryny, dopraw pieprzem.",
+      "Pieczywo podpiecz na suchej patelni lub w tosterze, posmaruj pastą.",
+      "Posyp pestkami dyni i podaj z rzodkiewką."
+    ],
+    "czas_min": 15,
+    "zrodlo": "Porcja 0.3.3 — autorski przepis roślinny; wartości wyłącznie z bazy produktów (BLS 4.0). Pieczywo i makaron bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_033_pasta_soczewica",
+    "nazwa": "Kanapki z pastą z czerwonej soczewicy i tofu",
+    "posilki": [
+      "sniadanie",
+      "kolacja"
+    ],
+    "kuchnia": "polska",
+    "tagi": [
+      "wege",
+      "wegan"
+    ],
+    "skladniki": [
+      {
+        "produkt": "soczewica_czerwona",
+        "rola": "bialko",
+        "typowo_g": 50,
+        "min_g": 30,
+        "max_g": 75
+      },
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 90,
+        "min_g": 50,
+        "max_g": 140
+      },
+      {
+        "produkt": "chleb_zytni",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 55,
+        "max_g": 160
+      },
+      {
+        "produkt": "cebula",
+        "rola": "warzywa",
+        "typowo_g": 30,
+        "min_g": 20,
+        "max_g": 45
+      },
+      {
+        "produkt": "olej_rzepakowy",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 4,
+        "max_g": 18
+      },
+      {
+        "produkt": "ogorek",
+        "rola": "warzywa",
+        "typowo_g": 80,
+        "min_g": 50,
+        "max_g": 120
+      },
+      {
+        "produkt": "papryka_slodka_mielona",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      },
+      {
+        "produkt": "majeranek",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Soczewicę opłucz i ugotuj w wodzie do miękkości (ok. 15 minut), odcedź.",
+      "Cebulę zeszklij na oleju. Zblenduj soczewicę, cebulę, tofu, paprykę i majeranek na gładką pastę.",
+      "Posmaruj pieczywo pastą i podaj ze świeżym ogórkiem."
+    ],
+    "czas_min": 25,
+    "zrodlo": "Porcja 0.3.3 — autorski przepis roślinny; wartości wyłącznie z bazy produktów (BLS 4.0). Pieczywo i makaron bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_033_bolognese",
+    "nazwa": "Spaghetti z sosem bolognese z granulatu sojowego",
+    "posilki": [
+      "obiad"
+    ],
+    "kuchnia": "wloska",
+    "tagi": [
+      "wege",
+      "wegan",
+      "na_cieplo"
+    ],
+    "skladniki": [
+      {
+        "produkt": "makaron_pszenny",
+        "rola": "weglowodany",
+        "typowo_g": 90,
+        "min_g": 50,
+        "max_g": 140
+      },
+      {
+        "produkt": "granulat_sojowy",
+        "rola": "bialko",
+        "typowo_g": 50,
+        "min_g": 30,
+        "max_g": 80
+      },
+      {
+        "produkt": "passata",
+        "rola": "warzywa",
+        "typowo_g": 200,
+        "min_g": 120,
+        "max_g": 300
+      },
+      {
+        "produkt": "cebula",
+        "rola": "warzywa",
+        "typowo_g": 50,
+        "min_g": 30,
+        "max_g": 75
+      },
+      {
+        "produkt": "marchew",
+        "rola": "warzywa",
+        "typowo_g": 50,
+        "min_g": 30,
+        "max_g": 75
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 4,
+        "max_g": 18
+      },
+      {
+        "produkt": "czosnek",
+        "rola": "przyprawa",
+        "typowo_g": 4,
+        "min_g": 0,
+        "max_g": 8
+      },
+      {
+        "produkt": "oregano_suszone",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      },
+      {
+        "produkt": "bazylia_suszona",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Granulat sojowy zalej wrzątkiem na 10 minut, odcedź i dokładnie odciśnij.",
+      "Na oliwie podsmaż posiekaną cebulę, startą marchew i czosnek. Dodaj granulat i smaż 3 minuty.",
+      "Wlej passatę, dodaj oregano i bazylię. Duś pod przykryciem 15 minut, w razie potrzeby podlej wodą.",
+      "Makaron bez jaj ugotuj al dente, odcedź i podaj z sosem."
+    ],
+    "czas_min": 30,
+    "zrodlo": "Porcja 0.3.3 — autorski przepis roślinny; wartości wyłącznie z bazy produktów (BLS 4.0). Pieczywo i makaron bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_033_chili_sin_carne",
+    "nazwa": "Chili sin carne z granulatem sojowym i ryżem",
+    "posilki": [
+      "obiad"
+    ],
+    "kuchnia": "meksykanska",
+    "tagi": [
+      "wege",
+      "wegan",
+      "na_cieplo"
+    ],
+    "skladniki": [
+      {
+        "produkt": "ryz_bialy",
+        "rola": "weglowodany",
+        "typowo_g": 75,
+        "min_g": 40,
+        "max_g": 120
+      },
+      {
+        "produkt": "granulat_sojowy",
+        "rola": "bialko",
+        "typowo_g": 40,
+        "min_g": 25,
+        "max_g": 65
+      },
+      {
+        "produkt": "fasola_czerwona_konserwowa",
+        "rola": "bialko",
+        "typowo_g": 120,
+        "min_g": 70,
+        "max_g": 180
+      },
+      {
+        "produkt": "pomidory_z_puszki",
+        "rola": "warzywa",
+        "typowo_g": 200,
+        "min_g": 120,
+        "max_g": 300
+      },
+      {
+        "produkt": "papryka_czerwona",
+        "rola": "warzywa",
+        "typowo_g": 80,
+        "min_g": 50,
+        "max_g": 120
+      },
+      {
+        "produkt": "cebula",
+        "rola": "warzywa",
+        "typowo_g": 40,
+        "min_g": 25,
+        "max_g": 60
+      },
+      {
+        "produkt": "olej_rzepakowy",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 4,
+        "max_g": 18
+      },
+      {
+        "produkt": "czosnek",
+        "rola": "przyprawa",
+        "typowo_g": 4,
+        "min_g": 0,
+        "max_g": 8
+      },
+      {
+        "produkt": "kmin_rzymski",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      },
+      {
+        "produkt": "papryka_ostra_mielona",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Granulat sojowy zalej wrzątkiem na 10 minut, odcedź i dokładnie odciśnij.",
+      "Na oleju podsmaż cebulę, paprykę i czosnek. Dodaj granulat, kumin i ostrą paprykę, smaż 2 minuty.",
+      "Dodaj pomidory i opłukaną fasolę. Duś 15 minut, aż sos zgęstnieje.",
+      "Ryż ugotuj według opakowania i podaj z chili."
+    ],
+    "czas_min": 35,
+    "zrodlo": "Porcja 0.3.3 — autorski przepis roślinny; wartości wyłącznie z bazy produktów (BLS 4.0). Pieczywo i makaron bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_033_gulasz",
+    "nazwa": "Gulasz z granulatu sojowego z papryką i ziemniakami",
+    "posilki": [
+      "obiad"
+    ],
+    "kuchnia": "polska",
+    "tagi": [
+      "wege",
+      "wegan",
+      "na_cieplo"
+    ],
+    "skladniki": [
+      {
+        "produkt": "ziemniaki",
+        "rola": "weglowodany",
+        "typowo_g": 250,
+        "min_g": 150,
+        "max_g": 380
+      },
+      {
+        "produkt": "granulat_sojowy",
+        "rola": "bialko",
+        "typowo_g": 60,
+        "min_g": 35,
+        "max_g": 90
+      },
+      {
+        "produkt": "papryka_czerwona",
+        "rola": "warzywa",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 150
+      },
+      {
+        "produkt": "cebula",
+        "rola": "warzywa",
+        "typowo_g": 60,
+        "min_g": 35,
+        "max_g": 90
+      },
+      {
+        "produkt": "koncentrat_pomidorowy",
+        "rola": "sos",
+        "typowo_g": 20,
+        "min_g": 10,
+        "max_g": 30
+      },
+      {
+        "produkt": "olej_rzepakowy",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 4,
+        "max_g": 18
+      },
+      {
+        "produkt": "papryka_slodka_mielona",
+        "rola": "przyprawa",
+        "typowo_g": 2,
+        "min_g": 0,
+        "max_g": 4
+      },
+      {
+        "produkt": "majeranek",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      },
+      {
+        "produkt": "pieprz_czarny",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Granulat sojowy zalej wrzątkiem na 10 minut, odcedź i dokładnie odciśnij.",
+      "Na oleju zeszklij cebulę, dodaj granulat i paprykę w kostce. Smaż 5 minut.",
+      "Dodaj koncentrat, paprykę mieloną, majeranek, pieprz i szklankę wody. Duś 15 minut pod przykryciem.",
+      "Ziemniaki ugotuj w osolonej wodzie i podaj z gulaszem."
+    ],
+    "czas_min": 35,
+    "zrodlo": "Porcja 0.3.3 — autorski przepis roślinny; wartości wyłącznie z bazy produktów (BLS 4.0). Pieczywo i makaron bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_033_miska_edamame",
+    "nazwa": "Miska z ryżem, edamame i tofu w sosie sojowo-imbirowym",
+    "posilki": [
+      "obiad"
+    ],
+    "kuchnia": "azjatycka",
+    "tagi": [
+      "wege",
+      "wegan",
+      "na_cieplo"
+    ],
+    "skladniki": [
+      {
+        "produkt": "ryz_bialy",
+        "rola": "weglowodany",
+        "typowo_g": 75,
+        "min_g": 40,
+        "max_g": 120
+      },
+      {
+        "produkt": "edamame",
+        "rola": "bialko",
+        "typowo_g": 120,
+        "min_g": 70,
+        "max_g": 180
+      },
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 160
+      },
+      {
+        "produkt": "marchew",
+        "rola": "warzywa",
+        "typowo_g": 60,
+        "min_g": 35,
+        "max_g": 90
+      },
+      {
+        "produkt": "ogorek",
+        "rola": "warzywa",
+        "typowo_g": 80,
+        "min_g": 50,
+        "max_g": 120
+      },
+      {
+        "produkt": "dymka",
+        "rola": "warzywa",
+        "typowo_g": 15,
+        "min_g": 8,
+        "max_g": 25
+      },
+      {
+        "produkt": "sos_sojowy",
+        "rola": "sos",
+        "typowo_g": 15,
+        "min_g": 8,
+        "max_g": 22
+      },
+      {
+        "produkt": "olej_rzepakowy",
+        "rola": "tluszcz",
+        "typowo_g": 8,
+        "min_g": 3,
+        "max_g": 15
+      },
+      {
+        "produkt": "imbir_swiezy",
+        "rola": "przyprawa",
+        "typowo_g": 5,
+        "min_g": 0,
+        "max_g": 10
+      }
+    ],
+    "przygotowanie": [
+      "Ryż ugotuj według opakowania. Edamame gotuj 4–5 minut w osolonej wodzie.",
+      "Tofu pokrój w kostkę i zrumień na oleju. Na koniec dodaj starty imbir i sos sojowy.",
+      "Marchew zetrzyj, ogórek pokrój w plasterki, dymkę posiekaj.",
+      "Ułóż w misce ryż, tofu, edamame i warzywa. Polej sosem z patelni."
+    ],
+    "czas_min": 25,
+    "zrodlo": "Porcja 0.3.3 — autorski przepis roślinny; wartości wyłącznie z bazy produktów (BLS 4.0). Pieczywo i makaron bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_033_zupa_pomidorowa",
+    "nazwa": "Zupa pomidorowa z ciecierzycą i granulatem sojowym",
+    "posilki": [
+      "obiad"
+    ],
+    "kuchnia": "polska",
+    "tagi": [
+      "wege",
+      "wegan",
+      "zupa",
+      "na_zapas",
+      "na_cieplo"
+    ],
+    "skladniki": [
+      {
+        "produkt": "pomidory_z_puszki",
+        "rola": "warzywa",
+        "typowo_g": 150,
+        "min_g": 90,
+        "max_g": 225
+      },
+      {
+        "produkt": "ciecierzyca_konserwowa",
+        "rola": "bialko",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 150
+      },
+      {
+        "produkt": "granulat_sojowy",
+        "rola": "bialko",
+        "typowo_g": 40,
+        "min_g": 25,
+        "max_g": 60
+      },
+      {
+        "produkt": "makaron_pszenny",
+        "rola": "weglowodany",
+        "typowo_g": 50,
+        "min_g": 30,
+        "max_g": 80
+      },
+      {
+        "produkt": "marchew",
+        "rola": "warzywa",
+        "typowo_g": 60,
+        "min_g": 35,
+        "max_g": 90
+      },
+      {
+        "produkt": "seler_korzen",
+        "rola": "warzywa",
+        "typowo_g": 40,
+        "min_g": 25,
+        "max_g": 60
+      },
+      {
+        "produkt": "cebula",
+        "rola": "warzywa",
+        "typowo_g": 40,
+        "min_g": 25,
+        "max_g": 60
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 4,
+        "max_g": 18
+      },
+      {
+        "produkt": "woda",
+        "rola": "dodatek",
+        "typowo_g": 150,
+        "min_g": 150,
+        "max_g": 150
+      },
+      {
+        "produkt": "bazylia_suszona",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Gramatury w tabeli garnka obejmują wszystkie porcje na dwa dni. Granulat sojowy zalej wrzątkiem na 10 minut, odcedź i dokładnie odciśnij.",
+      "Na oliwie podsmaż pokrojone marchew, seler i cebulę. Dodaj pomidory i wodę, gotuj 15 minut.",
+      "Zupę zblenduj, dodaj ciecierzycę i granulat, gotuj jeszcze 5 minut. Dopraw bazylią.",
+      "Makaron bez jaj ugotuj osobno i dodawaj do talerza przy podawaniu. Zapas szybko schłodź, przechowuj w lodówce i odgrzej tylko potrzebną porcję."
+    ],
+    "czas_min": 40,
+    "zrodlo": "Porcja 0.3.3 — autorski przepis roślinny; wartości wyłącznie z bazy produktów (BLS 4.0). Pieczywo i makaron bez jaj i mleka.",
+    "status": "zatwierdzone",
+    "na_ile_dni": 2
+  },
+  {
+    "id": "roslinne_033_zupa_gulaszowa",
+    "nazwa": "Zupa gulaszowa z granulatem sojowym i ziemniakami",
+    "posilki": [
+      "obiad"
+    ],
+    "kuchnia": "polska",
+    "tagi": [
+      "wege",
+      "wegan",
+      "zupa",
+      "na_zapas",
+      "na_cieplo"
+    ],
+    "skladniki": [
+      {
+        "produkt": "granulat_sojowy",
+        "rola": "bialko",
+        "typowo_g": 55,
+        "min_g": 35,
+        "max_g": 80
+      },
+      {
+        "produkt": "ziemniaki",
+        "rola": "weglowodany",
+        "typowo_g": 200,
+        "min_g": 120,
+        "max_g": 300
+      },
+      {
+        "produkt": "papryka_czerwona",
+        "rola": "warzywa",
+        "typowo_g": 80,
+        "min_g": 50,
+        "max_g": 120
+      },
+      {
+        "produkt": "cebula",
+        "rola": "warzywa",
+        "typowo_g": 50,
+        "min_g": 30,
+        "max_g": 75
+      },
+      {
+        "produkt": "koncentrat_pomidorowy",
+        "rola": "sos",
+        "typowo_g": 20,
+        "min_g": 10,
+        "max_g": 30
+      },
+      {
+        "produkt": "olej_rzepakowy",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 4,
+        "max_g": 18
+      },
+      {
+        "produkt": "chleb_zytni",
+        "rola": "weglowodany",
+        "typowo_g": 80,
+        "min_g": 40,
+        "max_g": 130
+      },
+      {
+        "produkt": "woda",
+        "rola": "dodatek",
+        "typowo_g": 150,
+        "min_g": 150,
+        "max_g": 150
+      },
+      {
+        "produkt": "papryka_slodka_mielona",
+        "rola": "przyprawa",
+        "typowo_g": 2,
+        "min_g": 0,
+        "max_g": 4
+      },
+      {
+        "produkt": "kminek",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Gramatury w tabeli garnka obejmują wszystkie porcje na dwa dni. Granulat sojowy zalej wrzątkiem na 10 minut, odcedź i dokładnie odciśnij.",
+      "Na oleju zeszklij cebulę, dodaj granulat, paprykę w kostce, paprykę mieloną i kminek. Smaż 5 minut.",
+      "Dodaj koncentrat, pokrojone ziemniaki i wodę. Gotuj 20 minut, aż ziemniaki będą miękkie.",
+      "Podaj z pieczywem. Zapas szybko schłodź, przechowuj w lodówce i odgrzej tylko potrzebną porcję."
+    ],
+    "czas_min": 40,
+    "zrodlo": "Porcja 0.3.3 — autorski przepis roślinny; wartości wyłącznie z bazy produktów (BLS 4.0). Pieczywo i makaron bez jaj i mleka.",
+    "status": "zatwierdzone",
+    "na_ile_dni": 2
+  },
+  {
+    "id": "roslinne_033_pita_sojowa",
+    "nazwa": "Pita z granulatem sojowym po grecku z warzywami",
+    "posilki": [
+      "kolacja"
+    ],
+    "kuchnia": "grecka",
+    "tagi": [
+      "wege",
+      "wegan"
+    ],
+    "skladniki": [
+      {
+        "produkt": "chlebek_pita",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 55,
+        "max_g": 150
+      },
+      {
+        "produkt": "granulat_sojowy",
+        "rola": "bialko",
+        "typowo_g": 50,
+        "min_g": 30,
+        "max_g": 75
+      },
+      {
+        "produkt": "pomidor",
+        "rola": "warzywa",
+        "typowo_g": 80,
+        "min_g": 50,
+        "max_g": 120
+      },
+      {
+        "produkt": "ogorek",
+        "rola": "warzywa",
+        "typowo_g": 80,
+        "min_g": 50,
+        "max_g": 120
+      },
+      {
+        "produkt": "cebula",
+        "rola": "warzywa",
+        "typowo_g": 30,
+        "min_g": 20,
+        "max_g": 45
+      },
+      {
+        "produkt": "salata_lodowa",
+        "rola": "warzywa",
+        "typowo_g": 30,
+        "min_g": 20,
+        "max_g": 45
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 4,
+        "max_g": 18
+      },
+      {
+        "produkt": "sok_z_cytryny",
+        "rola": "dodatek",
+        "typowo_g": 10,
+        "min_g": 5,
+        "max_g": 15
+      },
+      {
+        "produkt": "oregano_suszone",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      },
+      {
+        "produkt": "czosnek_granulowany",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      },
+      {
+        "produkt": "papryka_slodka_mielona",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Granulat sojowy zalej wrzątkiem na 10 minut, odcedź i dokładnie odciśnij.",
+      "Granulat skrop sokiem z cytryny, dopraw oregano, czosnkiem i papryką. Smaż na oliwie 5 minut, aż się zrumieni.",
+      "Pomidor i ogórek pokrój, cebulę posiekaj, sałatę porwij.",
+      "Pitę podgrzej, napełnij granulatem i warzywami."
+    ],
+    "czas_min": 20,
+    "zrodlo": "Porcja 0.3.3 — autorski przepis roślinny; wartości wyłącznie z bazy produktów (BLS 4.0). Pieczywo i makaron bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_033_salatka_edamame",
+    "nazwa": "Sałatka z edamame, ciecierzycą i warzywami z pieczywem",
+    "posilki": [
+      "kolacja"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "edamame",
+        "rola": "bialko",
+        "typowo_g": 130,
+        "min_g": 80,
+        "max_g": 200
+      },
+      {
+        "produkt": "ciecierzyca_konserwowa",
+        "rola": "bialko",
+        "typowo_g": 80,
+        "min_g": 50,
+        "max_g": 120
+      },
+      {
+        "produkt": "pomidor",
+        "rola": "warzywa",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 150
+      },
+      {
+        "produkt": "ogorek",
+        "rola": "warzywa",
+        "typowo_g": 80,
+        "min_g": 50,
+        "max_g": 120
+      },
+      {
+        "produkt": "salata_maslowa",
+        "rola": "warzywa",
+        "typowo_g": 40,
+        "min_g": 25,
+        "max_g": 60
+      },
+      {
+        "produkt": "pestki_dyni",
+        "rola": "dodatek",
+        "typowo_g": 15,
+        "min_g": 8,
+        "max_g": 25
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 4,
+        "max_g": 18
+      },
+      {
+        "produkt": "sok_z_cytryny",
+        "rola": "dodatek",
+        "typowo_g": 10,
+        "min_g": 5,
+        "max_g": 15
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 80,
+        "min_g": 45,
+        "max_g": 130
+      }
+    ],
+    "przygotowanie": [
+      "Edamame gotuj 4–5 minut w osolonej wodzie, przestudź. Ciecierzycę opłucz i odsącz.",
+      "Pomidor i ogórek pokrój, sałatę porwij. Wymieszaj z edamame i ciecierzycą.",
+      "Polej oliwą z sokiem z cytryny, posyp pestkami dyni. Podaj z pieczywem."
+    ],
+    "czas_min": 15,
+    "zrodlo": "Porcja 0.3.3 — autorski przepis roślinny; wartości wyłącznie z bazy produktów (BLS 4.0). Pieczywo i makaron bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_033_koktajl_banan",
+    "nazwa": "Koktajl bananowo-kakaowy na napoju sojowym z waflami ryżowymi",
+    "posilki": [
+      "kolacja"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "slodkie",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "napoj_sojowy",
+        "rola": "nabial",
+        "typowo_g": 300,
+        "min_g": 180,
+        "max_g": 400
+      },
+      {
+        "produkt": "odzywka_bialkowa_sojowa",
+        "rola": "bialko",
+        "typowo_g": 25,
+        "min_g": 15,
+        "max_g": 35
+      },
+      {
+        "produkt": "banan",
+        "rola": "owoce",
+        "typowo_g": 120,
+        "min_g": 70,
+        "max_g": 180
+      },
+      {
+        "produkt": "maslo_orzechowe",
+        "rola": "tluszcz",
+        "typowo_g": 15,
+        "min_g": 8,
+        "max_g": 25
+      },
+      {
+        "produkt": "kakao",
+        "rola": "dodatek",
+        "typowo_g": 5,
+        "min_g": 3,
+        "max_g": 8
+      },
+      {
+        "produkt": "wafle_ryzowe",
+        "rola": "weglowodany",
+        "typowo_g": 30,
+        "min_g": 15,
+        "max_g": 50
+      }
+    ],
+    "przygotowanie": [
+      "Zblenduj napój sojowy z odżywką, bananem, masłem orzechowym i kakao.",
+      "Podaj od razu, z waflami ryżowymi obok."
+    ],
+    "czas_min": 5,
+    "zrodlo": "Porcja 0.3.3 — autorski przepis roślinny; wartości wyłącznie z bazy produktów (BLS 4.0). Pieczywo i makaron bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_033_pudding_chia",
+    "nazwa": "Pudding chia na napoju sojowym z malinami",
+    "posilki": [
+      "kolacja"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "slodkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "nasiona_chia",
+        "rola": "dodatek",
+        "typowo_g": 30,
+        "min_g": 20,
+        "max_g": 45
+      },
+      {
+        "produkt": "napoj_sojowy",
+        "rola": "nabial",
+        "typowo_g": 250,
+        "min_g": 150,
+        "max_g": 350
+      },
+      {
+        "produkt": "odzywka_bialkowa_sojowa",
+        "rola": "bialko",
+        "typowo_g": 20,
+        "min_g": 10,
+        "max_g": 30
+      },
+      {
+        "produkt": "maliny",
+        "rola": "owoce",
+        "typowo_g": 120,
+        "min_g": 70,
+        "max_g": 180
+      },
+      {
+        "produkt": "banan",
+        "rola": "owoce",
+        "typowo_g": 80,
+        "min_g": 50,
+        "max_g": 120
+      },
+      {
+        "produkt": "maslo_orzechowe",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 5,
+        "max_g": 20
+      }
+    ],
+    "przygotowanie": [
+      "Wymieszaj napój sojowy z odżywką, dodaj nasiona chia i wymieszaj ponownie po 5 minutach.",
+      "Odstaw do lodówki na co najmniej 30 minut (może stać przez noc).",
+      "Podaj z malinami, plasterkami banana i masłem orzechowym."
+    ],
+    "czas_min": 35,
+    "zrodlo": "Porcja 0.3.3 — autorski przepis roślinny; wartości wyłącznie z bazy produktów (BLS 4.0). Pieczywo i makaron bez jaj i mleka.",
+    "status": "zatwierdzone"
+  }
+]

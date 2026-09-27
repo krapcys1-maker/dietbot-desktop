@@ -25,7 +25,7 @@ MEAL_ICONS = {"sniadanie": "🍳", "obiad": "🍲", "kolacja": "🥗", "przekask
 DAY_SHORT = ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Nd"]
 
 HELP = (
-    "<b>DietBot</b> — wasz jadłospis na tydzień.\n\n"
+    "<b>Porcja</b> — wasz jadłospis na tydzień.\n\n"
     "/dzis — posiłki na dziś z gramaturami\n"
     "/jutro — posiłki na jutro\n"
     "/tydzien — dania na cały tydzień\n"

@@ -13,8 +13,16 @@ from enum import StrEnum
 from pydantic import BaseModel, Field
 
 from ..domain.assumptions import DAY_LABELS_PL, Assumptions, Weekday
-from ..domain.diet import compatible
-from ..domain.dish import GROUP_MEMBER_STEP_G, MEAL_LABELS_PL, DishIngredient, DishTemplate, MealType, Role
+from ..domain.diet import DIET_GENITIVE_PL, compatible
+from ..domain.dish import (
+    GROUP_MEMBER_STEP_G,
+    MEAL_LABELS_PL,
+    DishIngredient,
+    DishTemplate,
+    MealType,
+    Portioning,
+    Role,
+)
 from ..domain.nutrition import BAND_TOLERANCE, EnergyMethod
 from ..domain.plan import PlannedMeal, WeekPlan
 from ..domain.product import Product
@@ -92,12 +100,12 @@ def _step_g(ing: DishIngredient, product: Product, in_group: bool = False) -> fl
     składniki grup proporcji ważymy co GROUP_MEMBER_STEP_G."""
     if in_group:
         return ing.step_g or GROUP_MEMBER_STEP_G
-    if ing.step_g:
-        return ing.step_g
     if ing.unit:
         m = product.measure(ing.unit)
         if m is not None:
             return m.grams
+    if ing.step_g:
+        return ing.step_g
     return product.step_g
 
 
@@ -129,13 +137,13 @@ def verify_plan(
             if it.grams < 0:
                 err("ujemna_gramatura", f"{where}: ujemna gramatura {it.product_id}", **kw)
             if it.grams > 0 and not compatible(products[it.product_id], a.diet):
-                err("rodzaj_diety", f"{where}: {products[it.product_id].name} nie pasuje do diety {a.diet}", **kw)
+                err("rodzaj_diety", f"{where}: {products[it.product_id].name} nie pasuje do diety {DIET_GENITIVE_PL.get(a.diet, a.diet)}", **kw)
             out[it.product_id] = out.get(it.product_id, 0.0) + it.grams
         return out
 
     for fixed in a.day.fixed_items:
         if fixed.product_id in products and not compatible(products[fixed.product_id], a.diet):
-            err("rodzaj_diety", f"Stała pozycja {products[fixed.product_id].name} nie pasuje do diety {a.diet}")
+            err("rodzaj_diety", f"Stała pozycja {products[fixed.product_id].name} nie pasuje do diety {DIET_GENITIVE_PL.get(a.diet, a.diet)}")
 
     # --- struktura: każdy dzień ma wszystkie posiłki, każdy posiłek porcje dla każdej osoby
     by_slot: dict[tuple[int, MealType], list[PlannedMeal]] = defaultdict(list)
@@ -223,6 +231,38 @@ def verify_plan(
                 warn("duza_porcja",
                      f"{DAY_LABELS_PL[m.day]}, {MEAL_LABELS_PL[m.meal].lower()}, {person.name}: porcja {fmt_num(grams, 0)} g "
                      f"— powyżej limitu {fmt_num(cap, 0)} g", day=m.day, meal=m.meal, person_id=person.id)
+
+    # --- twarde zależności przepisu i jednostki; niezależnie od rozwiązania silnika
+    for m in plan.meals:
+        dish = dishes.get(m.dish_id)
+        if dish is None:
+            continue
+        for reason in dish.culinary_errors:
+            err("przepis_niekompletny", f"{dish.name}: {reason}", day=m.day, meal=m.meal)
+        for portion in m.portions:
+            grams = {it.product_id: it.grams for it in portion.items}
+            for ratio in dish.ratios:
+                numerator = sum(grams.get(p, 0) for p in ratio.numerator)
+                denominator = sum(grams.get(p, 0) for p in ratio.denominator)
+                if ((denominator <= 0 and numerator > 0)
+                        or (ratio.min is not None and numerator < ratio.min * denominator - .15)
+                        or (ratio.max is not None and numerator > ratio.max * denominator + .15)):
+                    err("proporcje_przepisu", f"{dish.name}: {ratio.description or 'proporcja składników'} "
+                        f"— {fmt_num(numerator)} g względem {fmt_num(denominator)} g nie zachowuje przepisu.",
+                        day=m.day, meal=m.meal, person_id=portion.person_id)
+            if dish.culinary_version:
+                for ing in dish.ingredients:
+                    if ing.product_id not in products or ing.role is Role.SPICE or products[ing.product_id].negligible:
+                        continue
+                    g = grams.get(ing.product_id, 0)
+                    if not ing.optional and ing.typical_g > 0 and g <= 0:
+                        err("brak_skladnika_przepisu", f"{dish.name}: brak wymaganego składnika {products[ing.product_id].name}.",
+                            day=m.day, meal=m.meal, person_id=portion.person_id)
+                    step = _step_g(ing, products[ing.product_id], ing.product_id in dish.grouped_products())
+                    # Shared mixtures are divided AFTER weighing the whole batch.
+                    if ing.scales and ing.portioning is Portioning.PER_PERSON and abs(g - round(g / step) * step) > .15:
+                        err("jednostka_przepisu", f"{dish.name}: {products[ing.product_id].name} wymaga kroku {fmt_num(step)} g, "
+                            f"otrzymano {fmt_num(g)} g.", day=m.day, meal=m.meal, person_id=portion.person_id)
 
     # --- grupy składników (ciasto, panierka, sos): proporcje jak w przepisie
     for m in plan.meals:

@@ -68,6 +68,37 @@ def test_new_recipes_classification(repo):
     assert all(dish_compatible(d, repo.products, "wege") and d.steps and d.prep_minutes for d in added)
 
 
+def test_plant_drink_replaces_coffee_milk_in_vegan_diet(repo):
+    a = repo.assumptions.model_copy(deep=True)
+    a.diet = "wegan"
+    errors = check_consistency(repo.products, repo.dishes, a).errors
+    # komunikat po polsku i z podpowiedzią zamiennika, który naprawdę jest w bazie
+    assert any("dietą wegańską" in e and "napój sojowy" in e for e in errors)
+    for drink in ("napoj_sojowy", "napoj_owsiany"):
+        assert compatible(repo.products[drink], "wegan") and repo.products[drink].source.code
+    a.day.fixed_items = [fx.model_copy(update={"product_id": "napoj_sojowy"}) if fx.product_id == "mleko_1_5" else fx
+                         for fx in a.day.fixed_items]
+    assert not check_consistency(repo.products, repo.dishes, a).errors
+
+
+def test_plant_recipes_033_widen_vegan_pools(repo):
+    from dietbot.engine import EngineSettings
+    from dietbot.planner.pools import build_pools
+
+    added = [d for d in repo.dishes.values() if d.id.startswith("roslinne_033_")]
+    assert len(added) == 14
+    for d in added:
+        assert dish_compatible(d, repo.products, "wegan"), d.id
+        assert d.steps and d.prep_minutes and not d.culinary_errors, d.id
+    a = repo.assumptions.model_copy(deep=True)
+    a.diet = "wegan"
+    pools = build_pools(repo.approved_dishes(), repo.products, a, EngineSettings())
+    assert not {d.id for d in added} & set(pools.excluded)
+    assert {m.value: len(ids) >= 12 for m, ids in pools.by_meal.items()} == {"sniadanie": True, "obiad": True,
+                                                                             "kolacja": True}
+    assert len(pools.batch[0]) >= 4  # wegańskie zupy na zapas: wtorek + środa
+
+
 def test_snapshot_keeps_fixed_items_targets_tables_and_exports(repo, tmp_path):
     s = DietService(repo.paths, use_llm=False, db_path=tmp_path / "snap.sqlite3")
     plan = WeekPlan(days=[0], meals=[])

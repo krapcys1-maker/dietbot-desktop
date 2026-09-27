@@ -6,7 +6,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 
 from ..domain.assumptions import Assumptions
-from ..domain.diet import dish_compatible
+from ..domain.diet import DIET_INSTRUMENTAL_PL, dish_compatible
 from ..domain.dish import DishStatus, DishTemplate, MealType, Role
 from ..domain.product import Category, Product
 from ..engine.catalog import Catalog
@@ -131,9 +131,9 @@ def build_pools(dishes: Mapping[str, DishTemplate], products: Mapping[str, Produ
     ratings = ratings or {}
 
     for dish in sorted(dishes.values(), key=lambda d: d.id):
-        reasons: list[str] = []
+        reasons: list[str] = list(dish.culinary_errors)
         if not dish_compatible(dish, products, a.diet):
-            reasons.append(f"składniki bez potwierdzonej zgodności z dietą {a.diet}")
+            reasons.append(f"składniki bez potwierdzonej zgodności z dietą {DIET_INSTRUMENTAL_PL.get(a.diet, a.diet)}")
         if ratings.get(dish.id, 0) < 0:
             reasons.append("nie lubisz tego dania — ocena 👎")
         if dish.status is not DishStatus.APPROVED:

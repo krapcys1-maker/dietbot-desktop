@@ -9,10 +9,11 @@ from ..checker.verify import VerificationReport
 from ..domain.assumptions import DAY_LABELS_PL, Assumptions
 from ..domain.dish import MEAL_LABELS_PL, DishTemplate
 from ..domain.plan import WeekPlan
-from ..domain.product import Category, Product, StoreProduct
+from ..domain.product import Product, StoreProduct
 from ..measures import household
 from ..shopping import SHOPPING_NOTE, SHOPPING_NUTRITION_NOTE, build_shopping_list
 from ..textfmt import fmt_num, plural_pl
+from .batch import batch_recipe
 from .summary import day_summaries, week_summaries
 
 METRICS = [("kcal", "Energia", "kcal"), ("protein", "Białko", "g"), ("fat", "Tłuszcz", "g"), ("carbs", "Węglowodany", "g")]
@@ -75,6 +76,38 @@ def render_plan(plan: WeekPlan, a: Assumptions, products: Mapping[str, Product],
                 tags.append(f"na zapas: {', '.join(days)}")
             tag_txt = f" _({'; '.join(tags)})_" if tags else ""
             lines += [f"### {MEAL_LABELS_PL[meal.meal]} — {name}{tag_txt}", ""]
+            batch = batch_recipe(plan, meal, dish, products, persons)
+            if batch:
+                if meal.batch_group in batch_done:
+                    lines += [f"**Dziś tylko odgrzewasz przygotowane porcje. Nie gotujesz drugi raz.** "
+                              f"Pełne składniki i przepis na całość ({batch['portions_text']}) "
+                              f"są przy dniu: {batch['days'][0].lower()}."
+                              + (" Pieczywo podaj osobno." if batch["has_side"] else ""), ""]
+                    continue
+                batch_done.add(meal.batch_group)
+                lines += [f"**{batch['title']}**", "", batch["instructions"], "",
+                          "| Składnik | Łącznie na wszystkie dni i osoby |", "|---|---:|"]
+                for item in batch["items"]:
+                    product = products.get(item["product_id"])
+                    label = product.name if product else item["product_id"]
+                    if item["side"]:
+                        label += " — dodatek do podania osobno"
+                    amount = fmt_amount(product, item["grams"]) if product else f"{fmt_num(item['grams'])} g"
+                    lines.append(f"| {label} | {amount} |")
+                if batch["water"]:
+                    lines.append(f"| Woda do gotowania | {batch['water']} |")
+                lines += ["", "**Przygotowanie całej ilości — wykonujesz raz:**", ""]
+                lines += [f"{i}. {s}" for i, s in enumerate(batch["steps"], 1)]
+                lines += ["", "_Podział porcji: poniższe ilości surowych składników są już zawarte w całości powyżej. "
+                          "To nie jest lista do ponownego gotowania. Mięso i większe kawałki rozdziel według porcji; "
+                          "jedna proporcja masy całej zupy nie daje dokładnego podziału każdego składnika._", ""]
+                for batch_meal in sorted((m for m in plan.meals if m.batch_group == meal.batch_group), key=lambda m: int(m.day)):
+                    for portion in batch_meal.portions:
+                        parts = ", ".join(f"{products[it.product_id].name.lower()} {fmt_amount(products[it.product_id], it.grams)}"
+                                          for it in portion.items if it.product_id in products and not products[it.product_id].negligible)
+                        lines.append(f"- {DAY_LABELS_PL[batch_meal.day]} — {person_names.get(portion.person_id, portion.person_id)}: {parts}.")
+                lines.append("")
+                continue
             if dish and dish.description:
                 lines += [dish.description, ""]
             header = "| Składnik | " + " | ".join(p.name for p in persons) + " |"
@@ -92,20 +125,19 @@ def render_plan(plan: WeekPlan, a: Assumptions, products: Mapping[str, Product],
                     cells.append(fmt_amount(product, g) if (g and product) else "—")
                 lines.append(f"| {label} | " + " | ".join(cells) + " |")
             lines.append("")
-            if meal.batch_group and meal.batch_pot_g and meal.batch_group not in batch_done:
-                batch_done.add(meal.batch_group)
-                # do garnka nie trafia pieczywo podawane obok
-                pot = ", ".join(f"{products[p].name.lower()} {fmt_amount(products[p], g)}"
-                                for p, g in meal.batch_pot_g.items()
-                                if p in products and products[p].category is not Category.BREAD)
-                lines += [f"**Gotujesz raz, na wszystkie porcje:** {pot}.", ""]
-            if dish and dish.steps and (not meal.batch_group or meal.batch_group in batch_done):
-                if not meal.batch_group or meal == next(m for m in plan.meals if m.batch_group == meal.batch_group):
-                    lines.append("_Przygotowanie:_")
-                    lines += [f"{i}. {s}" for i, s in enumerate(dish.steps, start=1)]
-                    lines.append("")
-                else:
-                    lines += ["_Odgrzewasz porcję ugotowaną wcześniej._", ""]
+            if dish and dish.groups and not meal.batch_group:
+                for group in dish.groups:
+                    amounts = [(pid, sum(g.get(pid, 0) for g in grams_by.values())) for pid in group.products]
+                    ingredients = ", ".join(f"{products[pid].name.lower()} {fmt_num(g)} g"
+                                            for pid, g in amounts if pid in products and g > 0)
+                    lines += [f"**{group.name.capitalize()} — razem dla wszystkich osób:** {ingredients}.", ""]
+                if any("jajko_kurze" in group.products for group in dish.groups):
+                    lines += ["_Jajko do masy roztrzep i odważ podaną łączną ilość. "
+                              "Gotową masę podziel według porcji z tabeli; nie odmierzaj ułamka jajka osobno na każdy talerz._", ""]
+            if dish and dish.steps:
+                lines.append("_Przygotowanie:_")
+                lines += [f"{i}. {s}" for i, s in enumerate(dish.steps, start=1)]
+                lines.append("")
 
         day_snacks = [s for s in plan.snacks if s.day == day]
         if day_snacks:

@@ -276,6 +276,8 @@ class BlockModel:
                           hi=1 if self.fixed_choices[key] == dish_id else 0)
             if rank:
                 self._cost_add(y, rank * self.settings.alternate_rank_cost)
+            if dish.culinary_errors:
+                self._row({y: 1}, hi=0)
 
             grouped = dish.grouped_products()
             for ing in dish.ingredients:
@@ -361,13 +363,13 @@ class BlockModel:
                     grp = f"proporcja:{key}:{dish_id}:{r_i}:{pid}"
                     if ratio.min is not None:
                         row = Expr()
-                        row.merge(num, 100)
-                        row.merge(den, -round(ratio.min * 100))
+                        row.merge(num, GROUP_PRECISION)
+                        row.merge(den, -math.ceil(ratio.min * GROUP_PRECISION - 1e-8))
                         self._row(row.coefs, lo=0, group=grp)
                     if ratio.max is not None:
                         row = Expr()
-                        row.merge(num, 100)
-                        row.merge(den, -round(ratio.max * 100))
+                        row.merge(num, GROUP_PRECISION)
+                        row.merge(den, -math.floor(ratio.max * GROUP_PRECISION + 1e-8))
                         self._row(row.coefs, hi=0, group=grp)
 
             # grupy (ciasto, panierka, sos): udział składnika w masie grupy jak w przepisie, dla każdej osoby.
@@ -470,6 +472,10 @@ class BlockModel:
                 dish = self.dishes.get(dish_id)
                 if dish is None:
                     raise EngineInputError(f"przekąska '{dish_id}' z założeń nie istnieje w bibliotece dań")
+                # Balancing snacks use a simpler portion model. A compound recipe
+                # must use a regular meal slot, never bypass its cooking rules here.
+                if dish.culinary_errors or dish.groups or dish.ratios:
+                    continue
                 if any(i.product_id in person.excluded_products and not i.optional for i in dish.ingredients):
                     continue
                 z = self._new_bool(f"z|{int(day)}|{pid}|{dish_id}")

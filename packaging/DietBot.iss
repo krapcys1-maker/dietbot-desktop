@@ -1,5 +1,5 @@
 #define MyAppName "Porcja"
-#define MyAppVersion "0.3.0"
+#define MyAppVersion "0.3.3"
 #define MyAppPublisher "krapcys1-maker"
 #define MyAppExeName "DietBot.exe"
 

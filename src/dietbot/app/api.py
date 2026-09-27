@@ -119,7 +119,7 @@ def create_app(service: DietService) -> FastAPI:
         if origin and request.method not in ("GET", "HEAD", "OPTIONS"):
             supplied, expected = urlsplit(origin), urlsplit(str(request.base_url))
             if (supplied.scheme, supplied.netloc) != (expected.scheme, expected.netloc):
-                return JSONResponse(status_code=403, content={"detail": "Żądanie spoza aplikacji DietBot."})
+                return JSONResponse(status_code=403, content={"detail": "Żądanie spoza aplikacji Porcja."})
         return await call_next(request)
 
     @app.exception_handler(Exception)
@@ -337,7 +337,7 @@ def create_app(service: DietService) -> FastAPI:
     else:
         @app.get("/", response_class=HTMLResponse)
         def no_ui() -> str:
-            return ("<meta charset='utf-8'><h1>DietBot</h1><p>Interfejs nie jest zbudowany. "
+            return ("<meta charset='utf-8'><h1>Porcja</h1><p>Interfejs nie jest zbudowany. "
                     "Uruchom <code>npm run build</code> w folderze <code>web</code>. API: <a href='/api/docs'>/api/docs</a></p>")
 
     return app

@@ -6,9 +6,12 @@ from PyInstaller.utils.hooks import collect_all, collect_data_files, collect_sub
 ROOT = SPECPATH + r"\.."
 datas = [
     (ROOT + r"\web\dist", r"web\dist"),
-    (ROOT + r"\dane", r"defaults\dane"),
     (ROOT + r"\konfiguracja", r"defaults\konfiguracja"),
 ]
+# Dane startowe bez dane\raw: surowe bazy BLS/CIQUAL (ok. 34 MB) są potrzebne tylko komendom deweloperskim
+# (importuj-bls, odswiez-bls), a paczka kopiuje defaults\dane do katalogu danych każdego użytkownika.
+for sub in ("dania", "produkty", "sklepy"):
+    datas.append((ROOT + "\\dane\\" + sub, "defaults\\dane\\" + sub))
 binaries = []
 hiddenimports = []
 for pkg in ("ortools", "webview", "uvicorn", "simplemma", "rapidfuzz", "aiogram", "clr_loader", "pythonnet"):

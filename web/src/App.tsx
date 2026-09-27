@@ -31,8 +31,26 @@ export default function App() {
   const page = route[0] || "start";
   const [status, setStatus] = useState<Status | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [theme, setTheme] = useState(() => loadLocal<string>("porcja:theme", "light") === "dark" ? "dark" : "light");
-  useEffect(() => { document.documentElement.dataset.theme = theme; saveLocal("porcja:theme", theme); }, [theme]);
+  // bez własnego wyboru motyw idzie za ustawieniem systemu (Windows: tryb ciemny aplikacji)
+  const systemTheme = () => (window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  // „porcja:theme” zapisywało się dawniej przy każdym starcie, więc „light” nie musiało być wyborem użytkownika
+  const [chosenTheme, setChosenTheme] = useState(() => loadLocal<string | null>("porcja:motyw", null)
+    ?? (loadLocal<string | null>("porcja:theme", null) === "dark" ? "dark" : null));
+  const [theme, setTheme] = useState(() => chosenTheme === "dark" || chosenTheme === "light" ? chosenTheme : systemTheme());
+  useEffect(() => { document.documentElement.dataset.theme = theme; }, [theme]);
+  useEffect(() => {
+    if (chosenTheme || !window.matchMedia) return;
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const follow = () => setTheme(media.matches ? "dark" : "light");
+    media.addEventListener?.("change", follow);
+    return () => media.removeEventListener?.("change", follow);
+  }, [chosenTheme]);
+  const toggleTheme = () => {
+    const next = theme === "light" ? "dark" : "light";
+    setTheme(next);
+    setChosenTheme(next);
+    saveLocal("porcja:motyw", next);
+  };
   useEffect(() => { setMenuOpen(false); document.querySelector(".main")?.scrollTo(0, 0); }, [page]);
 
   useEffect(() => {
@@ -120,7 +138,7 @@ export default function App() {
         </nav>
         <main className="main" id="main-content" tabIndex={-1}>
           <div className="topbar no-print"><span>Twoja przestrzeń <span className="topbar-divider">/</span> <b>{NAV.find(n => n.key === page)?.label ?? ({ nowy: "Nowy plan", zalozenia: "Cele i preferencje", ustawienia: "Ustawienia", pomoc: "Pomoc", czat: "Asystent", produkty: "Produkty" } as Record<string, string>)[page] ?? "Plan tygodnia"}</b></span>
-            <div className="row"><a href="#/ustawienia" className="connection-label"><span className={`live-dot ${status?.llm.key_present && status?.llm.enabled ? "" : "neutral"}`} />{status ? status.llm.key_present && status.llm.enabled ? "AI dostępne" : "Tryb bez AI" : "Łączenie…"}</a><button className="btn icon-button" aria-label={theme === "light" ? "Włącz ciemny motyw" : "Włącz jasny motyw"} onClick={() => setTheme(t => t === "light" ? "dark" : "light")}><Icon name={theme === "light" ? "moon" : "sun"} /></button></div>
+            <div className="row"><a href="#/ustawienia" className="connection-label"><span className={`live-dot ${status?.llm.key_present && status?.llm.enabled ? "" : "neutral"}`} />{status ? status.llm.key_present && status.llm.enabled ? "AI dostępne" : "Tryb bez AI" : "Łączenie…"}</a><button className="btn icon-button" aria-label={theme === "light" ? "Włącz ciemny motyw" : "Włącz jasny motyw"} onClick={toggleTheme}><Icon name={theme === "light" ? "moon" : "sun"} /></button></div>
           </div>
           {content}
           <footer className="page-footer no-print">porcja. <span>Dobrze mieć plan.</span><a href="#/pomoc">Pomoc</a></footer>

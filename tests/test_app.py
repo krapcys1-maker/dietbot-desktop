@@ -69,6 +69,8 @@ def test_generate_and_view(service, generated):
         assert all(s == "ok" for d in view["days"] for t in d["totals"].values() for s in t["states"].values())
     batch = [m for d in view["days"] for m in d["meals"] if m["batch_group"]]
     assert batch and batch[0]["pot"] and not batch[0]["reheat"] and batch[1]["reheat"]
+    assert batch[0]["batch_recipe"]["portions_count"] == 4
+    assert batch[0]["batch_recipe"]["items"] == batch[1]["batch_recipe"]["items"]
     assert batch[0]["slot_key"] == "1-2_obiad"
     assert any(f["label"] == "Posiłki z puli 20%" for f in view["facts"])
     assert [w["person_id"] for w in view["week_summary"]] == ["kobieta", "mezczyzna"]
