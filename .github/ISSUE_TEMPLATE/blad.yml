@@ -1,6 +1,7 @@
 name: Zgłoś błąd
 description: Coś nie działa w Porcji
 title: "[Błąd] "
+labels: ["bug"]
 body:
   - type: markdown
     attributes:
@@ -9,7 +10,7 @@ body:
     id: version
     attributes:
       label: Wersja Porcji i Windows
-      placeholder: "Porcja 0.3.0, Windows 11 x64"
+      placeholder: "Porcja 0.3.3, Windows 11 x64"
     validations:
       required: true
   - type: textarea
