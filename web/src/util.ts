@@ -27,6 +27,7 @@ export const DAY_NAMES = ["Poniedziałek", "Wtorek", "Środa", "Czwartek", "Pią
 export const MEAL_NAMES: Record<string, string> = { sniadanie: "Śniadanie", obiad: "Obiad", kolacja: "Kolacja", przekaska: "Przekąska" };
 export const METRIC_NAMES: Record<string, string> = { kcal: "Energia", protein: "Białko", fat: "Tłuszcz", carbs: "Węglowodany" };
 export const TAG_NAMES: Record<string, string> = {
+  wegan: "wegańskie",
   slodkie: "słodkie", pula_20: "pula 20%", na_zapas: "na zapas", zupa: "zupa", wege: "wege", na_cieplo: "na ciepło", szybkie: "szybkie",
 };
 export const STATUS_NAMES: Record<string, string> = { szkic: "szkic", zatwierdzone: "zatwierdzone", odrzucone: "odrzucone" };

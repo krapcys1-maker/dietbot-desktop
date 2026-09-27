@@ -5,9 +5,9 @@
 wersja: 1
 
 energia:
-  # makro_4_9_4 — kcal = 4·białko + 9·tłuszcz + 4·węglowodany (tak policzone są cele poniżej)
-  # etykieta    — kcal z tabel/etykiet (UE, z błonnikiem 2 kcal/g); daje ok. 2–3% więcej kcal
-  metoda: makro_4_9_4
+  # Kalorie z pola kcal produktów w tabelach/etykietach. Makro sprawdzamy osobno.
+  # Nie zastępujemy kcal skrótem 4·B + 9·T + 4·W, który pomija m.in. błonnik.
+  metoda: etykieta
 
 osoby:
   - id: kobieta

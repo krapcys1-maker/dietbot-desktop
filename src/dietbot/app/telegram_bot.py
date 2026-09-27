@@ -150,12 +150,7 @@ def format_shopping(data: dict) -> str:
         lines += ["", f"<b>{html.escape(g['label'])}</b>"]
         for it in g["items"]:
             amount = "" if it["pomijalny"] else f" — {it['ilosc']}"
-            store = ""
-            if it.get("sklep"):
-                s = it["sklep"]
-                packs = f", {it['opakowania_tekst']}" if it.get("opakowania_tekst") else ""
-                store = f"\n    <i>{html.escape(s['sklep'])}: {html.escape(s['nazwa'])}{packs}</i>"
-            lines.append(f"▫️ {html.escape(it['nazwa'])}{amount}{store}")
+            lines.append(f"▫️ {html.escape(it['nazwa'])}{amount}")
     return "\n".join(lines)
 
 

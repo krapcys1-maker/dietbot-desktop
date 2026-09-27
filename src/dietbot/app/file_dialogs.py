@@ -51,7 +51,14 @@ def save_text_as(default_name: str, title: str, content: str) -> Path | None:
     dialog.lStructSize = ctypes.sizeof(OPENFILENAMEW)
     get_foreground_window = ctypes.windll.user32.GetForegroundWindow
     get_foreground_window.restype = wintypes.HWND
-    dialog.hwndOwner = get_foreground_window()
+    # W trybie przeglądarkowym okno zapisu nie może blokować obcej aplikacji.
+    foreground = get_foreground_window()
+    owner_pid = wintypes.DWORD()
+    get_window_process = ctypes.windll.user32.GetWindowThreadProcessId
+    get_window_process.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.DWORD)]
+    get_window_process.restype = wintypes.DWORD
+    get_window_process(foreground, ctypes.byref(owner_pid))
+    dialog.hwndOwner = foreground if owner_pid.value == os.getpid() else None
     dialog.lpstrFilter = "Pliki tekstowe (*.txt)\0*.txt\0Wszystkie pliki (*.*)\0*.*\0\0"
     dialog.nFilterIndex = 1
     dialog.lpstrFile = ctypes.cast(buffer, wintypes.LPWSTR)

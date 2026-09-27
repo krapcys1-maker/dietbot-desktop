@@ -34,7 +34,7 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
       body: body === undefined ? undefined : JSON.stringify(body),
     });
   } catch {
-    throw new ApiError("Brak połączenia z aplikacją DietBot (serwer nie odpowiada).", 0);
+    throw new ApiError("Brak połączenia z Porcją. Sprawdź, czy aplikacja jest uruchomiona, i spróbuj ponownie.", 0);
   }
   const text = await res.text();
   let data: unknown = null;
@@ -63,12 +63,18 @@ const q = (params: Record<string, string | undefined>) => {
 };
 
 export const api = {
+  calculateGoals: (body: Record<string, unknown>) => request<import("./components/GoalCalculator").GoalEstimate>("POST", "/api/cele/oblicz", body),
   status: () => request<Status>("GET", "/api/status"),
   job: (id: string, since = 0) => request<Job>("GET", `/api/zadania/${id}?od=${since}`),
 
   generate: (body: { wishes?: string; days?: number[]; avoid_recent: boolean; use_llm: boolean; week_start?: string; invent?: boolean }) =>
     request<Job>("POST", "/api/plany/generuj", body),
   plans: () => request<PlanSummary[]>("GET", "/api/plany"),
+  library: () => request<PlanSummary[]>("GET", "/api/diety"),
+  saveDiet: (id: string, title: string) => request<NonNullable<PlanSummary["saved_diet"]>>("PUT", `/api/diety/${id}`, { title }),
+  unsaveDiet: (id: string) => request<{ ok: boolean }>("DELETE", `/api/diety/${id}`),
+  ratings: () => request<Record<string, number>>("GET", "/api/oceny"),
+  rateDish: (id: string, rating: number) => request<{ dish_id: string; rating: number }>("PUT", `/api/oceny/${id}`, { rating }),
   activePlan: () => request<PlanView>("GET", "/api/plany/aktywny"),
   plan: (id: string) => request<PlanView>("GET", `/api/plany/${id}`),
   patchPlan: (id: string, body: { title?: string; active?: boolean }) => request<PlanView>("PATCH", `/api/plany/${id}`, body),

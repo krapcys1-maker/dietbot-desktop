@@ -41,8 +41,8 @@ Wniosek: budujemy własny rdzeń (silnik + weryfikator + planer), korzystając z
 Ustalenia techniczne:
 - Węglowodany w BLS/CIQUAL to węglowodany przyswajalne (definicja UE) — tak samo liczy aplikacja.
 - Energia na etykietach UE (rozporządzenie 1169/2011): białko i węglowodany 4, tłuszcz 9, błonnik 2, kwasy
-  organiczne 3, poliole 2,4, alkohol 7 kcal/g. Cele użytkownika są liczone 4/9/4, więc aplikacja domyślnie liczy
-  tak samo, a współczynników UE używa do wykrywania błędów w danych.
+  organiczne 3, poliole 2,4, alkohol 7 kcal/g. Od wersji 0.1.2 aplikacja sumuje pole kcal produktów z tabel,
+  a współczynników UE używa do wykrywania błędów w danych. Cele makro są odrębnymi ograniczeniami.
 - Niemiecki **Quark** ≠ polski **twaróg**: w Rumunii najbliżej twarogu jest brânză de vaci (Pilos 4,2%: 17 g białka).
 
 ## 4. Miary domowe

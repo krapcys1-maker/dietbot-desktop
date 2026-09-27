@@ -164,6 +164,7 @@ function AddProductDialog({ categories, onClose, onAdded }: { categories: { id: 
     try {
       const payload: Record<string, unknown> = {
         name: form.name, aliases: form.aliases, category: form.category, state: form.state,
+        dietary_class: form.dietary_class || "nieznany",
         kcal: numVal("kcal"), protein: numVal("protein"), fat: numVal("fat"), carbs: numVal("carbs"),
         fiber: numVal("fiber"), sugars: numVal("sugars"), salt: numVal("salt"), saturated_fat: numVal("saturated_fat"),
         ean: form.ean, store: form.store, brand: form.brand, store_name_local: form.store_name_local, package_g: numVal("package_g"),
@@ -199,6 +200,13 @@ function AddProductDialog({ categories, onClose, onAdded }: { categories: { id: 
       }
     >
       <div className="muted small">Przepisz wartości „w 100 g” z opakowania. Program sprawdzi, czy kalorie zgadzają się z makroskładnikami.</div>
+      <label className="field"><span>Zgodność diety — sprawdź pełny skład na etykiecie</span>
+        <select value={form.dietary_class || "nieznany"} onChange={set("dietary_class")}>
+          <option value="nieznany">Nie wiem — pomijaj w trybach roślinnych</option><option value="wegan">Wegański — bez składników odzwierzęcych</option>
+          <option value="wege">Wegetariański — może zawierać nabiał / jaja</option><option value="zwierzecy">Z mięsem, rybą lub innymi składnikami niewegetariańskimi</option>
+        </select>
+      </label>
+      <p className="muted small">Napój roślinny dodaj w kategorii Napoje, nie Nabiał. Deklaracja nie zastępuje kontroli składu, żelatyny i podpuszczki.</p>
       <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: 10 }}>
         {field("name", "Nazwa (po polsku)", { placeholder: "np. Twaróg chudy (brânză de vaci 0,5%)" })}
         <label className="field">

@@ -1,5 +1,5 @@
-#define MyAppName "DietBot"
-#define MyAppVersion "0.1.1"
+#define MyAppName "Porcja"
+#define MyAppVersion "0.3.0"
 #define MyAppPublisher "krapcys1-maker"
 #define MyAppExeName "DietBot.exe"
 
@@ -8,12 +8,13 @@ AppId={{A62F37F9-C1A4-4C98-AB77-E99B18BFE539}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
-DefaultDirName={localappdata}\Programs\{#MyAppName}
+; Stable install identity/path: upgrades must preserve existing DietBot data and shortcuts.
+DefaultDirName={localappdata}\Programs\DietBot
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
 OutputDir=..\release
-OutputBaseFilename=DietBot-Setup-{#MyAppVersion}
+OutputBaseFilename=Porcja-Setup-{#MyAppVersion}
 SetupIconFile=dietbot.ico
 UninstallDisplayIcon={app}\{#MyAppExeName}
 Compression=lzma2/max

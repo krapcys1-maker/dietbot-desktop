@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../api";
+import DishRating from "../components/DishRating";
+import SaveDietButton from "../components/SaveDietButton";
+import ExportButtons from "../components/ExportButtons";
+import MoreActions from "../components/MoreActions";
+import Icon from "../components/Icon";
 import { ErrorBox, JobProgress, Loading, Modal, Spinner, StateBadge, TagBadges, useToast } from "../components/ui";
 import type { Day, DayBreakdown, Job, Meal, Metric, Person, PlanView, SwapOptions } from "../types";
 import { DAY_SHORT, dateTime, dayDate, go, loadLocal, num, saveLocal, todayIndex, useAsync, usd } from "../util";
@@ -42,7 +47,7 @@ export default function WeekPage({ planId }: { planId?: string }) {
     return (
       <div className="page">
         <div className="card empty">
-          <div className="big">🥗</div>
+          <Icon name="calendar" />
           <h2>Nie ma jeszcze planu</h2>
           <p>Ułóż pierwszy tydzień — program dobierze dania i policzy gramatury dla obu osób.</p>
           <button className="btn primary" onClick={() => go("nowy")}>Ułóż plan tygodnia</button>
@@ -77,26 +82,6 @@ export default function WeekPage({ planId }: { planId?: string }) {
     }
   };
 
-  const exportPlan = async () => {
-    try {
-      const r = await api.exportPlan(plan.id);
-      toast(`Zapisano pliki: ${r.plan_path.split(/[\\/]/).pop()} i ${r.shopping_path.split(/[\\/]/).pop()}`);
-      api.openResults().catch(() => undefined);
-    } catch (e) {
-      toast((e as Error).message, "error");
-    }
-  };
-
-  const saveFile = async (kind: "plan" | "shopping") => {
-    try {
-      const result = await api.savePlanFile(plan.id, kind);
-      if (result.saved) toast(`Zapisano: ${result.path}`);
-      else toast("Anulowano zapis.");
-    } catch (e) {
-      toast((e as Error).message, "error");
-    }
-  };
-
   const remove = async () => {
     if (!window.confirm(`Usunąć „${plan.title}” (wersja ${plan.version})?`)) return;
     try {
@@ -114,19 +99,22 @@ export default function WeekPage({ planId }: { planId?: string }) {
     <div className="page">
       <div className="page-head">
         <div>
+          <span className="eyebrow">TWÓJ TYDZIEŃ NA TALERZU</span>
           <div className="row">
             <h1>{plan.title}</h1>
-            {plan.ok ? <span className="badge ok">✓ plan poprawny</span> : errors.length ? <span className="badge error">naruszenia założeń</span> : <span className="badge warn">uwagi</span>}
+            {plan.ok ? <span className="badge ok"><Icon name="check" />zgodny z założeniami</span> : errors.length ? <span className="badge error">naruszenia założeń</span> : <span className="badge warn">uwagi</span>}
             {plan.active && <span className="badge">aktualny</span>}
+            {plan.saved_diet && <span className="badge ok">💾 {plan.saved_diet.title}</span>}
           </div>
-          <div className="sub">
-            Wersja {plan.version} · {plan.source_label}
-            {plan.change_note ? ` · ${plan.change_note}` : ""} · {dateTime(plan.created_at)}
-            {plan.llm_cost_usd > 0 ? ` · LLM ${usd(plan.llm_cost_usd)}` : ""}
-          </div>
-          {plan.wishes && <div className="sub">Życzenia: „{plan.wishes}”</div>}
+          <div className="sub">{plan.days.length} dni · {plan.persons.map((p) => p.name).join(" i ")} · wersja {plan.version}</div>
         </div>
-        <div className="row no-print">
+      </div>
+      <div className="plan-toolbar no-print">
+        <ExportButtons key={plan.id} planId={plan.id} />
+        <div className="row secondary-actions">
+          <SaveDietButton key={plan.id} plan={plan} onSaved={reload} />
+          <MoreActions>
+          <button className="btn" onClick={() => go("zakupy", plan.id)}>Otwórz listę zakupów</button>
           {plan.versions.length > 1 && (
             <select value={plan.id} onChange={(e) => go("tydzien", e.target.value)} title="Wersje planu" style={{ maxWidth: 300 }}>
               {plan.versions.map((v) => (
@@ -141,18 +129,15 @@ export default function WeekPage({ planId }: { planId?: string }) {
               Ustaw jako aktualny
             </button>
           )}
-          <button className="btn" onClick={() => go("zakupy", plan.id)}>🛒 Lista zakupów</button>
-          <button className="btn primary" onClick={() => void saveFile("plan")}>Zapisz cały jadłospis</button>
-          <button className="btn" onClick={() => void saveFile("shopping")}>Zapisz listę zakupów</button>
-          <button className="btn" onClick={exportPlan}>Eksportuj</button>
-          <button className="btn" onClick={() => window.print()}>Drukuj</button>
           <button className="btn danger" onClick={remove}>Usuń</button>
+          </MoreActions>
         </div>
       </div>
 
       {plan.assumptions_changed && (
         <div className="alert warn row no-print">
-          <span className="grow">Założenia zmieniły się od utworzenia tego planu — liczby mogą nie pasować do nowych celów.</span>
+          <span className="grow">Cele lub baza zmieniły się od zapisu. Ta dieta zachowuje zapisane dane, liczby i zakupy.
+            Przelicz, aby utworzyć nową wersję według aktualnych ustawień.</span>
           <button className="btn small" onClick={() => startJob("recompute")}>Przelicz te same dania</button>
           <button className="btn small" onClick={() => startJob("repair")}>Przelicz i napraw</button>
         </div>
@@ -164,8 +149,17 @@ export default function WeekPage({ planId }: { planId?: string }) {
         </div>
       )}
 
-      {(plan.comment || plan.facts.length > 0) && (
-        <div className="card stack">
+      <div className="plan-overviews">
+      {(plan.comment || plan.facts.length > 0 || plan.snapshot_legacy) && (
+        <details className="card disclosure">
+          <summary>O tym planie <span className="summary-hint">Opis, zasady i szczegóły</span></summary>
+          <div className="stack">
+          {plan.snapshot_legacy && <div className="muted small">Starszy zapis: dane zabezpieczono {plan.snapshot_date ? new Date(plan.snapshot_date).toLocaleDateString("pl-PL") : "przy aktualizacji"}.
+            Aplikacja nie miała wcześniejszej kopii tabel i założeń; nie jest to odtworzenie ich historycznych wartości.</div>}
+          <div className="muted small">{plan.source_label} · {dateTime(plan.created_at)}
+            {plan.llm_cost_usd > 0 ? ` · koszt AI ${usd(plan.llm_cost_usd)}` : ""}
+            {plan.change_note ? ` · ${plan.change_note}` : ""}</div>
+          {plan.wishes && <div className="small">Życzenia: {plan.wishes}</div>}
           {plan.comment && <blockquote className="plan-comment">{plan.comment}</blockquote>}
           <div className="facts">
             {plan.facts.map((f, i) => (
@@ -177,14 +171,28 @@ export default function WeekPage({ planId }: { planId?: string }) {
               </div>
             ))}
           </div>
-        </div>
+          </div>
+        </details>
       )}
 
+      <details className="card disclosure week-overview">
+        <summary>Cały tydzień w skrócie <span className="summary-hint">Wszystkie dania na jednym ekranie</span></summary>
+        <div className="week-grid">
+          {plan.days.map((d) => <button className={`week-day ${d.day === current?.day ? "selected" : ""}`} key={d.day}
+            onClick={(e) => { setDay(d.day); saveLocal(`dzien:${plan.family_id}`, d.day); e.currentTarget.closest("details")?.removeAttribute("open"); }}>
+            <b>{d.label} {plan.week_start && <span>{dayDate(plan.week_start, d.day)}</span>}</b>
+            {d.meals.map((m) => <span className="week-meal" key={m.slot_key}><small>{m.meal_label}</small>{m.dish_name}</span>)}
+            {!!d.snacks.length && <small>+ przekąski: {[...new Set(d.snacks.map((s) => s.dish_name))].join(", ")}</small>}
+          </button>)}
+        </div>
+      </details>
+
+      </div>
       <div className="tabs no-print">
         {plan.days.map((d) => {
           const bad = d.issues.some((i) => i.severity === "blad") || Object.values(d.totals).some((t) => Object.values(t.states).some((s) => s !== "ok"));
           return (
-            <button key={d.day} className={`tab ${d.day === current.day ? "active" : ""}`} onClick={() => { setDay(d.day); saveLocal(`dzien:${plan.family_id}`, d.day); }}>
+            <button key={d.day} aria-pressed={d.day === current?.day} className={`tab ${d.day === current?.day ? "active" : ""}`} onClick={() => { setDay(d.day); saveLocal(`dzien:${plan.family_id}`, d.day); }}>
               <span className={`dot ${bad ? "bad" : ""}`} />
               {DAY_SHORT[d.day]}
               {plan.week_start && <span className="today">{dayDate(plan.week_start, d.day)}</span>}
@@ -194,7 +202,8 @@ export default function WeekPage({ planId }: { planId?: string }) {
         })}
       </div>
 
-      {current && <DayView day={current} plan={plan} onSwap={setSwapMeal} />}
+      {current && <DayView key={`${plan.id}:${current.day}`} day={current} plan={plan} onSwap={setSwapMeal} />}
+      {!!plan.week_summary?.length && <details className="disclosure"><summary>Bilans całego tygodnia</summary><WeekSummaryCard plan={plan} /></details>}
 
       {(errors.length > 0 || warnings.length > 0) && (
         <section className="card stack">
@@ -249,6 +258,19 @@ export default function WeekPage({ planId }: { planId?: string }) {
 function DayView({ day, plan, onSwap }: { day: Day; plan: PlanView; onSwap: (m: Meal) => void }) {
   return (
     <div className="stack">
+      <div className="day-heading"><h2>{day.label}</h2><span className="muted small">Łącznie z przekąskami i stałymi pozycjami</span></div>
+      <div className="daily-summary">
+        {plan.persons.map((p) => { const total = day.totals[p.id]; if (!total) return null;
+          const ok = Object.values(total.states).every((s) => s === "ok");
+          return <section className="card flat" key={p.id}>
+            <div className="card-head"><b>{p.name}</b><span className={`badge ${ok ? "ok" : "warn"}`}>{ok ? "W celach" : "Sprawdź cele"}</span></div>
+            <div className="macro-grid">{METRICS.map((m) => <div key={m.key} className={total.states[m.key] !== "ok" ? "bad-text" : ""}>
+              <span>{m.label}</span><b>{num(total.values[m.key])}<small> {m.unit}</small></b>
+              <small>cel {num(p.targets[m.key].min)}–{num(p.targets[m.key].max)}</small>
+            </div>)}</div>
+          </section>;
+        })}
+      </div>
       {day.meals.map((m) => (
         <MealCard key={m.slot_key + m.meal} meal={m} persons={plan.persons} onSwap={() => onSwap(m)} />
       ))}
@@ -263,6 +285,7 @@ function DayView({ day, plan, onSwap }: { day: Day; plan: PlanView; onSwap: (m: 
                 <div className="grow">
                   {s.items.map((it) => `${it.name.toLowerCase()} ${it.amount}${it.household ? ` (≈ ${it.household})` : ""}`).join(", ")}
                   <div className="muted small">{s.reason}</div>
+                  <DishRating id={s.dish_id} name={s.dish_name} />
                 </div>
                 <span className="muted nowrap">{num(s.nutrition.kcal)} kcal · B {num(s.nutrition.protein)} g</span>
               </div>
@@ -270,7 +293,8 @@ function DayView({ day, plan, onSwap }: { day: Day; plan: PlanView; onSwap: (m: 
           })}
         </section>
       )}
-      <section className="card">
+      <details className="card disclosure">
+        <summary>Dokładne rozliczenie dnia <span className="summary-hint">Skąd pochodzą kcal i makro</span></summary>
         <div className="card-head">
           <h3>Suma dnia — {day.label}</h3>
           <span className="muted small">
@@ -289,10 +313,7 @@ function DayView({ day, plan, onSwap }: { day: Day; plan: PlanView; onSwap: (m: 
             <PersonTotals key={p.id} person={p} totals={day.totals[p.id]} />
           ))}
         </div>
-      </section>
-      {plan.days.length > 0 && day.day === plan.days[plan.days.length - 1].day && (plan.week_summary?.length ?? 0) > 0 && (
-        <WeekSummaryCard plan={plan} />
-      )}
+      </details>
     </div>
   );
 }
@@ -461,13 +482,21 @@ function MealCard({ meal, persons, onSwap }: { meal: Meal; persons: Person[]; on
           <div className="row" style={{ marginTop: 6 }}>
             <TagBadges tags={meal.tags} isTreat={meal.is_treat} isSweet={meal.is_sweet} />
             {meal.cuisine && <span className="badge">kuchnia {meal.cuisine}</span>}
-            {meal.prep_minutes && <span className="badge">⏱ {meal.prep_minutes} min</span>}
+            {meal.prep_minutes && <span className="badge"><Icon name="clock" />{meal.prep_minutes} min</span>}
             {meal.batch_group && <span className="badge batch">{meal.reheat ? "odgrzewasz" : "gotujesz"}: {meal.batch_days.join(", ").toLowerCase()}</span>}
           </div>
         </div>
         <button className="btn no-print" onClick={onSwap} aria-label={`Zamień ${meal.meal_label.toLowerCase()}: ${meal.dish_name}`}>↻ Zamień</button>
       </div>
       {meal.description && <p className="meal-desc">{meal.description}</p>}
+      <div className="meal-summary">{persons.map((p) => { const por = meal.portions[p.id]; if (!por) return null;
+        const n = por.nutrition;
+        return <div key={p.id}><span>{p.name}</span><b>{num(n.kcal)} kcal</b><small>B {num(n.protein)} · T {num(n.fat)} · W {num(n.carbs)} g</small>
+          {(por.mass_over || (por.anchor_state && por.anchor_state !== "ok")) && <small className="bad-text">Sprawdź szczegóły porcji</small>}</div>;
+      })}</div>
+      <DishRating id={meal.dish_id} name={meal.dish_name} />
+      <details className="disclosure meal-ingredients">
+        <summary>Składniki i gramatury <span className="summary-hint">{rows.length} składników · porcje dla {persons.length} osób</span></summary>
       <div style={{ overflowX: "auto" }}>
         <table className="portions">
           <thead>
@@ -538,6 +567,7 @@ function MealCard({ meal, persons, onSwap }: { meal: Meal; persons: Person[]; on
           {meal.pot.map((p) => `${p.name.toLowerCase()} ${p.amount}${p.household ? ` (≈ ${p.household})` : ""}`).join(", ")}
         </div>
       )}
+      </details>
       {meal.reheat ? (
         <div className="muted">Odgrzewasz porcję ugotowaną wcześniej.</div>
       ) : (

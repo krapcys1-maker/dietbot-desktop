@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api } from "../api";
+import Icon from "../components/Icon";
 import { ErrorBox, Loading, useToast } from "../components/ui";
 import type { Costs, Status } from "../types";
 import { MEAL_NAMES, num, plural, usd, useAsync } from "../util";
@@ -33,6 +34,7 @@ export default function SettingsPage({ status, onStatusChange }: {
   };
 
   const deleteKey = async () => {
+    if (!window.confirm("Usunąć zapisany klucz DeepSeek z tego komputera?")) return;
     setSavingKey(true);
     try {
       const next = await api.deleteDeepSeekKey();
@@ -53,16 +55,17 @@ export default function SettingsPage({ status, onStatusChange }: {
     <div className="page">
       <div className="page-head">
         <div>
-          <h1>Ustawienia i stan</h1>
-          <div className="sub">Wszystkie dane są lokalnie w folderze aplikacji: dane/, konfiguracja/, wyniki/.</div>
+          <span className="eyebrow">TWOJA APLIKACJA</span><h1>Ustawienia</h1>
+          <div className="sub">Porcja {status.version} · bezpłatna aplikacja z opcjonalnym AI.</div>
         </div>
         <button className="btn" onClick={() => api.openResults().then((r) => toast(`Folder: ${r.path}`)).catch((e) => toast(e.message, "error"))}>
-          📂 Otwórz folder wyników
+          <Icon name="product" />Otwórz folder wyników
         </button>
       </div>
 
       <section className="card stack">
-        <h2>Model językowy</h2>
+        <div className="row"><span className="feature-icon sage" style={{ marginBottom: 0 }}><Icon name="sparkles" /></span><div><h2>Twój pomocnik AI</h2><p className="muted small">Opcjonalne połączenie z DeepSeek. Podstawowe plany działają także bez klucza.</p></div></div>
+        <div className="alert info">Porcja nie pobiera opłat. Użycie AI może być płatne u DeepSeek i jest rozliczane na Twoim koncie. Klucz dodajesz tylko dla siebie.</div>
         <div className="row" style={{ gap: 24 }}>
           <div><span className="muted">Dostawca:</span> <b>{status.llm.provider}</b></div>
           <div><span className="muted">Model:</span> <b>{status.llm.model}</b></div>
@@ -97,13 +100,14 @@ export default function SettingsPage({ status, onStatusChange }: {
           )}
         </div>
         <div className="muted small">
-          Klucz jest zapisywany wyłącznie lokalnie dla bieżącego użytkownika i aplikacja nigdy go nie wyświetla.
-          Możesz wkleić klucz utworzony w panelu DeepSeek. Model, ceny i budżet: <code>konfiguracja/llm.yaml</code>.
+          Klucz jest przechowywany lokalnie w pliku .env użytkownika, nie jest szyfrowany i nie jest ponownie wyświetlany w interfejsie.
+          Służy do autoryzacji połączeń z DeepSeek. Nie udostępniaj swojego folderu danych innym osobom.
+          Model, ceny i budżet: <code>konfiguracja/llm.yaml</code>.
           Gdy budżet się skończy, plan układa algorytm, a czat jest wyłączony.
         </div>
         {costs.error && <ErrorBox error={costs.error} />}
         {costs.data && costs.data.by_task.length > 0 && (
-          <table className="table">
+          <details className="disclosure"><summary>Szczegóły kosztów AI</summary><table className="table">
             <thead><tr><th>Zadanie</th><th className="right">Wywołania</th><th className="right">Nieudane</th><th className="right">Koszt</th></tr></thead>
             <tbody>
               {costs.data.by_task.map((t) => (
@@ -115,12 +119,14 @@ export default function SettingsPage({ status, onStatusChange }: {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></details>
         )}
       </section>
+      <section className="card stack"><h2>Na dobry początek</h2><p className="muted">Jak zapisać cały jadłospis, co oznaczają oceny i gdzie zostają Twoje dane?</p><a className="text-link" href="#/pomoc">Otwórz krótki przewodnik <Icon name="arrow" /></a></section>
 
-      <section className="card stack">
-        <h2>Dane</h2>
+      <details className="card disclosure" open={status.data_errors.length > 0 || undefined}>
+        <summary>Stan bazy i diagnostyka <span className="summary-hint">{status.approved_dishes} zatwierdzonych dań · {status.products} produktów</span></summary>
+        <div className="stack">
         <div className="row" style={{ gap: 24 }}>
           <div><span className="muted">Produkty:</span> <b>{status.products}</b></div>
           <div><span className="muted">Dania:</span> <b>{status.dishes}</b> (zatwierdzone {status.approved_dishes})</div>
@@ -142,10 +148,11 @@ export default function SettingsPage({ status, onStatusChange }: {
           </details>
         )}
         {status.data_errors.length === 0 && <div className="alert ok small">Dane są spójne.</div>}
-      </section>
+        </div>
+      </details>
 
-      <section className="card stack">
-        <h2>Telegram</h2>
+      <details className="card disclosure">
+        <summary>Telegram <span className="summary-hint">Opcjonalny dostęp do bota</span></summary>
         {status.telegram.configured ? (
           <div className="alert ok">
             Bot jest skonfigurowany ({status.telegram.allowed_users} {plural(status.telegram.allowed_users, "dozwolony użytkownik", "dozwolonych użytkowników", "dozwolonych użytkowników")}).
@@ -163,12 +170,14 @@ export default function SettingsPage({ status, onStatusChange }: {
           </div>
         )}
         <div className="muted small">Komendy bota: /dzis, /jutro, /tydzien, /zakupy, /nowyplan, a zwykłe wiadomości trafiają do czatu.</div>
-      </section>
+      </details>
 
-      <section className="card small muted">
+      <details className="card disclosure small muted"><summary>Źródła danych i informacje techniczne</summary>
+        <p>Oprawa: autorskie logo i ilustracja Porcji. Ikony Lucide (ISC/MIT), fonty DM Sans i Fraunces (SIL OFL 1.1). Materiały są dołączone lokalnie.
+          Licencje: <a href="/licenses/lucide.txt" target="_blank" rel="noreferrer">Lucide</a>, <a href="/licenses/dm-sans.txt" target="_blank" rel="noreferrer">DM Sans</a>, <a href="/licenses/fraunces.txt" target="_blank" rel="noreferrer">Fraunces</a>.</p>
         Wartości odżywcze: BLS 4.0 (Max Rubner-Institut, CC BY 4.0), Open Food Facts (ODbL) i etykiety. Miary domowe: USDA FoodData Central,
         rozporządzenie UE 589/2008 i NHS. Produkty z półek: Monitorul Prețurilor (Consiliul Concurenței). Silnik: OR-Tools CP-SAT. Liczby: {num(status.products)} produktów w bazie.
-      </section>
+      </details>
     </div>
   );
 }

@@ -13,6 +13,7 @@ from enum import StrEnum
 from pydantic import BaseModel, Field
 
 from ..domain.assumptions import DAY_LABELS_PL, Assumptions, Weekday
+from ..domain.diet import compatible
 from ..domain.dish import GROUP_MEMBER_STEP_G, MEAL_LABELS_PL, DishIngredient, DishTemplate, MealType, Role
 from ..domain.nutrition import BAND_TOLERANCE, EnergyMethod
 from ..domain.plan import PlannedMeal, WeekPlan
@@ -127,8 +128,14 @@ def verify_plan(
                 continue
             if it.grams < 0:
                 err("ujemna_gramatura", f"{where}: ujemna gramatura {it.product_id}", **kw)
+            if it.grams > 0 and not compatible(products[it.product_id], a.diet):
+                err("rodzaj_diety", f"{where}: {products[it.product_id].name} nie pasuje do diety {a.diet}", **kw)
             out[it.product_id] = out.get(it.product_id, 0.0) + it.grams
         return out
+
+    for fixed in a.day.fixed_items:
+        if fixed.product_id in products and not compatible(products[fixed.product_id], a.diet):
+            err("rodzaj_diety", f"Stała pozycja {products[fixed.product_id].name} nie pasuje do diety {a.diet}")
 
     # --- struktura: każdy dzień ma wszystkie posiłki, każdy posiłek porcje dla każdej osoby
     by_slot: dict[tuple[int, MealType], list[PlannedMeal]] = defaultdict(list)

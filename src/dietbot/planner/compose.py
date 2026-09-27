@@ -306,7 +306,7 @@ def vary_treat_snacks(comp: Composition, pools: Pools, dishes: Mapping[str, Dish
                    and (dishes[d].cuisine == cur or (dishes[d].cuisine not in counts and cur not in counts))]
         if not options:
             continue
-        new = rng.choice(options)
+        new = rng.choices(options, weights=[3 if d in pools.liked else 1 for d in options])[0]
         name = dishes[s.dish_id].name if s.dish_id in dishes else s.dish_id
         notes.append(f"{DAY_LABELS_PL[s.days[0]].lower()}, przekąska: {name} → {dishes[new].name} "
                      "(inny rodzaj przekąski niż w pozostałe dni)")
@@ -371,6 +371,7 @@ def prompt_pools(pools: Pools, dishes: Mapping[str, DishTemplate], seed: int, fo
         chosen = {d for d in ids if d in focus or dishes[d].cuisine in cuisines}
         rest = [d for d in ids if d not in chosen]
         rnd.shuffle(rest)
+        rest.sort(key=lambda d: d not in pools.liked)
         for pred, n in quotas:
             have = sum(1 for d in chosen if pred(d))
             for d in [d for d in rest if pred(d)][:max(0, n - have)]:
@@ -395,7 +396,7 @@ def prompt_pools(pools: Pools, dishes: Mapping[str, DishTemplate], seed: int, fo
         by_meal[meal] = sample(ids, per_meal, quotas)
     batch = {idx: sample(ids, PROMPT_BATCH, []) for idx, ids in pools.batch.items()}
     return Pools(by_meal=by_meal, batch=batch, profiles=pools.profiles, excluded=pools.excluded, target=pools.target,
-                 treat_snacks=list(pools.treat_snacks))
+                 treat_snacks=list(pools.treat_snacks), liked=pools.liked)
 
 
 # ---------------------------------------------------------------------------------------------- algorytm zapasowy
@@ -418,7 +419,7 @@ def compose_fallback(pools: Pools, dishes: Mapping[str, DishTemplate], a: Assump
         options = [d for d in pools.batch.get(idx, []) if d not in used]
         if not options:
             continue
-        pick = fixed.get(key_of(ds, meal)) or rng.choice(options)
+        pick = fixed.get(key_of(ds, meal)) or rng.choices(options, weights=[3 if d in pools.liked else 1 for d in options])[0]
         chosen[key_of(ds, meal)] = SlotPlan(days=ds, meal=meal, dish_id=pick)
         used.add(pick)
 
@@ -451,7 +452,7 @@ def compose_fallback(pools: Pools, dishes: Mapping[str, DishTemplate], a: Assump
 
     def score(dish_id: str, ds: list[Weekday], meal: MealType) -> float:
         prof = pools.profiles[dish_id]
-        sc = rng.random()
+        sc = rng.random() + (0.65 if dish_id in pools.liked else 0)
         day = int(ds[0])
         for other in chosen.values():
             od = int(other.days[0])
@@ -518,7 +519,8 @@ def compose_fallback(pools: Pools, dishes: Mapping[str, DishTemplate], a: Assump
         free = [d for d in (5, 6, 4, 3, 2, 1, 0) if d not in treat_days and Weekday(d) in days]
         if free:
             slots.append(SlotPlan(days=[Weekday(free[rng.randrange(min(2, len(free)))])], meal=MealType.SNACK,
-                                  dish_id=rng.choice(pools.treat_snacks)))
+                                  dish_id=rng.choices(pools.treat_snacks,
+                                                      weights=[3 if d in pools.liked else 1 for d in pools.treat_snacks])[0]))
     return Composition(slots=slots, source="algorytm")
 
 
@@ -613,6 +615,8 @@ def build_compose_prompt(pools: Pools, a: Assumptions, days: list[Weekday], wish
         "dzień z samych tłustych dań nie zmieści się w celach.",
         f"Do każdego posiłku podaj 0–{MAX_ALTERNATES} dania zapasowe z tej samej listy (nieużyte gdzie indziej, ten sam status pula_20/slodkie) — program użyje ich, jeśli pierwszy wybór nie zmieści się w celach.",
         "Używaj WYŁĄCZNIE identyfikatorów dań z list poniżej. Nie podawaj kalorii ani gramatur.",
+        "Dania oznaczone ULUBIONE proponuj częściej, ale zachowaj różnorodność i wszystkie zasady. "
+        "Ocena jest preferencją, nie nakazem umieszczenia dania w każdym tygodniu.",
     ]
     text = "Zasady:\n- " + "\n- ".join(rules)
     if wishes:

@@ -152,6 +152,7 @@ export interface Fact {
 }
 
 export interface PlanSummary {
+  saved_diet?: { plan_id: string; title: string; saved_at: string } | null;
   id: string;
   title: string;
   created_at: string;
@@ -169,6 +170,8 @@ export interface PlanSummary {
 }
 
 export interface PlanView extends PlanSummary {
+  snapshot_legacy?: boolean;
+  snapshot_date?: string;
   source_label: string;
   comment: string | null;
   persons: Person[];
@@ -208,6 +211,7 @@ export interface Job {
 }
 
 export interface Status {
+  version: string;
   products: number;
   dishes: number;
   approved_dishes: number;
@@ -275,6 +279,7 @@ export interface DishProfile {
 }
 
 export interface DishListItem {
+  diets: string[];
   id: string;
   name: string;
   description: string | null;
@@ -368,8 +373,8 @@ export interface MatchResult {
 export interface AssumptionsResponse {
   data: AssumptionsData;
   warnings: string[];
-  snack_options: { id: string; name: string }[];
-  products: { id: string; name: string }[];
+  snack_options: { id: string; name: string; diets: string[] }[];
+  products: { id: string; name: string; diets: string[] }[];
   categories: { id: string; name: string }[];
   cuisines: string[];
   tags: string[];
@@ -393,6 +398,7 @@ export interface PersonData {
 }
 
 export interface AssumptionsData {
+  rodzaj_diety?: "tradycyjna" | "wege" | "wegan";
   wersja?: number;
   energia?: { metoda: string };
   osoby: PersonData[];

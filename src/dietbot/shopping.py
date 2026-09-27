@@ -1,11 +1,11 @@
-"""Lista zakupów jako dane: suma gramatur z planu + podpowiedź produktu z półki (np. Lidl RO) i liczby opakowań."""
+"""Prosta lista zakupów: połączone warianty, bez sklepów i przypraw. Plan pozostaje bez zmian."""
 
 from __future__ import annotations
 
 import math
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from .domain.assumptions import Assumptions
 from .domain.plan import WeekPlan
@@ -15,6 +15,27 @@ from .textnorm import normalize
 
 # produkty, których nie kupuje się na liście (woda z kranu, napar liczony jako stała pozycja)
 NOT_BOUGHT = frozenset({"woda", "kawa_napar"})
+# Zioła występują także w kategorii warzywa, ale na uproszczonej liście pomijamy je jak przyprawy.
+SHOPPING_HERBS = frozenset({"bazylia_swieza", "natka_pietruszki", "szczypiorek"})
+SHOPPING_FAMILIES = {
+    "mozzarella": ("Mozzarella", {"mozzarella", "mozzarella_light"}),
+    "feta": ("Feta", {"feta", "feta_light"}),
+    "jogurt": ("Jogurt", {"jogurt_naturalny_1_5", "jogurt_naturalny_3_5", "jogurt_owocowy",
+                           "jogurt_owocowy_light", "jogurt_waniliowy"}),
+    "skyr": ("Skyr", {"skyr_naturalny"}),
+    "mleko": ("Mleko", {"mleko_1_5", "mleko_3_5"}),
+    "twarog": ("Twaróg", {"twarog_chudy", "twarog_poltlusty"}),
+    "serek_wiejski": ("Serek wiejski", {"serek_wiejski", "serek_wiejski_lekki"}),
+    "gouda": ("Gouda", {"gouda", "ser_zolty_light"}),
+    "smietana": ("Śmietana", {"smietana_10", "smietana_20"}),
+    "kefir": ("Kefir", {"kefir"}),
+}
+SHOPPING_FAMILY_BY_PRODUCT = {pid: (key, name) for key, (name, ids) in SHOPPING_FAMILIES.items() for pid in ids}
+SHOPPING_NOTE = "Warianty produktów są połączone, ilości zsumowane. Bez przypraw, ziół i podpowiedzi sklepów."
+SHOPPING_NUTRITION_NOTE = (
+    "Uproszczona nazwa nie zmienia obliczeń planu. Zakup innego wariantu (np. o innej zawartości tłuszczu) "
+    "może zmienić rzeczywiste kcal i makro."
+)
 # jedzenie z pizzerii, budki czy baru — nie do koszyka w sklepie, tylko do zamówienia (osobna grupa na liście)
 TAKEAWAY_TAG = "na_wynos"
 TAKEAWAY_GROUP = "na_wynos"
@@ -34,6 +55,7 @@ class ShoppingRow:
     packs: int | None = None
     pack_text: str | None = None  # "2 × 180 g", "1 × 750 ml"
     takeaway: bool = False
+    source_product_ids: tuple[str, ...] = ()
 
     @property
     def group(self) -> str:
@@ -51,7 +73,7 @@ class ShoppingRow:
         return {"produkt": self.product_id, "nazwa": self.name, "kategoria": self.category.value,
                 "kategoria_nazwa": self.category_label, "gramy": round(self.grams, 1), "ilosc": self.amount_text,
                 "pomijalny": self.negligible, "sklep": store, "opakowania": self.packs, "opakowania_tekst": self.pack_text,
-                "na_wynos": self.takeaway}
+                "na_wynos": self.takeaway, "produkty_zrodlowe": list(self.source_product_ids or (self.product_id,))}
 
 
 def totals_grams(plan: WeekPlan, a: Assumptions) -> dict[str, float]:
@@ -80,8 +102,9 @@ def _preferred(store_products: Sequence[StoreProduct], product_id: str) -> Store
     return next((s for s in options if s.preferred), None)
 
 
-def build_shopping_list(plan: WeekPlan, a: Assumptions, products: Mapping[str, Product],
-                        store_products: Sequence[StoreProduct] = ()) -> list[ShoppingRow]:
+def build_detailed_shopping_list(plan: WeekPlan, a: Assumptions, products: Mapping[str, Product],
+                                 store_products: Sequence[StoreProduct] = ()) -> list[ShoppingRow]:
+    """Szczegółowe ilości źródłowe do kontroli; nie są listą prezentowaną użytkownikowi."""
     rows: list[ShoppingRow] = []
     for pid, grams in totals_grams(plan, a).items():
         product = products.get(pid)
@@ -92,7 +115,7 @@ def build_shopping_list(plan: WeekPlan, a: Assumptions, products: Mapping[str, P
             piece = product.measure("kawałek") or product.measure("szt")
             amount = f"{fmt_num(round(grams), 0)} g"
             if piece:
-                count = math.ceil(grams / piece.grams - 0.05)
+                count = math.ceil(round(grams / piece.grams, 9))
                 unit = plural_pl(count, "kawałek", "kawałki", "kawałków") if piece.unit == "kawałek" else "szt."
                 amount += f" (≈ {count} {unit})"
             rows.append(ShoppingRow(pid, product.name, product.category, label, grams, amount, False, takeaway=True))
@@ -106,11 +129,12 @@ def build_shopping_list(plan: WeekPlan, a: Assumptions, products: Mapping[str, P
             amount = f"{fmt_num(max(math.ceil(grams / 10) * 10, 10), 0)} g"
             piece = product.measure("szt")
             if piece:
-                amount += f" (≈ {math.ceil(grams / piece.grams - 0.05)} szt.)"
+                amount += f" (≈ {math.ceil(round(grams / piece.grams, 9))} szt.)"
         store = _preferred(store_products, pid)
         packs = pack_text = None
         if store is not None and store.package_g:
-            packs = max(1, math.ceil(grams / store.package_g - 0.02))  # 2% luzu: 505 g przy paczce 500 g to 1 paczka
+            # Zaokrąglamy wyłącznie szum float, nigdy rzeczywisty niedobór produktu.
+            packs = max(1, math.ceil(round(grams / store.package_g, 9)))
             piece = product.measure("szt")
             pieces = round(store.package_g / piece.grams) if piece else 0
             if product.density_g_per_ml:
@@ -125,3 +149,32 @@ def build_shopping_list(plan: WeekPlan, a: Assumptions, products: Mapping[str, P
     order = {c: i for i, c in enumerate(Category)}
     rows.sort(key=lambda r: (r.takeaway, order[r.category], normalize(r.name)))
     return rows
+
+
+def build_shopping_list(plan: WeekPlan, a: Assumptions, products: Mapping[str, Product],
+                        store_products: Sequence[StoreProduct] = ()) -> list[ShoppingRow]:
+    # Bez sklepu: po połączeniu wariantów nie ma jednego wiarygodnego rozmiaru opakowania.
+    detailed = build_detailed_shopping_list(plan, a, products)
+    grouped: dict[str, list[ShoppingRow]] = defaultdict(list)
+    for row in detailed:
+        if row.category is Category.SPICES or row.negligible or row.product_id in SHOPPING_HERBS:
+            continue
+        family = SHOPPING_FAMILY_BY_PRODUCT.get(row.product_id)
+        key = f"zakup_{family[0]}" if family else row.product_id
+        grouped[key].append(row)
+    rows = []
+    for key, members in grouped.items():
+        first = members[0]
+        family = SHOPPING_FAMILY_BY_PRODUCT.get(first.product_id)
+        grams = math.fsum(row.grams for row in members)
+        amount = first.amount_text
+        if family:
+            if all(products[row.product_id].density_g_per_ml for row in members):
+                amount = _volume_text(math.fsum(row.grams / products[row.product_id].density_g_per_ml for row in members))
+            else:
+                amount = f"{fmt_num(math.ceil(round(grams / 10, 9)) * 10, 0)} g"
+        rows.append(replace(first, product_id=key, name=family[1] if family else first.name,
+                            grams=grams, amount_text=amount, store=None, packs=None, pack_text=None,
+                            source_product_ids=tuple(sorted(row.product_id for row in members))))
+    order = {c: i for i, c in enumerate(Category)}
+    return sorted(rows, key=lambda row: (row.takeaway, order[row.category], normalize(row.name)))

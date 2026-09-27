@@ -1,30 +1,39 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
+import ExportButtons from "../components/ExportButtons";
+import MoreActions from "../components/MoreActions";
+import Icon from "../components/Icon";
 import { ErrorBox, Loading, useToast } from "../components/ui";
 import type { PlanSummary, Shopping } from "../types";
-import { go, loadLocal, num, plural, saveLocal, useAsync } from "../util";
+import { go, loadLocal, plural, saveLocal, useAsync } from "../util";
 
 export default function ShoppingPage({ planId }: { planId?: string }) {
   const toast = useToast();
   const plans = useAsync<PlanSummary[]>(() => api.plans(), []);
   const activeId = planId ?? plans.data?.find((p) => p.active)?.id ?? plans.data?.[0]?.id;
-  const { data, error, loading, reload } = useAsync<Shopping | null>(
+  const { data: response, error, loading, reload } = useAsync<Shopping | null>(
     () => (activeId ? api.shopping(activeId) : Promise.resolve(null)),
     [activeId],
   );
+  const data = response?.plan_id === activeId ? response : null;
   // odhaczenia trzymamy dla całej rodziny planu — zamiana dania (nowa wersja) nie kasuje listy
   const family = plans.data?.find((p) => p.id === activeId)?.family_id ?? activeId;
-  const storageKey = `zakupy:${family}`;
-  const [done, setDone] = useState<string[]>([]);
+  // Stare odhaczenie jednego wariantu nie oznacza zakupu całej połączonej pozycji.
+  const storageKey = `zakupy:ilosci:${family}`;
+  const [bought, setBought] = useState<Record<string, number>>({});
+  const done = data?.groups.flatMap(g => g.items).filter(it => (bought[it.produkt] ?? 0) >= it.gramy).map(it => it.produkt) ?? [];
   const [hideDone, setHideDone] = useState(false);
 
   useEffect(() => {
-    setDone(loadLocal<string[]>(storageKey, []));
+    setBought(loadLocal<Record<string, number>>(storageKey, {}));
   }, [storageKey]);
 
   const toggle = (pid: string) => {
-    const next = done.includes(pid) ? done.filter((x) => x !== pid) : [...done, pid];
-    setDone(next);
+    const grams = data?.groups.flatMap(g => g.items).find(it => it.produkt === pid)?.gramy;
+    if (grams == null) return;
+    const next = { ...bought };
+    if (done.includes(pid)) delete next[pid]; else next[pid] = grams;
+    setBought(next);
     saveLocal(storageKey, next);
   };
 
@@ -35,8 +44,8 @@ export default function ShoppingPage({ planId }: { planId?: string }) {
       lines.push("", g.label.toUpperCase());
       for (const it of g.items) {
         if (done.includes(it.produkt)) continue;
-        const store = it.sklep ? ` [${it.sklep.sklep}: ${it.sklep.nazwa}${it.sklep.marka ? `, ${it.sklep.marka}` : ""}${it.opakowania_tekst ? ` — ${it.opakowania_tekst}` : ""}]` : "";
-        lines.push(`- ${it.nazwa}${it.ilosc ? ` — ${it.ilosc}` : ""}${store}`);
+        const remaining = Math.round((it.gramy - (bought[it.produkt] ?? 0)) * 10) / 10;
+        lines.push(`- ${it.nazwa} — ${remaining} g do kupienia`);
       }
     }
     try {
@@ -47,24 +56,13 @@ export default function ShoppingPage({ planId }: { planId?: string }) {
     }
   };
 
-  const saveFile = async () => {
-    if (!activeId) return;
-    try {
-      const result = await api.savePlanFile(activeId, "shopping");
-      if (result.saved) toast(`Zapisano: ${result.path}`);
-      else toast("Anulowano zapis.");
-    } catch (e) {
-      toast(e instanceof Error ? e.message : "Nie udało się zapisać listy.", "error");
-    }
-  };
-
   if (plans.loading && !plans.data) return <div className="page"><Loading /></div>;
   if (plans.error && !plans.data) return <div className="page"><ErrorBox error={plans.error} onRetry={plans.reload} /></div>;
   if (!activeId)
     return (
       <div className="page">
         <div className="card empty">
-          <div className="big">🛒</div>
+          <Icon name="basket" />
           <h2>Brak planu</h2>
           <p>Lista zakupów powstaje z planu tygodnia.</p>
           <button className="btn primary" onClick={() => go("nowy")}>Ułóż plan</button>
@@ -73,42 +71,50 @@ export default function ShoppingPage({ planId }: { planId?: string }) {
     );
 
   const total = data?.groups.reduce((s, g) => s + g.items.length, 0) ?? 0;
+  const doneCount = data?.groups.reduce((s, g) => s + g.items.filter((it) => done.includes(it.produkt)).length, 0) ?? 0;
 
   return (
     <div className="page">
       <div className="page-head">
         <div>
-          <h1>Lista zakupów</h1>
+          <span className="eyebrow">WSZYSTKO NA JEDNEJ LIŚCIE</span><h1>Lista zakupów</h1>
           {data && (
             <div className="sub">
-              {data.title} · {data.days} {plural(data.days, "dzień", "dni", "dni")} · {data.persons} {plural(data.persons, "osoba", "osoby", "osób")} · odhaczone {done.length} z {total}
+              {data.title} · {data.days} {plural(data.days, "dzień", "dni", "dni")} · {data.persons} {plural(data.persons, "osoba", "osoby", "osób")} · odhaczone {doneCount} z {total}
             </div>
           )}
         </div>
-        <div className="row no-print">
-          <select value={activeId} onChange={(e) => go("zakupy", e.target.value)}>
+      </div>
+      <div className="plan-toolbar no-print">
+        <ExportButtons key={activeId} planId={activeId} shoppingOnly />
+        <MoreActions>
+          <button className="btn" onClick={() => go("tydzien", activeId)}>Otwórz dietę</button>
+          <select aria-label="Plan do zakupów" value={activeId} onChange={(e) => go("zakupy", e.target.value)}>
             {(plans.data ?? []).map((p) => (
               <option key={p.id} value={p.id}>
                 {p.title} (wersja {p.version}){p.active ? " — aktualny" : ""}
               </option>
             ))}
           </select>
-          <label className="check">
-            <input type="checkbox" checked={hideDone} onChange={(e) => setHideDone(e.target.checked)} /> Ukryj kupione
-          </label>
-          <button className="btn primary" onClick={() => void saveFile()}>Zapisz listę do pliku</button>
-          <button className="btn" onClick={copy}>Kopiuj</button>
-          <button className="btn" onClick={() => window.print()}>Drukuj</button>
-          <button className="btn" onClick={() => { setDone([]); saveLocal(storageKey, []); }}>Wyczyść odhaczenia</button>
-        </div>
+          <button className="btn" onClick={copy}>Kopiuj pozostałe zakupy</button>
+          <button className="btn" disabled={!Object.keys(bought).length} onClick={() => { if (window.confirm("Wyczyścić odhaczenia tej listy?")) { setBought({}); saveLocal(storageKey, {}); } }}>Wyczyść odhaczenia</button>
+        </MoreActions>
+      </div>
+      <div className="card flat row no-print">
+        <div className="grow"><b>{doneCount === total && total > 0 ? "Wszystko kupione" : `Pozostało ${total - doneCount} z ${total} produktów`}</b>
+          <div className="muted small">Eksport obejmuje całą listę. Odhaczenie zapamiętuje ilość — po zmianie diety większy zakup pojawi się ponownie.</div></div>
+        <label className="check"><input type="checkbox" checked={hideDone} onChange={(e) => setHideDone(e.target.checked)} /> Ukryj kupione</label>
+        <div className="shopping-progress" role="progressbar" aria-label="Kupione produkty" aria-valuemin={0} aria-valuemax={total || 1} aria-valuenow={doneCount}><span style={{ width: `${total ? doneCount / total * 100 : 0}%` }} /></div>
       </div>
       <div className="alert info small no-print">
-        Ilości w stanie jak w przepisach: ryż i makaron suche, mięso surowe, ziemniaki obrane. Podpowiedzi 🛒 to produkty z półek Lidla (i Kauflandu, gdy w Lidlu brak) w Rumunii — sprawdzone w serwisie Monitorul Prețurilor.
+        Jedna pozycja na produkt, warianty zsumowane. Bez sklepów, przypraw i ziół.
+        Ryż i makaron ważone na sucho, mięso surowe, ziemniaki obrane.
+        <div className="muted">Zakup innego wariantu niż w przepisie może zmienić rzeczywiste kcal i makro.</div>
       </div>
       {loading && !data && <Loading />}
       {error && <ErrorBox error={error} onRetry={reload} />}
       {data && (
-        <div className="stack">
+        <div className="shopping-groups">
           {data.groups.map((g) => {
             const items = g.items.filter((it) => !(hideDone && done.includes(it.produkt)));
             if (!items.length) return null;
@@ -121,18 +127,10 @@ export default function ShoppingPage({ planId }: { planId?: string }) {
                       aria-label={`${it.nazwa}${it.na_wynos ? " — do zamówienia" : " — kupione"}`} />
                     <div>
                       <div className="shop-name">{it.nazwa}</div>
-                      {it.sklep && (
-                        <div className="shop-store">
-                          🛒 {it.sklep.sklep}: <i>{it.sklep.nazwa}</i>
-                          {it.sklep.marka ? `, ${it.sklep.marka}` : ""}
-                          {it.opakowania_tekst ? ` — ${it.opakowania_tekst}` : ""}
-                          {it.sklep.uwagi ? <span className="muted"> · {it.sklep.uwagi}</span> : null}
-                        </div>
-                      )}
+                      {(bought[it.produkt] ?? 0) > 0 && !done.includes(it.produkt) && <div className="muted small">Kupiono {bought[it.produkt]} g · dokup {Math.round((it.gramy - bought[it.produkt]) * 10) / 10} g</div>}
                     </div>
                     <div className="right nowrap">
-                      {it.pomijalny ? <span className="muted">do smaku</span> : <b>{it.ilosc}</b>}
-                      {!it.pomijalny && /(ml|l)$/.test(it.ilosc) && <div className="muted small">{num(it.gramy)} g</div>}
+                      <b>{it.ilosc}</b>
                     </div>
                   </label>
                 ))}

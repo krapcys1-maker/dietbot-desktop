@@ -147,6 +147,8 @@ class ChatAssistant:
     def handle(self, text: str, plan_id: str | None = None) -> dict:
         text = text.strip()
         rec = (self.s.store.get(plan_id) if plan_id else None) or self.s.store.active()
+        if rec is not None:
+            rec = self.s.checked_record(rec)
         self.s.store.add_message("uzytkownik", text, plan_id=rec.id if rec else None, channel=self.channel)
         llm = self.s.llm()
         if llm is None:
@@ -191,7 +193,8 @@ class ChatAssistant:
 
     def _context(self, rec: PlanRecord | None) -> str:
         s = self.s
-        a = s.repo.assumptions
+        repo = s.record_repo(rec) if rec else s.repo
+        a = repo.assumptions
         today = date.today()
         lines = [f"Dziś: {DAY_LABELS_PL[Weekday(today.weekday())].lower()}, {today:%d.%m.%Y}.",
                  "Osoby: " + ", ".join(f"{p.name} (id: {p.id})" for p in a.persons) +
@@ -202,7 +205,7 @@ class ChatAssistant:
             idx = s.today_index(rec)
             lines.append(f"Aktualny plan: {rec.title}" + (f" (dziś to {DAY_LABELS_PL[Weekday(idx)].lower()} planu)"
                                                           if idx is not None else ""))
-            dishes = s.repo.dishes
+            dishes = repo.dishes
             for day in rec.plan.days:
                 meals = [m for m in rec.plan.meals if m.day == day]
                 parts = []
@@ -246,8 +249,8 @@ class ChatAssistant:
             raise UserError("Napisz, o który dzień chodzi — aktualny plan nie obejmuje dzisiejszej daty.")
         return Weekday(idx)
 
-    def _persons(self, value: str | None) -> list:
-        a = self.s.repo.assumptions
+    def _persons(self, value: str | None, rec: PlanRecord | None = None) -> list:
+        a = self.s.record_repo(rec).assumptions if rec else self.s.repo.assumptions
         if not value:
             return list(a.persons)
         pid = _person_ids(self.s).get(normalize(value))
@@ -258,12 +261,14 @@ class ChatAssistant:
     def _show(self, action: ChatAction, rec: PlanRecord | None) -> dict:
         if rec is None:
             raise UserError("Nie ma jeszcze planu — najpierw go wygeneruj.")
-        s, a = self.s, self.s.repo.assumptions
-        products, dishes = s.repo.products, s.repo.dishes
+        s = self.s
+        repo = s.record_repo(rec)
+        a = repo.assumptions
+        products, dishes = repo.products, repo.dishes
         totals = {(int(t.day), t.person_id): t for t in (rec.report.totals if rec.report else [])}
         blocks: list[str] = []
         for fact in action.fakty or []:
-            persons = self._persons(fact.osoba)
+            persons = self._persons(fact.osoba, rec)
             if fact.rodzaj == "dzien":
                 day = self._day_or_today(fact.dzien, rec)
                 rows = [f"**{DAY_LABELS_PL[day]}**"]
@@ -455,7 +460,7 @@ class ChatAssistant:
     def confirm(self, proposal_id: str) -> dict:
         s = self.s
         prop = s.pending_changes.pop(proposal_id, None)
-        rec = s.store.active()
+        rec = s.active_plan()
         if prop is None:
             return self._reply("Ta propozycja zmian wygasła — napisz jeszcze raz, co zmienić.", rec)
         try:

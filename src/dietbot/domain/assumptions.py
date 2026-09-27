@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from enum import IntEnum
+from typing import Literal
 
 from pydantic import Field, field_validator, model_validator
 
@@ -193,10 +194,18 @@ class Prohibitions(DomainModel):
 
 
 class EnergySettings(DomainModel):
-    method: EnergyMethod = Field(default=EnergyMethod.MACROS_4_9_4, alias="metoda")
+    method: EnergyMethod = Field(default=EnergyMethod.LABEL, alias="metoda")
+
+    @field_validator("method")
+    @classmethod
+    def _table_calories(cls, value: EnergyMethod) -> EnergyMethod:
+        if value is not EnergyMethod.LABEL:
+            raise ValueError("Kalorie liczymy z wartości kcal produktów (metoda: etykieta), nie ze skrótu 4/9/4.")
+        return value
 
 
 class Assumptions(DomainModel):
+    diet: Literal["tradycyjna", "wege", "wegan"] = Field(default="tradycyjna", alias="rodzaj_diety")
     version: int = Field(default=1, alias="wersja")
     energy: EnergySettings = Field(default_factory=EnergySettings, alias="energia")
     persons: list[Person] = Field(alias="osoby", min_length=1)
@@ -228,24 +237,10 @@ class Assumptions(DomainModel):
         raise KeyError(person_id)
 
     def consistency_warnings(self) -> list[str]:
-        """Sprawdza, czy widełki makro dają się pogodzić z widełkami kcal (dla metody 4/9/4)."""
+        """Sprawdza ograniczenia porcji i kotwic białka; kcal z tabel nie są tożsame z 4/9/4."""
         warnings: list[str] = []
         for p in self.persons:
             t = p.targets
-            if self.energy.method is EnergyMethod.MACROS_4_9_4:
-                lo = 4 * t.protein.min + 9 * t.fat.min + 4 * t.carbs.min
-                hi = 4 * t.protein.max + 9 * t.fat.max + 4 * t.carbs.max
-                if hi < t.kcal.min or lo > t.kcal.max:
-                    warnings.append(
-                        f"{p.name}: widełki makro dają {lo:.0f}–{hi:.0f} kcal, "
-                        f"a widełki kcal to {t.kcal.min:.0f}–{t.kcal.max:.0f} — nie da się ich pogodzić"
-                    )
-                center = 4 * t.protein.center + 9 * t.fat.center + 4 * t.carbs.center
-                if not (t.kcal.min <= center <= t.kcal.max):
-                    warnings.append(
-                        f"{p.name}: środki celów makro dają {center:.0f} kcal — poza widełkami kcal "
-                        f"{t.kcal.min:.0f}–{t.kcal.max:.0f}; silnik przesunie makro w obrębie widełek"
-                    )
             meals = len(self.day.meals)
             caps = sum(p.meal_mass_cap(m) for m in self.day.meals)
             if caps > 0 and t.kcal.center / caps > MAX_PLATE_ENERGY_DENSITY:

@@ -1,4 +1,4 @@
-"""Rysuje ikonę aplikacji (miska z sałatą) do pliku packaging/dietbot.ico."""
+"""Rysuje autorski znak Porcji (talerz, liść, kropka) do zgodnej wstecz nazwy ICO."""
 
 from pathlib import Path
 
@@ -7,17 +7,12 @@ from PIL import Image, ImageDraw
 S = 1024
 img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
 d = ImageDraw.Draw(img)
-d.rounded_rectangle((40, 40, S - 40, S - 40), radius=210, fill=(46, 125, 79, 255))
-# liście
-d.ellipse((250, 250, 560, 560), fill=(160, 214, 120, 255))
-d.ellipse((450, 200, 780, 530), fill=(120, 190, 95, 255))
-d.ellipse((360, 330, 640, 610), fill=(196, 232, 150, 255))
-d.ellipse((600, 360, 760, 520), fill=(230, 90, 70, 255))  # pomidor
-# miska
-d.pieslice((190, 330, S - 190, S - 170), start=0, end=180, fill=(250, 248, 240, 255))
-d.rectangle((190, 580, S - 190, 600), fill=(250, 248, 240, 255))
-d.pieslice((250, 390, S - 250, S - 230), start=0, end=180, fill=(232, 226, 210, 255))
-d.rounded_rectangle((420, 830, S - 420, 870), radius=20, fill=(250, 248, 240, 255))
+d.rounded_rectangle((30, 30, S - 30, S - 30), radius=300, fill="#244D3D")
+d.ellipse((213, 234, 811, 832), outline="#F9F5EA", width=43)
+d.ellipse((292, 300, 590, 623), fill="#C4D98C")
+d.polygon([(300, 567), (380, 373), (590, 290), (573, 462), (449, 599)], fill="#C4D98C")
+d.line([(362, 575), (510, 405)], fill="#244D3D", width=30)
+d.ellipse((555, 512, 768, 725), fill="#ECA67F")
 
 out = Path(__file__).with_name("dietbot.ico")
 img.save(out, sizes=[(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)])

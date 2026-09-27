@@ -136,7 +136,7 @@ def resolve_uncertain(days: list[ExampleDay], matcher: ProductMatcher, products:
 
 
 def day_totals(day: ExampleDay, products: Mapping[str, Product], fixed: Mapping[str, float] | None = None,
-               method: EnergyMethod = EnergyMethod.MACROS_4_9_4) -> dict[str, dict[str, float]]:
+               method: EnergyMethod = EnergyMethod.LABEL) -> dict[str, dict[str, float]]:
     out = {}
     for pid, items in day.items.items():
         grams: dict[str, float] = dict(fixed or {})
@@ -155,7 +155,7 @@ def render_report(files: list[tuple[str, list[ExampleDay]]], products: Mapping[s
                   fixed: Mapping[str, float], notes: list[str]) -> str:
     lines = ["# Przeliczenie przykładowych jadłospisów", "",
              "_Sumy podane przez czat porównane z przeliczeniem DietBota (te same gramatury, wartości z tabel BLS 4.0 "
-             "i etykiet, energia 4·B + 9·T + 4·W). „Ze stałymi” = z mlekiem do kawy i siemieniem z założeń._", ""]
+             "i etykiet, energia z pola kcal produktów). „Ze stałymi” = z mlekiem do kawy i siemieniem z założeń._", ""]
     errors: list[float] = []
     unmatched: dict[str, int] = {}
     for name, days in files:

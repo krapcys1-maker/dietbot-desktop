@@ -3,6 +3,7 @@
 Programowanie celowe na liczbach całkowitych:
 - gramatury = krok × liczba całkowita (zaokrąglanie w modelu, nie po fakcie),
 - widełki dzienne i kotwice białka są elastyczne (luz z bardzo wysoką karą) — zawsze jest wynik i diagnoza,
+- require_targets wymusza cele także podczas optymalizacji realizmu porcji,
 - tryb ścisły (strict) służy do wyznaczenia zbioru sprzecznych ograniczeń (assumptions).
 """
 
@@ -170,12 +171,17 @@ class BlockModel:
         return store[key]
 
     # ------------------------------------------------------------------ budowa
-    def build(self) -> BlockModel:
+    def build(self, *, require_targets: bool = False) -> BlockModel:
         for slot in self.slots:
             self._build_slot(slot)
         for day in self.days:
             self._build_snacks(day)
             self._build_day(day)
+        if require_targets:
+            # Duża kara nie jest twardym ograniczeniem: solver może zatrzymać się na rozwiązaniu
+            # poza widełkami. Ta ścieżka nadal optymalizuje realizm, lecz zabrania naruszeń celów.
+            for index in self.slacks.values():
+                self._row({index: 1}, hi=0)
         if not self.strict:
             self._build_lighter_supper()
             self.m.minimize(self._lin({i: round(c) for i, c in self._cost.items()}))
@@ -471,7 +477,7 @@ class BlockModel:
                     on = 1 if self.fixed_snacks.get((int(day), pid)) == dish_id else 0
                     self._row({z: 1}, lo=on, hi=on)
                 z_list.append(z)
-                self._cost_add(z, self.settings.snack_cost)
+                self._cost_add(z, self.settings.snack_cost * (0.75 if dish_id in self.settings.liked_dishes else 1))
                 items: list[IngVar] = []
                 key = f"przekaska|{int(day)}|{pid}|{dish_id}"
                 for ing in dish.ingredients:

@@ -100,10 +100,11 @@ class PlanOutcome:
 class WeekPlanner:
     def __init__(self, repo: Repository, llm: LLMClient | None = None, settings: EngineSettings | None = None,
                  cache: dict | None = None):
-        self.repo = repo
+        self.repo = repo.for_planning()
         self.llm = llm
         # zapasowe dania sprawdza naprawa (równolegle, z krótkim limitem) — szybciej niż jeden duży model z wyborem
-        self.settings = (settings or EngineSettings()).model_copy(update={"use_alternates": False})
+        self.settings = (settings or EngineSettings()).model_copy(update={
+            "use_alternates": False, "liked_dishes": {d for d, rating in repo.dish_ratings.items() if rating > 0}})
         self.cache: dict = cache if cache is not None else {}
 
     def dishes_for(self, comp: Composition | None = None) -> dict[str, DishTemplate]:
@@ -124,7 +125,7 @@ class WeekPlanner:
 
     def pools(self, avoid: set[str] | None = None, extra_banned: set[str] | None = None) -> Pools:
         return build_pools(self.repo.approved_dishes(), self.repo.products, self.repo.assumptions, self.settings,
-                           avoid=avoid or set(), extra_banned=extra_banned)
+                           avoid=avoid or set(), extra_banned=extra_banned, ratings=self.repo.dish_ratings)
 
     def compose(self, pools: Pools, days: list[Weekday], wishes: str | None, seed: int, avoid: set[str],
                 log: list[str], prefer: set[str] | None = None,

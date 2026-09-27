@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "../api";
+import DishRating, { useRatings } from "../components/DishRating";
+import Icon from "../components/Icon";
 import { ErrorBox, JobProgress, Loading, Modal, Spinner, TagBadges, useToast } from "../components/ui";
 import type { DishDetail, DishListItem, Job } from "../types";
 import { MEAL_NAMES, STATUS_NAMES, go, num, useAsync } from "../util";
@@ -14,43 +16,63 @@ export default function DishesPage({ dishId }: { dishId?: string }) {
   const [meal, setMeal] = useState("");
   const [status, setStatus] = useState("");
   const [q, setQ] = useState("");
+  const [search, setSearch] = useState("");
+  const [diet, setDiet] = useState("");
+  useEffect(() => { const timer = setTimeout(() => setSearch(q), 250); return () => clearTimeout(timer); }, [q]);
   const [inventing, setInventing] = useState(false);
-  const list = useAsync<DishListItem[]>(() => api.dishes({ posilek: meal || undefined, status: status || undefined, q: q || undefined }), [meal, status, q]);
+  const [ratingFilter, setRatingFilter] = useState("");
+  const [quick, setQuick] = useState(false);
+  const [limit, setLimit] = useState(40);
+  useEffect(() => setLimit(40), [meal, status, q, ratingFilter, quick, diet]);
+  const { ratings } = useRatings();
+  const list = useAsync<DishListItem[]>(() => api.dishes({ posilek: meal || undefined, status: status || undefined, q: search || undefined }), [meal, status, search, ratings]);
+  const visibleDishes = list.data?.filter((d) => (!ratingFilter || (ratings[d.id] ?? 0) === Number(ratingFilter)) && (!quick || (d.prep_minutes != null && d.prep_minutes <= 15)) && (!diet || d.diets.includes(diet))) ?? [];
 
   return (
     <div className="page">
       <div className="page-head">
         <div>
-          <h1>Biblioteka dań</h1>
-          <div className="sub">Z tych dań model układa tydzień. Dania odrzucone nie trafiają do planów.</div>
+          <span className="eyebrow">ZNAJDŹ SWOJE SMAKI</span><h1>Biblioteka dań</h1>
+          <div className="sub">Przepisy na Twój kolejny tydzień. Oceniaj dania — lubiane pojawią się częściej, nielubiane nie trafią do nowych planów.</div>
         </div>
-        <button className="btn primary" onClick={() => setInventing(true)}>✨ Wymyśl nowe dania</button>
+        <button className="btn" onClick={() => setInventing(true)}><Icon name="sparkles" />Wymyśl nowe dania z AI</button>
       </div>
       {inventing && <InventDialog onClose={() => { setInventing(false); list.reload(); }} />}
-      <div className="row">
-        <input type="search" placeholder="Szukaj po nazwie, składniku, kuchni…" value={q} onChange={(e) => setQ(e.target.value)} style={{ minWidth: 280 }} />
-        <select value={meal} onChange={(e) => setMeal(e.target.value)}>
+      <div className="row filters">
+        <input type="search" aria-label="Szukaj dań" placeholder="Nazwa, składnik lub kuchnia…" value={q} onChange={(e) => setQ(e.target.value)} style={{ minWidth: 280 }} />
+        <select aria-label="Rodzaj posiłku" value={meal} onChange={(e) => setMeal(e.target.value)}>
           <option value="">Wszystkie posiłki</option>
           {Object.entries(MEAL_NAMES).map(([k, v]) => (
             <option key={k} value={k}>{v}</option>
           ))}
         </select>
-        <select value={status} onChange={(e) => setStatus(e.target.value)}>
+        <select aria-label="Status dania" value={status} onChange={(e) => setStatus(e.target.value)}>
           <option value="">Każdy status</option>
           {Object.entries(STATUS_NAMES).map(([k, v]) => (
             <option key={k} value={k}>{v}</option>
           ))}
         </select>
-        {list.data && <span className="muted">{list.data.length} dań</span>}
+        {list.data && <span className="muted">{visibleDishes.length} z {list.data.length} dań</span>}
+        <select aria-label="Filtr ocen" value={ratingFilter} onChange={(e) => setRatingFilter(e.target.value)}>
+          <option value="">Wszystkie oceny</option>
+          <option value="1">👍 Lubię</option><option value="-1">👎 Nie lubię</option><option value="0">Bez oceny</option>
+        </select>
+        <select aria-label="Dieta w bibliotece" value={diet} onChange={e => setDiet(e.target.value)}><option value="">Każda dieta</option><option value="wege">Wegetariańskie</option><option value="wegan">Wegańskie</option></select>
+        <label className="check"><input type="checkbox" checked={quick} onChange={(e) => setQuick(e.target.checked)} /> Do 15 minut</label>
+        {(q || meal || status || ratingFilter || quick || diet) && <button className="btn ghost" onClick={() => { setQ(""); setMeal(""); setStatus(""); setRatingFilter(""); setQuick(false); setDiet(""); }}>Wyczyść filtry</button>}
       </div>
       {list.error && <ErrorBox error={list.error} onRetry={list.reload} />}
       <div className="split">
         <div className="list">
           {list.loading && !list.data && <Loading />}
-          {list.data?.map((d) => (
+          {list.data && !visibleDishes.length && <div className="card empty">Brak dań z wybranymi filtrami.</div>}
+          {visibleDishes.slice(0, limit).map((d) => (
             <button key={d.id} className={`list-item ${dishId === d.id ? "selected" : ""}`} onClick={() => go("dania", d.id)}>
+              <span className="recipe-mark"><Icon name={d.diets.includes("wegan") ? "leaf" : "dish"} /></span>
               <div className="grow">
                 <div><b>{d.name}</b></div>
+                {ratings[d.id] === 1 && <span className="badge ok">👍 Lubię</span>}
+                {ratings[d.id] === -1 && <span className="badge error">👎 Nie proponuj</span>}
                 <div className="row small muted" style={{ gap: 6, marginTop: 3 }}>
                   <span>{d.meal_types.map((m) => MEAL_NAMES[m]).join(", ")}</span>
                   <span>· {d.cuisine}</span>
@@ -71,8 +93,9 @@ export default function DishesPage({ dishId }: { dishId?: string }) {
               </div>
             </button>
           ))}
+          {visibleDishes.length > limit && <button className="btn" onClick={() => setLimit((n) => n + 40)}>Pokaż kolejne dania ({limit} z {visibleDishes.length})</button>}
         </div>
-        <div className="sticky">{dishId ? <DishDetailCard id={dishId} onChanged={list.reload} /> : <div className="card empty">Wybierz danie z listy.</div>}</div>
+        <div className="sticky" id="dish-detail">{dishId ? <><button className="btn recipe-back" onClick={() => { go("dania"); document.querySelector(".main")?.scrollTo(0, 0); }}>Wróć do listy dań</button><DishDetailCard key={`${dishId}:${ratings[dishId] ?? 0}`} id={dishId} onChanged={list.reload} /></> : <div className="card empty"><Icon name="dish" /><h2>Coś wpadło Ci w oko?</h2><p>Wybierz danie, żeby zobaczyć składniki, sposób przygotowania i dodać swoją ocenę.</p></div>}</div>
       </div>
     </div>
   );
@@ -81,6 +104,11 @@ export default function DishesPage({ dishId }: { dishId?: string }) {
 function DishDetailCard({ id, onChanged }: { id: string; onChanged: () => void }) {
   const toast = useToast();
   const { data: d, error, loading, setData } = useAsync<DishDetail>(() => api.dish(id), [id]);
+  useEffect(() => {
+    if (!d || !window.matchMedia("(max-width: 900px)").matches) return;
+    const frame = requestAnimationFrame(() => document.getElementById("dish-detail")?.scrollIntoView({ block: "start" }));
+    return () => cancelAnimationFrame(frame);
+  }, [d?.id]);
   if (loading && !d) return <div className="card"><Loading /></div>;
   if (error) return <ErrorBox error={error} />;
   if (!d) return null;
@@ -105,6 +133,7 @@ function DishDetailCard({ id, onChanged }: { id: string; onChanged: () => void }
         <span className={`badge ${d.status === "zatwierdzone" ? "ok" : d.status === "odrzucone" ? "error" : "warn"}`}>{STATUS_NAMES[d.status]}</span>
       </div>
       <TagBadges tags={d.tags} isTreat={d.is_treat} isSweet={d.is_sweet} />
+      <DishRating id={d.id} name={d.name} />
       {d.description && <p className="meal-desc">{d.description}</p>}
       {d.excluded.length > 0 && (
         <div className="alert warn small">
@@ -113,7 +142,7 @@ function DishDetailCard({ id, onChanged }: { id: string; onChanged: () => void }
       )}
       <div>
         <h3 style={{ marginBottom: 4 }}>Składniki (typowa porcja przy 2000 kcal)</h3>
-        <table className="table">
+        <div className="table-scroll"><table className="table">
           <thead>
             <tr><th>Produkt</th><th>Rola</th><th className="right">Typowo</th><th className="right">Zakres</th></tr>
           </thead>
@@ -131,7 +160,7 @@ function DishDetailCard({ id, onChanged }: { id: string; onChanged: () => void }
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
         <div className="muted small">Gramatury w planie dobiera silnik do celów każdej osoby.</div>
       </div>
       {d.groups.length > 0 && (

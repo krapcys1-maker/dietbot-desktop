@@ -39,6 +39,7 @@ class EngineSettings(BaseModel):
     realism_cost_mid: int = 30_000  # za odchylenie równe 100% typowej porcji w strefie 20–50%
     realism_cost_high: int = 150_000  # j.w. powyżej 50%
     snack_cost: int = 30_000  # użycie przekąski bilansującej
+    liked_dishes: set[str] = Field(default_factory=set)  # miękka preferencja; nie zmienia celów ani ograniczeń
     meal_mass_cost_per_g: int = 2_500  # 1 g ponad limit masy posiłku (100 g ≈ 2,5 g poza kotwicą białka)
     meal_mass_tolerance: float = 0.02  # ile ponad limit nie zgłaszamy jako odchylenie (zaokrąglenia kroków)
     alternate_rank_cost: int = 50_000  # wybór dania zapasowego zamiast pierwszego

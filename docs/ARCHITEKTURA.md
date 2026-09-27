@@ -110,7 +110,7 @@ Sklep, nazwa na półce (po rumuńsku), marka, EAN, opakowanie w gramach, prefer
   dozwolone).
 - Tydzień: pula 20% (min–max), maks. słodkich kolacji, dania na zapas (tag, posiłek, dni), bez powtórek.
 - Zakazy: produkty, tagi dań w posiłkach, dozwolone źródła węglowodanów, węglowodany wykluczone z kolacji.
-- Metoda energii: `makro_4_9_4` (jak w celach użytkownika) albo `etykieta`.
+- Metoda energii: `etykieta` — suma pola kcal produktów. Stary `makro_4_9_4` jest migrowany przy aktualizacji.
 
 ### 5.5 Plan (`wyniki/dietbot.sqlite3`)
 Plan tygodnia (dni → posiłki → porcje osób → produkty w gramach, przekąski z powodem, partie na zapas z ilością
@@ -161,7 +161,10 @@ Plan tygodnia (dni → posiłki → porcje osób → produkty w gramach, przeką
    pilnuje osobna reguła; naprawa sprawdza wtedy tylko zamienniki tej samej kuchni (test na żywo 14.09.2026: dzień
    z trzema tłustymi daniami, w tym „Sałatką włoską z pesto”, nie miał żadnej zamiany do sprawdzenia). Na 10 tygodniach: dni poza celami po pierwszym liczeniu 36 → 20, rundy napraw 12 → 9, przekąski
    bilansujące 7,3 → 5,1 na tydzień, czas planu 18,6 → 15,5 s.
-4. **Gramatury (silnik)** — najpierw pierwsze wybory.
+4. **Gramatury (silnik)** — najpierw pierwsze wybory. Gdy model z karami zwróci przekroczenia,
+   druga próba wymusza zerowe odchylenia widełek, kotwic i mas talerzy, zachowując optymalizację realizmu.
+   Dzięki temu wynik poza limitami nie wygrywa z istniejącym poprawnym rozwiązaniem tylko ze względu na kary
+   lub przedwczesne zatrzymanie pierwszej próby. Niepowodzenie zachowuje uczciwą diagnozę, nie poszerza celów.
 5. **Naprawa (kod + LLM)** — dla dni z problemami kod równolegle sprawdza silnikiem zamienniki (najpierw zapasowe
    z układu, potem pula uporządkowana według potrzeb dnia: brakuje węglowodanów → dania z większą ilością
    węglowodanów, za duża porcja → lżejsze). Całkowicie działające zamiany wybiera LLM (z życzeniami domowników),
@@ -326,8 +329,10 @@ ograniczeń (model ścisły z założeniami) i powód każdej przekąski po pols
   (`dietbot dane importuj-bls`), odświeżanie wartości produktów po kodzie (`dietbot dane odswiez-bls`).
 - **CIQUAL 2025** (ANSES) — kontrola krzyżowa; **Open Food Facts** (ODbL) — produkty markowe z Rumunii
   (np. brânză de vaci Pilos jako polski twaróg — niemiecki Quark ma inne wartości); **USDA FDC** (CC0) — wagi sztuk.
-- Energia: cele użytkownika są w 4/9/4, więc cały system liczy 4·B + 9·T + 4·W (+7·alkohol); kontrola danych
-  używa współczynników UE (błonnik 2, kwasy organiczne 3, poliole 2,4).
+- Energia: cały system sumuje kcal zapisane w tabelach/etykietach produktów, niezależnie od celów makro.
+  Kontrola danych używa pełnych współczynników UE (w tym błonnik 2, kwasy organiczne 3, poliole 2,4).
+  Raporty przy odczycie planów są liczone na nowo. Od 0.2.0 korzystają z kopii danych przypisanej do planu,
+  nie z później zmienionej bazy. Historyczne sumy w SQLite nie zastępują tych obliczeń.
 - Dopasowanie nazw PL (`food/matcher.py`): normalizacja, lematyzacja (simplemma), procenty jako tokeny, słowa
   opisowe i warianty (light, chudy, kiszony…), rzeczownik główny, alternatywy „albo/lub”; wynik `pewne` /
   `niepewne` / `brak` — niepewne rozstrzyga LLM wyłącznie spośród kandydatów.

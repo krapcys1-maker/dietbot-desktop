@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import date
 from enum import StrEnum
+from typing import Literal
 
 from pydantic import Field, field_validator, model_validator
 
@@ -117,6 +118,7 @@ class Measure(DomainModel):
 
 
 class Product(DomainModel):
+    dietary_class: Literal["wegan", "wege", "zwierzecy", "nieznany"] | None = Field(default=None, alias="zgodnosc_diety")
     id: str
     name: str = Field(alias="nazwa", min_length=2)
     aliases: list[str] = Field(default_factory=list, alias="aliasy")

@@ -8,6 +8,7 @@ import sys
 from datetime import date
 from pathlib import Path
 from typing import Literal
+from urllib.parse import urlsplit
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
@@ -16,6 +17,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+from ..domain.goal_calculator import GoalInput, calculate_goals
 from .file_dialogs import save_text_as
 from .jobs import UserError
 from .service import DietService
@@ -53,6 +55,14 @@ class AssumptionsIn(BaseModel):
 
 class DishPatchIn(BaseModel):
     status: str
+
+
+class RatingIn(BaseModel):
+    rating: Literal[-1, 0, 1]
+
+
+class SaveDietIn(BaseModel):
+    title: str = Field(min_length=2, max_length=80)
 
 
 class InventIn(BaseModel):
@@ -107,8 +117,8 @@ def create_app(service: DietService) -> FastAPI:
         # żądania zmieniające stan tylko z własnej strony: obca strona w przeglądarce nie uruchomi eksportu ani zadań
         origin = request.headers.get("origin")
         if origin and request.method not in ("GET", "HEAD", "OPTIONS"):
-            host = origin.split("://", 1)[-1].split(":", 1)[0].lower()
-            if host not in ("127.0.0.1", "localhost", "testserver"):
+            supplied, expected = urlsplit(origin), urlsplit(str(request.base_url))
+            if (supplied.scheme, supplied.netloc) != (expected.scheme, expected.netloc):
                 return JSONResponse(status_code=403, content={"detail": "Żądanie spoza aplikacji DietBot."})
         return await call_next(request)
 
@@ -136,6 +146,27 @@ def create_app(service: DietService) -> FastAPI:
         return j.to_dict(since=max(0, od))
 
     # ---------------------------------------------------------------- plany
+    @app.get("/api/diety")
+    def library() -> list[dict]:
+        return s.library()
+
+    @app.put("/api/diety/{plan_id}")
+    def save_diet(plan_id: str, body: SaveDietIn) -> dict:
+        return s.save_diet(plan_id, body.title)
+
+    @app.delete("/api/diety/{plan_id}")
+    def unsave_diet(plan_id: str) -> dict:
+        s.unsave_diet(plan_id)
+        return {"ok": True}
+
+    @app.get("/api/oceny")
+    def ratings() -> dict:
+        return s.store.ratings()
+
+    @app.put("/api/oceny/{dish_id}")
+    def rate_dish(dish_id: str, body: RatingIn) -> dict:
+        return s.rate_dish(dish_id, body.rating)
+
     @app.post("/api/plany/generuj")
     def generate(body: GenerateIn) -> dict:
         if body.days is not None and (not body.days or any(d < 0 or d > 6 for d in body.days)):
@@ -206,6 +237,13 @@ def create_app(service: DietService) -> FastAPI:
     @app.get("/api/zalozenia")
     def assumptions() -> dict:
         return s.assumptions()
+
+    @app.post("/api/cele/oblicz")
+    def calculate_targets(body: GoalInput) -> dict:
+        try:
+            return calculate_goals(body)
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from None
 
     @app.post("/api/zalozenia/sprawdz")
     def check_assumptions(body: AssumptionsIn) -> dict:

@@ -11,6 +11,8 @@ import time
 import webbrowser
 from pathlib import Path
 
+from .. import __version__
+
 log = logging.getLogger("dietbot.desktop")
 # stały port okna aplikacji: pamięć strony (odhaczone zakupy, wybrany dzień) jest przypisana do adresu z portem,
 # więc losowy port przy każdym starcie kasowałby ją; gdy port jest zajęty przez inny program — bierzemy dowolny wolny
@@ -92,7 +94,7 @@ def _message_box(text: str) -> None:
     try:
         import ctypes
 
-        ctypes.windll.user32.MessageBoxW(None, text, "DietBot", 0x40)
+        ctypes.windll.user32.MessageBoxW(None, text, "Porcja", 0x40)
     except Exception:  # noqa: BLE001 — poza Windows po prostu wypisujemy
         print(text)
 
@@ -109,7 +111,7 @@ def run_desktop(with_telegram: bool = True) -> None:
     lock = storage / "instancja.json"
     running = _other_instance(lock)
     if running:  # druga kopia okna nie może używać tego samego profilu WebView2 (sprawdzamy przed wczytaniem danych)
-        _message_box(f"DietBot jest już otwarty. Jeśli nie widzisz okna, adres aplikacji to {running}")
+        _message_box(f"Porcja jest już otwarta. Jeśli nie widzisz okna, adres aplikacji to {running}")
         return
     service = DietService(paths)
     server, thread, port = start_server(service)
@@ -127,8 +129,8 @@ def run_desktop(with_telegram: bool = True) -> None:
             webbrowser.open(url)
             thread.join()
             return
-        webview.create_window("DietBot — jadłospis na tydzień", url, width=1360, height=900, min_size=(960, 640),
-                              text_select=True, background_color="#F5F6F2")
+        webview.create_window(f"Porcja {__version__} — dobrze mieć plan", url, width=1360, height=900, min_size=(960, 640),
+                              text_select=True, background_color="#FAF9F5")
         webview.start(private_mode=False, storage_path=str(storage))  # pamięć okna (np. odhaczone zakupy) przetrwa restart
     finally:
         server.should_exit = True
@@ -184,5 +186,5 @@ def main() -> None:
     except Exception as exc:
         logging.getLogger("dietbot").exception("Aplikacja zakończyła się błędem")
         # okno bez konsoli: bez tego program po prostu by zniknął
-        _message_box(f"DietBot nie mógł wystartować:\n{exc}\n\nSzczegóły w pliku wyniki\\dietbot.log.")
+        _message_box(f"Porcja nie mogła wystartować:\n{exc}\n\nSzczegóły w pliku wyniki\\dietbot.log.")
         raise

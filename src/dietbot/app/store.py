@@ -37,10 +37,24 @@ CREATE TABLE IF NOT EXISTS plans (
     deleted INTEGER NOT NULL DEFAULT 0
 );
 CREATE INDEX IF NOT EXISTS plans_created ON plans(created_at);
+CREATE TABLE IF NOT EXISTS plan_snapshots (
+    plan_id TEXT PRIMARY KEY REFERENCES plans(id),
+    data_json TEXT NOT NULL
+);
 CREATE INDEX IF NOT EXISTS plans_family ON plans(family_id);
 CREATE TABLE IF NOT EXISTS settings (
     key TEXT PRIMARY KEY,
     value TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS saved_diets (
+    plan_id TEXT PRIMARY KEY REFERENCES plans(id),
+    title TEXT NOT NULL,
+    saved_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS dish_ratings (
+    dish_id TEXT PRIMARY KEY,
+    rating INTEGER NOT NULL CHECK(rating IN (-1, 1)),
+    updated_at TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS chat (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -64,6 +78,7 @@ class PlanRecord:
     title: str
     source: str  # llm / algorytm / zamiana / przeliczenie / naprawa
     ok: bool
+    snapshot: dict | None = None
     report: VerificationReport | None = None
     composition: dict | None = None
     log: list[str] = field(default_factory=list)
@@ -91,6 +106,14 @@ class PlanStore:
     def __init__(self, path: Path):
         self.path = path
         path.parent.mkdir(parents=True, exist_ok=True)
+        if path.exists():
+            with sqlite3.connect(path) as old:
+                exists = old.execute("SELECT 1 FROM sqlite_master WHERE name='plan_snapshots'").fetchone()
+                if not exists:
+                    backup = path.with_name(path.name + ".before-snapshots.bak")
+                    if not backup.exists():
+                        with sqlite3.connect(backup) as target:
+                            old.backup(target)
         with self._conn() as c:
             c.executescript(SCHEMA)
 
@@ -128,7 +151,20 @@ class PlanStore:
                  json.dumps(rec.composition, ensure_ascii=False) if rec.composition else None,
                  json.dumps(rec.log, ensure_ascii=False)),
             )
+            if rec.snapshot is not None:
+                c.execute("INSERT INTO plan_snapshots VALUES (?, ?)",
+                          (rec.id, json.dumps(rec.snapshot, ensure_ascii=False)))
         return rec
+
+    def snapshot(self, plan_id: str) -> dict | None:
+        with self._conn() as c:
+            row = c.execute("SELECT data_json FROM plan_snapshots WHERE plan_id = ?", (plan_id,)).fetchone()
+        return json.loads(row[0]) if row else None
+
+    def freeze(self, plan_id: str, snapshot: dict) -> None:
+        with self._conn() as c:
+            c.execute("INSERT OR IGNORE INTO plan_snapshots VALUES (?, ?)",
+                      (plan_id, json.dumps(snapshot, ensure_ascii=False)))
 
     @staticmethod
     def _record(row: sqlite3.Row) -> PlanRecord:
@@ -147,7 +183,11 @@ class PlanStore:
     def get(self, plan_id: str) -> PlanRecord | None:
         with self._conn() as c:
             row = c.execute("SELECT * FROM plans WHERE id = ? AND deleted = 0", (plan_id,)).fetchone()
-        return self._record(row) if row else None
+        if row is None:
+            return None
+        rec = self._record(row)
+        rec.snapshot = self.snapshot(plan_id)
+        return rec
 
     def list(self, limit: int = 100) -> list[PlanRecord]:
         with self._conn() as c:
@@ -169,6 +209,40 @@ class PlanStore:
     def rename(self, plan_id: str, title: str) -> None:
         with self._conn() as c:
             c.execute("UPDATE plans SET title = ? WHERE id = ?", (title, plan_id))
+
+    def saved_diets(self) -> dict[str, dict]:
+        with self._conn() as c:
+            rows = c.execute("SELECT s.* FROM saved_diets s JOIN plans p ON p.id = s.plan_id "
+                             "WHERE p.deleted = 0 ORDER BY s.saved_at DESC").fetchall()
+        return {r["plan_id"]: dict(r) for r in rows}
+
+    def save_diet(self, plan_id: str, title: str) -> None:
+        with self._conn() as c:
+            c.execute("BEGIN IMMEDIATE")
+            if not c.execute("SELECT 1 FROM plans WHERE id = ? AND deleted = 0", (plan_id,)).fetchone():
+                raise KeyError(plan_id)
+            c.execute("INSERT INTO saved_diets VALUES (?, ?, ?) ON CONFLICT(plan_id) "
+                      "DO UPDATE SET title = excluded.title",
+                      (plan_id, title, datetime.now(UTC).isoformat()))
+
+    def unsave_diet(self, plan_id: str) -> None:
+        with self._conn() as c:
+            c.execute("DELETE FROM saved_diets WHERE plan_id = ?", (plan_id,))
+
+    def ratings(self) -> dict[str, int]:
+        with self._conn() as c:
+            return {r["dish_id"]: r["rating"] for r in c.execute("SELECT * FROM dish_ratings")}
+
+    def rate_dish(self, dish_id: str, rating: int) -> None:
+        if rating not in (-1, 0, 1):
+            raise ValueError("Ocena musi wynosić -1, 0 lub 1.")
+        with self._conn() as c:
+            if rating == 0:
+                c.execute("DELETE FROM dish_ratings WHERE dish_id = ?", (dish_id,))
+            else:
+                c.execute("INSERT INTO dish_ratings VALUES (?, ?, ?) ON CONFLICT(dish_id) "
+                          "DO UPDATE SET rating = excluded.rating, updated_at = excluded.updated_at",
+                          (dish_id, rating, datetime.now(UTC).isoformat()))
 
     def delete(self, plan_id: str) -> None:
         """Miękkie usunięcie (plan znika z list, ale zostaje w bazie)."""

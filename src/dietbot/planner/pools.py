@@ -6,6 +6,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 
 from ..domain.assumptions import Assumptions
+from ..domain.diet import dish_compatible
 from ..domain.dish import DishStatus, DishTemplate, MealType, Role
 from ..domain.product import Category, Product
 from ..engine.catalog import Catalog
@@ -52,6 +53,7 @@ class DishProfile:
     with_eggs: bool = False  # jajka są wyraźnym składnikiem (nie tylko np. do panierki)
     protein_range: dict[str, tuple[float, float]] = field(default_factory=dict)  # osoba -> (min, max) g
     typical: dict[str, float] = field(default_factory=dict)  # kcal/protein/fat/carbs przy typowych porcjach (2000 kcal)
+    liked: bool = False
 
     def line(self) -> str:
         tags = [t for t in self.tags if t in ("slodkie", "pula_20", "zupa", "na_zapas", "wege", "szybkie")]
@@ -72,6 +74,8 @@ class DishProfile:
             parts.append("z jajkami")
         if self.prep_minutes:
             parts.append(f"{self.prep_minutes} min")
+        if self.liked:
+            parts.append("ULUBIONE użytkownika — preferuj, jeśli pasuje do zasad")
         return " | ".join(parts)
 
 
@@ -83,6 +87,7 @@ class Pools:
     excluded: dict[str, list[str]]  # danie -> powody wykluczenia
     target: MacroSplit = DEFAULT_TARGET  # docelowy rozkład energii posiłków (bilans makro dnia)
     treat_snacks: list[str] = field(default_factory=list)  # przekąski z puli 20% (lody, chipsy…) — slot „przekąska”
+    liked: set[str] = field(default_factory=set)
 
 
 def _typical_nutrition(dish: DishTemplate, catalog: Catalog, settings: EngineSettings) -> dict[str, float]:
@@ -113,7 +118,7 @@ def protein_range(dish: DishTemplate, catalog: Catalog, settings: EngineSettings
 
 def build_pools(dishes: Mapping[str, DishTemplate], products: Mapping[str, Product], a: Assumptions,
                 settings: EngineSettings | None = None, avoid: set[str] | None = None,
-                extra_banned: set[str] | None = None) -> Pools:
+                extra_banned: set[str] | None = None, ratings: Mapping[str, int] | None = None) -> Pools:
     """`extra_banned` — produkty wykluczone tylko w tym planie (np. z życzeń „bez ryb”)."""
     settings = settings or EngineSettings()
     catalog = Catalog(products, a.energy.method)
@@ -123,9 +128,14 @@ def build_pools(dishes: Mapping[str, DishTemplate], products: Mapping[str, Produ
     profiles: dict[str, DishProfile] = {}
     excluded: dict[str, list[str]] = {}
     avoid = avoid or set()
+    ratings = ratings or {}
 
     for dish in sorted(dishes.values(), key=lambda d: d.id):
         reasons: list[str] = []
+        if not dish_compatible(dish, products, a.diet):
+            reasons.append(f"składniki bez potwierdzonej zgodności z dietą {a.diet}")
+        if ratings.get(dish.id, 0) < 0:
+            reasons.append("nie lubisz tego dania — ocena 👎")
         if dish.status is not DishStatus.APPROVED:
             reasons.append("danie niezatwierdzone")
         if dish.id in avoid:
@@ -166,6 +176,7 @@ def build_pools(dishes: Mapping[str, DishTemplate], products: Mapping[str, Produ
             protein_label="wysokie" if protein >= 35 else "średnie" if protein >= 25 else "niskie",
             energy_label="sycące" if kcal >= 650 else "średnie" if kcal >= 450 else "lekkie",
             prep_minutes=dish.prep_minutes, egg_based=egg_based, with_eggs=with_eggs, typical={k: round(v, 1) for k, v in typical.items()},
+            liked=ratings.get(dish.id, 0) > 0,
         )
         for person in a.persons:
             scale = person.energy_center / settings.reference_kcal
@@ -211,4 +222,4 @@ def build_pools(dishes: Mapping[str, DishTemplate], products: Mapping[str, Produ
     treat_snacks = sorted(d.id for d in dishes.values() if d.id not in excluded and d.id in profiles and d.is_treat
                           and MealType.SNACK in d.meal_types)
     return Pools(by_meal=by_meal, batch=batch, profiles=profiles, excluded=excluded, target=target_split(a, products),
-                 treat_snacks=treat_snacks)
+                 treat_snacks=treat_snacks, liked={d for d, rating in ratings.items() if rating > 0})

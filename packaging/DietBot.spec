@@ -36,6 +36,7 @@ exe = EXE(
     exclude_binaries=True,
     name="DietBot",
     icon=ROOT + r"\packaging\dietbot.ico",
+    version=ROOT + r"\packaging\version_info.txt",
     console=False,
     upx=False,
 )

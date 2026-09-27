@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import { api } from "./api";
 import { ToastProvider } from "./components/ui";
+import { RatingsProvider } from "./components/DishRating";
+import Icon from "./components/Icon";
+import Brand from "./components/Brand";
+import HomePage from "./pages/HomePage";
+import HelpPage from "./pages/HelpPage";
+import LibraryPage from "./pages/LibraryPage";
 import AssumptionsPage from "./pages/AssumptionsPage";
 import ChatPage from "./pages/ChatPage";
 import DishesPage from "./pages/DishesPage";
@@ -10,23 +16,24 @@ import SettingsPage from "./pages/SettingsPage";
 import ShoppingPage from "./pages/ShoppingPage";
 import WeekPage from "./pages/WeekPage";
 import type { Status } from "./types";
-import { plural, useRoute, usd } from "./util";
+import { loadLocal, saveLocal, useRoute } from "./util";
 
 const NAV = [
-  { key: "tydzien", label: "Tydzień", icon: "📅" },
-  { key: "nowy", label: "Nowy plan", icon: "✨" },
-  { key: "zakupy", label: "Zakupy", icon: "🛒" },
-  { key: "czat", label: "Czat", icon: "💬" },
-  { key: "dania", label: "Dania", icon: "🍲" },
-  { key: "produkty", label: "Produkty", icon: "🥕" },
-  { key: "zalozenia", label: "Założenia", icon: "🎯" },
-  { key: "ustawienia", label: "Ustawienia", icon: "⚙️" },
+  { key: "start", label: "Pulpit", icon: "home" },
+  { key: "tydzien", label: "Plan tygodnia", icon: "calendar" },
+  { key: "zakupy", label: "Lista zakupów", icon: "basket" },
+  { key: "diety", label: "Moje diety", icon: "bookmark" },
+  { key: "dania", label: "Biblioteka dań", icon: "dish" },
 ];
 
 export default function App() {
   const route = useRoute();
-  const page = route[0] || "tydzien";
+  const page = route[0] || "start";
   const [status, setStatus] = useState<Status | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [theme, setTheme] = useState(() => loadLocal<string>("porcja:theme", "light") === "dark" ? "dark" : "light");
+  useEffect(() => { document.documentElement.dataset.theme = theme; saveLocal("porcja:theme", theme); }, [theme]);
+  useEffect(() => { setMenuOpen(false); document.querySelector(".main")?.scrollTo(0, 0); }, [page]);
 
   useEffect(() => {
     let alive = true;
@@ -41,6 +48,15 @@ export default function App() {
 
   let content;
   switch (page) {
+    case "start":
+      content = <HomePage status={status} />;
+      break;
+    case "pomoc":
+      content = <HelpPage />;
+      break;
+    case "diety":
+      content = <LibraryPage />;
+      break;
     case "nowy":
       content = <GeneratePage status={status} />;
       break;
@@ -68,35 +84,49 @@ export default function App() {
 
   return (
     <ToastProvider>
+      <RatingsProvider>
       <div className="app">
-        <nav className="sidebar">
-          <div className="brand">
-            <span className="brand-logo">🥗</span>
-            <div>
-              <div className="brand-name">DietBot</div>
-              <div className="brand-sub">jadłospis na tydzień</div>
-            </div>
-          </div>
+        <a className="skip-link" href="#main-content" onClick={e => { e.preventDefault(); document.getElementById("main-content")?.focus(); }}>Przejdź do treści</a>
+        <nav className={`sidebar ${menuOpen ? "menu-open" : ""}`} aria-label="Nawigacja główna">
+          <a className="brand-link" href="#/start" aria-label="Porcja — pulpit"><Brand /></a>
+          <button className="btn mobile-menu" aria-expanded={menuOpen} aria-controls="navigation-links" aria-label={menuOpen ? "Zamknij menu" : "Otwórz menu"} onClick={() => setMenuOpen(v => !v)}><Icon name={menuOpen ? "close" : "menu"} /></button>
+          <div className="navigation-links" id="navigation-links">
+          <a href="#/nowy" className={`nav-item nav-new ${page === "nowy" ? "active" : ""}`} aria-current={page === "nowy" ? "page" : undefined}>
+            <Icon name="plus" />Nowy plan
+          </a>
+          <div className="nav-section">Na co dzień</div>
           {NAV.map((n) => (
-            <a key={n.key} href={`#/${n.key}`} className={`nav-item ${page === n.key ? "active" : ""}`}>
-              <span className="nav-icon">{n.icon}</span>
+            <a key={n.key} href={`#/${n.key}`} className={`nav-item ${page === n.key ? "active" : ""}`} aria-current={page === n.key ? "page" : undefined}>
+              <Icon name={n.icon} />
               {n.label}
             </a>
           ))}
+          <div className="nav-section">Dopasuj do siebie</div>
+          <a href="#/zalozenia" className={`nav-item ${page === "zalozenia" ? "active" : ""}`}><Icon name="target" />Cele i preferencje</a>
+          <a href="#/ustawienia" className={`nav-item ${page === "ustawienia" ? "active" : ""}`}><Icon name="settings" />Ustawienia</a>
+          <details className="nav-extra" key={page === "czat" || page === "produkty" ? "extra" : "main"} open={page === "czat" || page === "produkty" ? true : undefined}>
+            <summary>Więcej narzędzi</summary>
+            <a href="#/czat" className={`nav-item ${page === "czat" ? "active" : ""}`}><Icon name="chat" />Asystent</a>
+            <a href="#/produkty" className={`nav-item ${page === "produkty" ? "active" : ""}`}><Icon name="product" />Baza produktów</a>
+          </details>
+          <a href="#/pomoc" className={`nav-item nav-help ${page === "pomoc" ? "active" : ""}`}><Icon name="help" />Pomoc i pierwsze kroki</a>
+          </div>
           {status && (
             <div className="sidebar-foot">
-              <div>
-                {status.approved_dishes} {plural(status.approved_dishes, "danie", "dania", "dań")} · {status.products} {plural(status.products, "produkt", "produkty", "produktów")}
-              </div>
-              <div title="Wydatki na model językowy">
-                LLM: {usd(status.llm.spent_usd)} / {usd(status.llm.budget_usd)}
-              </div>
-              {status.jobs_busy && <div>⏳ trwa liczenie…</div>}
+              <div className="row"><span className="live-dot" />{status.jobs_busy ? "Układamy Twój plan…" : "Dane zapisane lokalnie"}</div>
+              <div>Porcja {status.version} · bezpłatna aplikacja</div>
             </div>
           )}
         </nav>
-        <main className="main">{content}</main>
+        <main className="main" id="main-content" tabIndex={-1}>
+          <div className="topbar no-print"><span>Twoja przestrzeń <span className="topbar-divider">/</span> <b>{NAV.find(n => n.key === page)?.label ?? ({ nowy: "Nowy plan", zalozenia: "Cele i preferencje", ustawienia: "Ustawienia", pomoc: "Pomoc", czat: "Asystent", produkty: "Produkty" } as Record<string, string>)[page] ?? "Plan tygodnia"}</b></span>
+            <div className="row"><a href="#/ustawienia" className="connection-label"><span className={`live-dot ${status?.llm.key_present && status?.llm.enabled ? "" : "neutral"}`} />{status ? status.llm.key_present && status.llm.enabled ? "AI dostępne" : "Tryb bez AI" : "Łączenie…"}</a><button className="btn icon-button" aria-label={theme === "light" ? "Włącz ciemny motyw" : "Włącz jasny motyw"} onClick={() => setTheme(t => t === "light" ? "dark" : "light")}><Icon name={theme === "light" ? "moon" : "sun"} /></button></div>
+          </div>
+          {content}
+          <footer className="page-footer no-print">porcja. <span>Dobrze mieć plan.</span><a href="#/pomoc">Pomoc</a></footer>
+        </main>
       </div>
+      </RatingsProvider>
     </ToastProvider>
   );
 }

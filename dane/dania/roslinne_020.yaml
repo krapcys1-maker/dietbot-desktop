@@ -1,0 +1,2081 @@
+[
+  {
+    "id": "roslinne_020_tofu_pomidory",
+    "nazwa": "Tofucznica z pomidorem i szczypiorkiem",
+    "posilki": [
+      "sniadanie"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "na_cieplo",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 160
+      },
+      {
+        "produkt": "pomidor",
+        "rola": "warzywa",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 150
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      },
+      {
+        "produkt": "szczypiorek",
+        "rola": "warzywa",
+        "typowo_g": 10,
+        "min_g": 6,
+        "max_g": 15
+      },
+      {
+        "produkt": "kurkuma",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Rozgnieć tofu widelcem. Pomidor pokrój w kostkę.",
+      "Na oliwie podgrzewaj pomidor 3 minuty, dodaj tofu i kurkumę. Smaż 5 minut mieszając.",
+      "Posyp szczypiorkiem i podaj z pieczywem."
+    ],
+    "czas_min": 15,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_tofu_pieczarki",
+    "nazwa": "Tofucznica z pieczarkami i szpinakiem",
+    "posilki": [
+      "sniadanie"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "na_cieplo",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 160
+      },
+      {
+        "produkt": "pieczarki",
+        "rola": "warzywa",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 150
+      },
+      {
+        "produkt": "szpinak",
+        "rola": "warzywa",
+        "typowo_g": 60,
+        "min_g": 36,
+        "max_g": 90
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      }
+    ],
+    "przygotowanie": [
+      "Pokrój pieczarki i smaż na oliwie około 6 minut.",
+      "Dodaj pokruszone tofu oraz szpinak. Podgrzewaj 4 minuty i podaj z pieczywem."
+    ],
+    "czas_min": 15,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_pasta_fasola",
+    "nazwa": "Kanapki z pastą fasolową i papryką",
+    "posilki": [
+      "sniadanie"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "fasola_czerwona_konserwowa",
+        "rola": "bialko",
+        "typowo_g": 160,
+        "min_g": 100,
+        "max_g": 240
+      },
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 180
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 160
+      },
+      {
+        "produkt": "papryka_czerwona",
+        "rola": "warzywa",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 150
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      },
+      {
+        "produkt": "papryka_wedzona",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Fasolę opłucz i odsącz. Zblenduj z tofu, oliwą, wędzoną papryką i łyżką wody.",
+      "Posmaruj pieczywo pastą i podaj ze świeżą papryką."
+    ],
+    "czas_min": 10,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_pasta_to_fu",
+    "nazwa": "Pasta z tofu, ogórka i szczypiorku",
+    "posilki": [
+      "sniadanie"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 160
+      },
+      {
+        "produkt": "ogorek",
+        "rola": "warzywa",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 150
+      },
+      {
+        "produkt": "szczypiorek",
+        "rola": "warzywa",
+        "typowo_g": 15,
+        "min_g": 9,
+        "max_g": 23
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      },
+      {
+        "produkt": "sok_z_cytryny",
+        "rola": "dodatek",
+        "typowo_g": 10,
+        "min_g": 5,
+        "max_g": 15
+      }
+    ],
+    "przygotowanie": [
+      "Rozgnieć tofu z oliwą i sokiem z cytryny.",
+      "Dodaj drobno pokrojony ogórek i szczypiorek; wymieszaj. Podaj na pieczywie."
+    ],
+    "czas_min": 10,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_tosty_groszek",
+    "nazwa": "Grzanki z pastą z groszku i tofu",
+    "posilki": [
+      "sniadanie"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 160
+      },
+      {
+        "produkt": "groszek_mrozony",
+        "rola": "warzywa",
+        "typowo_g": 120,
+        "min_g": 72,
+        "max_g": 180
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      },
+      {
+        "produkt": "sok_z_cytryny",
+        "rola": "dodatek",
+        "typowo_g": 10,
+        "min_g": 5,
+        "max_g": 15
+      }
+    ],
+    "przygotowanie": [
+      "Ugotuj groszek 5 minut, odcedź.",
+      "Zblenduj groszek z tofu, oliwą i cytryną. Podaj na podpieczonym pieczywie."
+    ],
+    "czas_min": 15,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_tofu_papryka",
+    "nazwa": "Tofu na ciepło z papryką i chlebem",
+    "posilki": [
+      "sniadanie"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "na_cieplo",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 160
+      },
+      {
+        "produkt": "papryka_czerwona",
+        "rola": "warzywa",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 150
+      },
+      {
+        "produkt": "cebula",
+        "rola": "warzywa",
+        "typowo_g": 30,
+        "min_g": 18,
+        "max_g": 45
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      },
+      {
+        "produkt": "papryka_slodka_mielona",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Cebulę i paprykę pokrój. Smaż na oliwie 5 minut.",
+      "Dodaj tofu w kostce i paprykę mieloną, smaż jeszcze 5 minut. Podaj z chlebem."
+    ],
+    "czas_min": 15,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_salatka_sniadanie",
+    "nazwa": "Śniadaniowa sałatka z ciecierzycą i tofu",
+    "posilki": [
+      "sniadanie"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "ciecierzyca_konserwowa",
+        "rola": "bialko",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 180
+      },
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 160
+      },
+      {
+        "produkt": "ogorek",
+        "rola": "warzywa",
+        "typowo_g": 70,
+        "min_g": 42,
+        "max_g": 105
+      },
+      {
+        "produkt": "pomidor",
+        "rola": "warzywa",
+        "typowo_g": 70,
+        "min_g": 42,
+        "max_g": 105
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      }
+    ],
+    "przygotowanie": [
+      "Ciecierzycę opłucz i odsącz. Warzywa i tofu pokrój.",
+      "Wymieszaj składniki z oliwą; podaj z pieczywem."
+    ],
+    "czas_min": 10,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_kanapka_orzechowa",
+    "nazwa": "Kanapki z kremem tofu i masła orzechowego",
+    "posilki": [
+      "sniadanie"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 160
+      },
+      {
+        "produkt": "maslo_orzechowe",
+        "rola": "tluszcz",
+        "typowo_g": 20,
+        "min_g": 10,
+        "max_g": 30
+      },
+      {
+        "produkt": "ogorek",
+        "rola": "warzywa",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 150
+      },
+      {
+        "produkt": "sok_z_cytryny",
+        "rola": "dodatek",
+        "typowo_g": 10,
+        "min_g": 5,
+        "max_g": 15
+      }
+    ],
+    "przygotowanie": [
+      "Zblenduj tofu z masłem orzechowym, cytryną i niewielką ilością wody.",
+      "Rozsmaruj na pieczywie. Dodaj plasterki ogórka."
+    ],
+    "czas_min": 10,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_curry",
+    "nazwa": "Curry z tofu, ciecierzycą i ryżem",
+    "posilki": [
+      "obiad"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "na_cieplo"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "ciecierzyca_konserwowa",
+        "rola": "bialko",
+        "typowo_g": 80,
+        "min_g": 40,
+        "max_g": 140
+      },
+      {
+        "produkt": "ryz_bialy",
+        "rola": "weglowodany",
+        "typowo_g": 80,
+        "min_g": 40,
+        "max_g": 140
+      },
+      {
+        "produkt": "pomidory_z_puszki",
+        "rola": "warzywa",
+        "typowo_g": 120,
+        "min_g": 72,
+        "max_g": 180
+      },
+      {
+        "produkt": "mleczko_kokosowe",
+        "rola": "sos",
+        "typowo_g": 35,
+        "min_g": 15,
+        "max_g": 60
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      },
+      {
+        "produkt": "curry_przyprawa",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Ugotuj ryż zgodnie z instrukcją na opakowaniu.",
+      "Tofu podsmaż na oliwie z curry 4 minuty. Dodaj odsączoną ciecierzycę, pomidory i mleczko kokosowe.",
+      "Duś 10 minut, podaj z ryżem."
+    ],
+    "czas_min": 25,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_soczewica_makaron",
+    "nazwa": "Makaron z pomidorowym sosem z soczewicy",
+    "posilki": [
+      "obiad"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "na_cieplo"
+    ],
+    "skladniki": [
+      {
+        "produkt": "soczewica_czerwona",
+        "rola": "bialko",
+        "typowo_g": 70,
+        "min_g": 45,
+        "max_g": 110
+      },
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 120,
+        "min_g": 60,
+        "max_g": 200
+      },
+      {
+        "produkt": "makaron_pszenny",
+        "rola": "weglowodany",
+        "typowo_g": 80,
+        "min_g": 40,
+        "max_g": 140
+      },
+      {
+        "produkt": "passata",
+        "rola": "warzywa",
+        "typowo_g": 150,
+        "min_g": 90,
+        "max_g": 225
+      },
+      {
+        "produkt": "cebula",
+        "rola": "warzywa",
+        "typowo_g": 30,
+        "min_g": 18,
+        "max_g": 45
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      },
+      {
+        "produkt": "oregano_suszone",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Podsmaż cebulę na oliwie. Dodaj opłukaną soczewicę, passatę i wodę do przykrycia.",
+      "Duś 15–20 minut, dolewając wodę. Dodaj rozkruszone tofu i oregano, podgrzewaj 3 minuty.",
+      "Ugotuj makaron bez jaj, odcedź i podaj z sosem."
+    ],
+    "czas_min": 30,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_chili",
+    "nazwa": "Chili z fasolą, tofu i ryżem",
+    "posilki": [
+      "obiad"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "na_cieplo"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "fasola_czerwona_konserwowa",
+        "rola": "bialko",
+        "typowo_g": 130,
+        "min_g": 80,
+        "max_g": 200
+      },
+      {
+        "produkt": "ryz_bialy",
+        "rola": "weglowodany",
+        "typowo_g": 80,
+        "min_g": 40,
+        "max_g": 140
+      },
+      {
+        "produkt": "pomidory_z_puszki",
+        "rola": "warzywa",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 150
+      },
+      {
+        "produkt": "papryka_czerwona",
+        "rola": "warzywa",
+        "typowo_g": 60,
+        "min_g": 36,
+        "max_g": 90
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      },
+      {
+        "produkt": "kmin_rzymski",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Ugotuj ryż. Paprykę pokrój i podsmaż na oliwie.",
+      "Dodaj pomidory, odsączoną fasolę, pokruszone tofu i kmin. Duś 12 minut. Podaj z ryżem."
+    ],
+    "czas_min": 25,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_ryz_brokul",
+    "nazwa": "Tofu w sosie orzechowym z brokułem i ryżem",
+    "posilki": [
+      "obiad"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "na_cieplo"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "ryz_bialy",
+        "rola": "weglowodany",
+        "typowo_g": 80,
+        "min_g": 40,
+        "max_g": 140
+      },
+      {
+        "produkt": "brokul",
+        "rola": "warzywa",
+        "typowo_g": 150,
+        "min_g": 90,
+        "max_g": 225
+      },
+      {
+        "produkt": "maslo_orzechowe",
+        "rola": "tluszcz",
+        "typowo_g": 20,
+        "min_g": 10,
+        "max_g": 30
+      },
+      {
+        "produkt": "sos_sojowy",
+        "rola": "sos",
+        "typowo_g": 10,
+        "min_g": 5,
+        "max_g": 15
+      },
+      {
+        "produkt": "olej_rzepakowy",
+        "rola": "tluszcz",
+        "typowo_g": 5,
+        "min_g": 3,
+        "max_g": 15
+      }
+    ],
+    "przygotowanie": [
+      "Ugotuj ryż; brokuł gotuj na parze 5–7 minut.",
+      "Tofu podsmaż na oleju. Masło orzechowe rozprowadź wodą i sosem sojowym.",
+      "Połącz tofu z sosem i brokułem. Podaj z ryżem."
+    ],
+    "czas_min": 25,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_ziemniaki",
+    "nazwa": "Pieczone ziemniaki z tofu i surówką",
+    "posilki": [
+      "obiad"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "na_cieplo"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "ziemniaki",
+        "rola": "weglowodany",
+        "typowo_g": 250,
+        "min_g": 150,
+        "max_g": 400
+      },
+      {
+        "produkt": "kapusta_biala",
+        "rola": "warzywa",
+        "typowo_g": 90,
+        "min_g": 54,
+        "max_g": 135
+      },
+      {
+        "produkt": "marchew",
+        "rola": "warzywa",
+        "typowo_g": 50,
+        "min_g": 30,
+        "max_g": 75
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      },
+      {
+        "produkt": "sok_z_cytryny",
+        "rola": "dodatek",
+        "typowo_g": 10,
+        "min_g": 5,
+        "max_g": 15
+      },
+      {
+        "produkt": "papryka_wedzona",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Ziemniaki pokrój, wymieszaj z połową oliwy i papryką. Piecz w 200°C około 35 minut.",
+      "Tofu pokrój, posmaruj resztą oliwy i dołóż na ostatnie 20 minut pieczenia.",
+      "Zetrzyj marchew, poszatkuj kapustę, skrop cytryną i podaj obok."
+    ],
+    "czas_min": 45,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_baklazan",
+    "nazwa": "Makaron z bakłażanem i kruszonym tofu",
+    "posilki": [
+      "obiad"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "na_cieplo"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "makaron_pszenny",
+        "rola": "weglowodany",
+        "typowo_g": 80,
+        "min_g": 40,
+        "max_g": 140
+      },
+      {
+        "produkt": "baklazan",
+        "rola": "warzywa",
+        "typowo_g": 130,
+        "min_g": 78,
+        "max_g": 195
+      },
+      {
+        "produkt": "passata",
+        "rola": "warzywa",
+        "typowo_g": 120,
+        "min_g": 72,
+        "max_g": 180
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      },
+      {
+        "produkt": "bazylia_suszona",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Pokrój bakłażan w kostkę, smaż na oliwie 8 minut.",
+      "Dodaj passatę i pokruszone tofu, duś 10 minut.",
+      "Ugotuj makaron bez jaj, połącz z sosem i bazylią."
+    ],
+    "czas_min": 30,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_zupa_soczewica",
+    "nazwa": "Zupa z soczewicą, tofu i marchewką",
+    "posilki": [
+      "obiad"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "zupa",
+      "na_zapas",
+      "na_cieplo"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "soczewica_czerwona",
+        "rola": "bialko",
+        "typowo_g": 60
+      },
+      {
+        "produkt": "marchew",
+        "rola": "warzywa",
+        "typowo_g": 70,
+        "min_g": 42,
+        "max_g": 105
+      },
+      {
+        "produkt": "pomidory_z_puszki",
+        "rola": "warzywa",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 150
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 160
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      },
+      {
+        "produkt": "woda",
+        "rola": "dodatek",
+        "typowo_g": 150,
+        "min_g": 150,
+        "max_g": 150
+      }
+    ],
+    "przygotowanie": [
+      "Gramatury w tabeli garnka obejmują wszystkie porcje na dwa dni. Warzywa pokrój i podsmaż na oliwie.",
+      "Dodaj pomidory, wodę i opłukaną suchą soczewicę; gotuj około 20 minut.",
+      "Dodaj tofu i podgrzewaj 5 minut. Podaj z pieczywem. Zapas szybko schłodź, przechowuj w lodówce i odgrzej tylko potrzebną porcję."
+    ],
+    "czas_min": 30,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone",
+    "na_ile_dni": 2
+  },
+  {
+    "id": "roslinne_020_zupa_fasola",
+    "nazwa": "Zupa fasolowa z tofu i papryką",
+    "posilki": [
+      "obiad"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "zupa",
+      "na_zapas",
+      "na_cieplo"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "fasola_czerwona_konserwowa",
+        "rola": "bialko",
+        "typowo_g": 130
+      },
+      {
+        "produkt": "papryka_czerwona",
+        "rola": "warzywa",
+        "typowo_g": 70,
+        "min_g": 42,
+        "max_g": 105
+      },
+      {
+        "produkt": "pomidory_z_puszki",
+        "rola": "warzywa",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 150
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 160
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      },
+      {
+        "produkt": "woda",
+        "rola": "dodatek",
+        "typowo_g": 150,
+        "min_g": 150,
+        "max_g": 150
+      }
+    ],
+    "przygotowanie": [
+      "Gramatury w tabeli garnka obejmują wszystkie porcje na dwa dni. Warzywa pokrój i podsmaż na oliwie.",
+      "Dodaj pomidory, wodę i opłukaną i odsączoną fasolę; gotuj około 10 minut.",
+      "Dodaj tofu i podgrzewaj 5 minut. Podaj z pieczywem. Zapas szybko schłodź, przechowuj w lodówce i odgrzej tylko potrzebną porcję."
+    ],
+    "czas_min": 30,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone",
+    "na_ile_dni": 2
+  },
+  {
+    "id": "roslinne_020_kolacja_grecka",
+    "nazwa": "Sałatka z tofu, pomidorem i oliwkami",
+    "posilki": [
+      "kolacja"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 160
+      },
+      {
+        "produkt": "pomidor",
+        "rola": "warzywa",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 150
+      },
+      {
+        "produkt": "ogorek",
+        "rola": "warzywa",
+        "typowo_g": 80,
+        "min_g": 48,
+        "max_g": 120
+      },
+      {
+        "produkt": "oliwki_zielone",
+        "rola": "warzywa",
+        "typowo_g": 20,
+        "min_g": 12,
+        "max_g": 30
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      }
+    ],
+    "przygotowanie": [
+      "Pokrój tofu, pomidor i ogórek. Wymieszaj z oliwkami i oliwą.",
+      "Podaj z pieczywem bez mleka i jaj."
+    ],
+    "czas_min": 10,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_kolacja_burak",
+    "nazwa": "Sałatka z pieczonym burakiem, tofu i orzechami",
+    "posilki": [
+      "kolacja"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 160
+      },
+      {
+        "produkt": "burak",
+        "rola": "warzywa",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 150
+      },
+      {
+        "produkt": "orzechy_wloskie",
+        "rola": "tluszcz",
+        "typowo_g": 15,
+        "min_g": 5,
+        "max_g": 25
+      },
+      {
+        "produkt": "salata_maslowa",
+        "rola": "warzywa",
+        "typowo_g": 40,
+        "min_g": 24,
+        "max_g": 60
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      }
+    ],
+    "przygotowanie": [
+      "Buraka obierz, pokrój drobno i piecz w 200°C około 30 minut.",
+      "Ułóż na sałacie z tofu i orzechami. Skrop oliwą, podaj z pieczywem."
+    ],
+    "czas_min": 40,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_kolacja_cukinia",
+    "nazwa": "Grzanki z tofu i duszoną cukinią",
+    "posilki": [
+      "kolacja"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "szybkie",
+      "na_cieplo"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 160
+      },
+      {
+        "produkt": "cukinia",
+        "rola": "warzywa",
+        "typowo_g": 140,
+        "min_g": 84,
+        "max_g": 210
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      },
+      {
+        "produkt": "oregano_suszone",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Pokrój cukinię, duś na oliwie 7 minut.",
+      "Dodaj pokruszone tofu i oregano, podgrzewaj 3 minuty. Podaj na grzankach."
+    ],
+    "czas_min": 15,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_kolacja_fasola",
+    "nazwa": "Pasta z fasoli, tofu i suszonej papryki",
+    "posilki": [
+      "kolacja"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "fasola_czerwona_konserwowa",
+        "rola": "bialko",
+        "typowo_g": 90,
+        "min_g": 50,
+        "max_g": 160
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 160
+      },
+      {
+        "produkt": "ogorek",
+        "rola": "warzywa",
+        "typowo_g": 80,
+        "min_g": 48,
+        "max_g": 120
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      },
+      {
+        "produkt": "papryka_wedzona",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Fasolę opłucz. Zblenduj z tofu, oliwą i wędzoną papryką.",
+      "Podaj pastę na pieczywie, obok ułóż plasterki ogórka."
+    ],
+    "czas_min": 10,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_kolacja_pita",
+    "nazwa": "Pita z tofu, kapustą i sosem orzechowym",
+    "posilki": [
+      "kolacja"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "pula_20"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "chlebek_pita",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 150
+      },
+      {
+        "produkt": "kapusta_pekinska",
+        "rola": "warzywa",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 150
+      },
+      {
+        "produkt": "marchew",
+        "rola": "warzywa",
+        "typowo_g": 40,
+        "min_g": 24,
+        "max_g": 60
+      },
+      {
+        "produkt": "maslo_orzechowe",
+        "rola": "tluszcz",
+        "typowo_g": 20,
+        "min_g": 10,
+        "max_g": 30
+      },
+      {
+        "produkt": "sok_z_cytryny",
+        "rola": "dodatek",
+        "typowo_g": 10,
+        "min_g": 5,
+        "max_g": 15
+      }
+    ],
+    "przygotowanie": [
+      "Tofu podsmaż na suchej patelni nieprzywierającej 5 minut. Kapustę poszatkuj, marchew zetrzyj.",
+      "Masło orzechowe rozprowadź wodą i sokiem z cytryny.",
+      "Podgrzej pitę bez składników odzwierzęcych, napełnij tofu, warzywami i sosem."
+    ],
+    "czas_min": 20,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_kolacja_pizza",
+    "nazwa": "Mini-pizza na pieczywie z tofu i pieczarkami",
+    "posilki": [
+      "kolacja"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "pula_20",
+      "na_cieplo"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 160
+      },
+      {
+        "produkt": "passata",
+        "rola": "warzywa",
+        "typowo_g": 60,
+        "min_g": 36,
+        "max_g": 90
+      },
+      {
+        "produkt": "pieczarki",
+        "rola": "warzywa",
+        "typowo_g": 80,
+        "min_g": 48,
+        "max_g": 120
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      },
+      {
+        "produkt": "oregano_suszone",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Pieczarki pokrój i podsmaż na oliwie 5 minut.",
+      "Pieczywo posmaruj passatą, dodaj pokruszone tofu, pieczarki i oregano.",
+      "Zapiekaj około 10 minut w 200°C."
+    ],
+    "czas_min": 20,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_kolacja_krem",
+    "nazwa": "Krem kakaowy z tofu, bananem i waflami",
+    "posilki": [
+      "kolacja"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "slodkie",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "banan",
+        "rola": "owoce",
+        "typowo_g": 130,
+        "min_g": 80,
+        "max_g": 200
+      },
+      {
+        "produkt": "wafle_ryzowe",
+        "rola": "weglowodany",
+        "typowo_g": 50,
+        "min_g": 25,
+        "max_g": 90
+      },
+      {
+        "produkt": "maslo_orzechowe",
+        "rola": "tluszcz",
+        "typowo_g": 20,
+        "min_g": 10,
+        "max_g": 30
+      },
+      {
+        "produkt": "kakao",
+        "rola": "dodatek",
+        "typowo_g": 5,
+        "min_g": 3,
+        "max_g": 8
+      }
+    ],
+    "przygotowanie": [
+      "Zblenduj tofu z bananem, masłem orzechowym i kakao. Jeśli trzeba dodaj łyżkę wody.",
+      "Podaj krem z waflami ryżowymi."
+    ],
+    "czas_min": 10,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_kolacja_truskawki",
+    "nazwa": "Krem z tofu i truskawek z chrupkim pieczywem",
+    "posilki": [
+      "kolacja"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "slodkie",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 180,
+        "min_g": 120,
+        "max_g": 280
+      },
+      {
+        "produkt": "truskawki",
+        "rola": "owoce",
+        "typowo_g": 150,
+        "min_g": 100,
+        "max_g": 220
+      },
+      {
+        "produkt": "pieczywo_chrupkie",
+        "rola": "weglowodany",
+        "typowo_g": 70,
+        "min_g": 35,
+        "max_g": 110
+      },
+      {
+        "produkt": "migdaly",
+        "rola": "tluszcz",
+        "typowo_g": 20,
+        "min_g": 10,
+        "max_g": 30
+      },
+      {
+        "produkt": "cukier",
+        "rola": "dodatek",
+        "typowo_g": 10,
+        "min_g": 0,
+        "max_g": 20
+      }
+    ],
+    "przygotowanie": [
+      "Zblenduj tofu z truskawkami i cukrem. Posyp posiekanymi migdałami.",
+      "Podaj z chrupkim pieczywem."
+    ],
+    "czas_min": 10,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_quark_rzodkiewka",
+    "nazwa": "Kanapki z twarożkiem i rzodkiewką",
+    "posilki": [
+      "sniadanie",
+      "kolacja"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "twarozek_typu_quark_chudy",
+        "rola": "bialko",
+        "typowo_g": 200,
+        "min_g": 120,
+        "max_g": 300
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 160
+      },
+      {
+        "produkt": "rzodkiewka",
+        "rola": "warzywa",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 150
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      },
+      {
+        "produkt": "szczypiorek",
+        "rola": "warzywa",
+        "typowo_g": 10,
+        "min_g": 6,
+        "max_g": 15
+      }
+    ],
+    "przygotowanie": [
+      "Warzywa drobno pokrój. Wymieszaj twarożek z oliwą i szczypiorkiem.",
+      "Dodaj warzywa i podaj z pieczywem."
+    ],
+    "czas_min": 10,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_quark_papryka",
+    "nazwa": "Twarożek z papryką i grzankami",
+    "posilki": [
+      "sniadanie",
+      "kolacja"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "twarozek_typu_quark_chudy",
+        "rola": "bialko",
+        "typowo_g": 200,
+        "min_g": 120,
+        "max_g": 300
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 160
+      },
+      {
+        "produkt": "papryka_czerwona",
+        "rola": "warzywa",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 150
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      },
+      {
+        "produkt": "szczypiorek",
+        "rola": "warzywa",
+        "typowo_g": 10,
+        "min_g": 6,
+        "max_g": 15
+      }
+    ],
+    "przygotowanie": [
+      "Warzywa drobno pokrój. Wymieszaj twarożek z oliwą i szczypiorkiem.",
+      "Dodaj warzywa i podaj z pieczywem."
+    ],
+    "czas_min": 10,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_quark_ogorek",
+    "nazwa": "Kanapki z twarożkiem i ogórkiem",
+    "posilki": [
+      "sniadanie",
+      "kolacja"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "twarozek_typu_quark_chudy",
+        "rola": "bialko",
+        "typowo_g": 200,
+        "min_g": 120,
+        "max_g": 300
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 160
+      },
+      {
+        "produkt": "ogorek",
+        "rola": "warzywa",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 150
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      },
+      {
+        "produkt": "szczypiorek",
+        "rola": "warzywa",
+        "typowo_g": 10,
+        "min_g": 6,
+        "max_g": 15
+      }
+    ],
+    "przygotowanie": [
+      "Warzywa drobno pokrój. Wymieszaj twarożek z oliwą i szczypiorkiem.",
+      "Dodaj warzywa i podaj z pieczywem."
+    ],
+    "czas_min": 10,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_jajka_szpinak",
+    "nazwa": "Jajka ze szpinakiem i grzankami",
+    "posilki": [
+      "sniadanie",
+      "kolacja"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "szybkie",
+      "na_cieplo"
+    ],
+    "skladniki": [
+      {
+        "produkt": "jajko_kurze",
+        "rola": "bialko",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 150
+      },
+      {
+        "produkt": "bialka_jaj",
+        "rola": "bialko",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 180
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 160
+      },
+      {
+        "produkt": "szpinak",
+        "rola": "warzywa",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 150
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      }
+    ],
+    "przygotowanie": [
+      "Szpinak podgrzej na oliwie 2 minuty.",
+      "Wlej roztrzepane jajka i białka, smaż mieszając do całkowitego ścięcia. Podaj z grzankami."
+    ],
+    "czas_min": 15,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_makaron_quark",
+    "nazwa": "Makaron ze szpinakiem i kremowym twarożkiem",
+    "posilki": [
+      "obiad"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "na_cieplo"
+    ],
+    "skladniki": [
+      {
+        "produkt": "twarozek_typu_quark_chudy",
+        "rola": "bialko",
+        "typowo_g": 200,
+        "min_g": 120,
+        "max_g": 300
+      },
+      {
+        "produkt": "makaron_pszenny",
+        "rola": "weglowodany",
+        "typowo_g": 80,
+        "min_g": 40,
+        "max_g": 140
+      },
+      {
+        "produkt": "szpinak",
+        "rola": "warzywa",
+        "typowo_g": 120,
+        "min_g": 72,
+        "max_g": 180
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      },
+      {
+        "produkt": "czosnek",
+        "rola": "dodatek",
+        "typowo_g": 5,
+        "min_g": 3,
+        "max_g": 8
+      }
+    ],
+    "przygotowanie": [
+      "Ugotuj makaron. Na oliwie krótko podgrzej czosnek i szpinak.",
+      "Zdejmij patelnię z ognia, dodaj twarożek i kilka łyżek wody z makaronu. Połącz z makaronem."
+    ],
+    "czas_min": 20,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_ziemniaki_quark",
+    "nazwa": "Pieczone ziemniaki z twarożkiem i ogórkiem",
+    "posilki": [
+      "obiad"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "na_cieplo"
+    ],
+    "skladniki": [
+      {
+        "produkt": "twarozek_typu_quark_chudy",
+        "rola": "bialko",
+        "typowo_g": 200,
+        "min_g": 120,
+        "max_g": 300
+      },
+      {
+        "produkt": "ziemniaki",
+        "rola": "weglowodany",
+        "typowo_g": 300,
+        "min_g": 180,
+        "max_g": 450
+      },
+      {
+        "produkt": "ogorek",
+        "rola": "warzywa",
+        "typowo_g": 100,
+        "min_g": 60,
+        "max_g": 150
+      },
+      {
+        "produkt": "oliwa_z_oliwek",
+        "rola": "tluszcz",
+        "typowo_g": 10,
+        "min_g": 3,
+        "max_g": 20
+      },
+      {
+        "produkt": "szczypiorek",
+        "rola": "warzywa",
+        "typowo_g": 10,
+        "min_g": 6,
+        "max_g": 15
+      }
+    ],
+    "przygotowanie": [
+      "Pokrojone ziemniaki wymieszaj z oliwą. Piecz około 35 minut w 200°C.",
+      "Twarożek wymieszaj z ogórkiem i szczypiorkiem, podaj obok upieczonych ziemniaków."
+    ],
+    "czas_min": 40,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_quark_jablko",
+    "nazwa": "Twarożek jabłkowo-cynamonowy z pieczywem",
+    "posilki": [
+      "kolacja"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "slodkie",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "twarozek_typu_quark_chudy",
+        "rola": "bialko",
+        "typowo_g": 200,
+        "min_g": 120,
+        "max_g": 300
+      },
+      {
+        "produkt": "jablko",
+        "rola": "owoce",
+        "typowo_g": 150,
+        "min_g": 80,
+        "max_g": 200
+      },
+      {
+        "produkt": "chleb_pelnoziarnisty",
+        "rola": "weglowodany",
+        "typowo_g": 100,
+        "min_g": 50,
+        "max_g": 160
+      },
+      {
+        "produkt": "orzechy_wloskie",
+        "rola": "tluszcz",
+        "typowo_g": 20,
+        "min_g": 10,
+        "max_g": 30
+      },
+      {
+        "produkt": "cynamon",
+        "rola": "przyprawa",
+        "typowo_g": 1,
+        "min_g": 0,
+        "max_g": 3
+      }
+    ],
+    "przygotowanie": [
+      "Jabłko zetrzyj, wymieszaj z twarożkiem i cynamonem.",
+      "Posyp orzechami, podaj z pieczywem."
+    ],
+    "czas_min": 10,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_quark_banan",
+    "nazwa": "Twarożek z bananem i kakao",
+    "posilki": [
+      "kolacja"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "slodkie",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "twarozek_typu_quark_chudy",
+        "rola": "bialko",
+        "typowo_g": 200,
+        "min_g": 120,
+        "max_g": 300
+      },
+      {
+        "produkt": "banan",
+        "rola": "owoce",
+        "typowo_g": 130,
+        "min_g": 70,
+        "max_g": 200
+      },
+      {
+        "produkt": "wafle_ryzowe",
+        "rola": "weglowodany",
+        "typowo_g": 50,
+        "min_g": 25,
+        "max_g": 90
+      },
+      {
+        "produkt": "maslo_orzechowe",
+        "rola": "tluszcz",
+        "typowo_g": 20,
+        "min_g": 10,
+        "max_g": 30
+      },
+      {
+        "produkt": "kakao",
+        "rola": "dodatek",
+        "typowo_g": 5,
+        "min_g": 3,
+        "max_g": 8
+      }
+    ],
+    "przygotowanie": [
+      "Rozgnieć banana, wymieszaj z twarożkiem i kakao.",
+      "Dodaj masło orzechowe, podaj z waflami."
+    ],
+    "czas_min": 10,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_snack_tofu",
+    "nazwa": "Tofu z pomidorem — przekąska",
+    "posilki": [
+      "przekaska"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "tofu",
+        "rola": "bialko",
+        "typowo_g": 100,
+        "min_g": 100,
+        "max_g": 100
+      },
+      {
+        "produkt": "pomidor",
+        "rola": "warzywa",
+        "typowo_g": 80,
+        "min_g": 80,
+        "max_g": 80
+      }
+    ],
+    "przygotowanie": [
+      "Pokrój tofu i pomidor; podaj razem."
+    ],
+    "czas_min": 5,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  },
+  {
+    "id": "roslinne_020_snack_banan",
+    "nazwa": "Banan z masłem orzechowym — przekąska",
+    "posilki": [
+      "przekaska"
+    ],
+    "kuchnia": "miedzynarodowa",
+    "tagi": [
+      "wege",
+      "wegan",
+      "szybkie"
+    ],
+    "skladniki": [
+      {
+        "produkt": "banan",
+        "rola": "owoce",
+        "typowo_g": 100,
+        "min_g": 100,
+        "max_g": 100
+      },
+      {
+        "produkt": "maslo_orzechowe",
+        "rola": "tluszcz",
+        "typowo_g": 15,
+        "min_g": 15,
+        "max_g": 15
+      }
+    ],
+    "przygotowanie": [
+      "Pokrój banana i dodaj masło orzechowe."
+    ],
+    "czas_min": 5,
+    "zrodlo": "DietBot 0.2 — autorski przepis; wartości z istniejącej bazy produktów. Pieczywo i makarony bez jaj i mleka.",
+    "status": "zatwierdzone"
+  }
+]

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { api } from "../api";
+import GoalCalculator from "../components/GoalCalculator";
 import { ErrorBox, JobProgress, Loading, Modal, Spinner, useToast } from "../components/ui";
 import type { AssumptionsData, AssumptionsResponse, BandData, PlanSummary } from "../types";
 import { DAY_NAMES, go, useAsync } from "../util";
@@ -103,8 +104,8 @@ export default function AssumptionsPage() {
     <div className="page">
       <div className="page-head">
         <div>
-          <h1>Założenia</h1>
-          <div className="sub">Cele i zasady, według których program układa i liczy plan. Zapis trafia do pliku konfiguracja/zalozenia.yaml.</div>
+          <span className="eyebrow">PO TWOJEMU</span><h1>Cele i preferencje</h1>
+          <div className="sub">Twój sposób jedzenia, cele i ulubione smaki. Zmiany zaczną działać po zapisaniu — dotychczasowe diety pozostaną bez zmian.</div>
         </div>
         <div className="row">
           <button className="btn" onClick={() => { setData(clone(resp.data)); setErrors([]); }} disabled={!dirty}>Cofnij zmiany</button>
@@ -123,6 +124,25 @@ export default function AssumptionsPage() {
         </div>
       )}
 
+      <section className="card stack">
+        <h2>Rodzaj diety</h2>
+        <label className="field"><span>Wspólny jadłospis dla wszystkich osób</span>
+          <select value={data.rodzaj_diety ?? "tradycyjna"} onChange={e => update(d => { d.rodzaj_diety = e.target.value as AssumptionsData["rodzaj_diety"]; })}>
+            <option value="tradycyjna">Tradycyjna — wszystkie produkty</option><option value="wege">Wegetariańska — bez mięsa i ryb</option><option value="wegan">Wegańska — bez składników odzwierzęcych</option>
+          </select>
+        </label>
+        {data.rodzaj_diety && data.rodzaj_diety !== "tradycyjna" && <>
+          <p className="muted">Sprawdzamy składniki, przekąski i stałe pozycje. Produkty złożone o nieznanym składzie są pomijane. Wybieraj pieczywo i makaron bez jaj/mleka; nazwa „wege” na daniu nie wystarcza. To filtr składników, nie audyt wszystkich witamin i minerałów diety.</p>
+          {data.rodzaj_diety === "wegan" && <p className="alert info small">Przy diecie wegańskiej trzeba zadbać m.in. o wiarygodne źródło witaminy B12. DietBot nie bilansuje witamin ani minerałów. <a href="https://www.nhs.uk/live-well/eat-well/how-to-eat-a-balanced-diet/the-vegan-diet/" target="_blank" rel="noreferrer">Informacje NHS o diecie wegańskiej</a>.</p>}
+          {(data.dzien.stale_pozycje ?? []).filter(f => !resp.products.find(p => p.id === f.produkt)?.diets.includes(data.rodzaj_diety!)).map(f => <div className="alert warn row" key={f.produkt}>
+            <span className="grow">Stała pozycja „{productName[f.produkt]}” nie pasuje do wybranej diety. Zmień ją w sekcji Dzień albo usuń.</span>
+            <button className="btn small" onClick={() => update(d => { d.dzien.stale_pozycje = d.dzien.stale_pozycje?.filter(x => x.produkt !== f.produkt); })}>Usuń tę stałą pozycję</button>
+          </div>)}
+          <p className="muted small">Niezgodne przekąski są pomijane przy układaniu; zaznaczenia pozostają do powrotu do diety tradycyjnej.</p>
+          <button className="btn" onClick={() => update(d => { const s = (d.dzien.przekaski ??= {}); s.dozwolone = [...new Set([...(s.dozwolone ?? []), ...resp.snack_options.filter(x => x.id.startsWith("roslinne_020_") && x.diets.includes(d.rodzaj_diety!)).map(x => x.id)])]; })}>Dodaj nowe zgodne przekąski do dozwolonych</button>
+        </>}
+      </section>
+
       {data.osoby.map((person, pi) => (
         <section key={person.id} className="card stack">
           <div className="card-head">
@@ -132,7 +152,11 @@ export default function AssumptionsPage() {
               <input type="text" value={person.nazwa} onChange={(e) => update((d) => { d.osoby[pi].nazwa = e.target.value; })} />
             </label>
           </div>
-          <table className="band-table">
+          <GoalCalculator key={data.dzien.posilki.length} meals={data.dzien.posilki.length} onApply={r => update(d => {
+            d.osoby[pi].cele_dzienne = r.targets;
+            d.osoby[pi].kotwica_bialka_na_posilek = r.protein_anchor;
+          })} />
+          <div className="table-scroll"><table className="band-table">
             <thead>
               <tr><th>Dziennie</th><th>min</th><th>cel</th><th>max</th><th /></tr>
             </thead>
@@ -144,11 +168,11 @@ export default function AssumptionsPage() {
               <BandRow label="Białko na posiłek" unit="g" band={person.kotwica_bialka_na_posilek} noTarget
                 onChange={(b) => update((d) => { d.osoby[pi].kotwica_bialka_na_posilek = b; })} />
             </tbody>
-          </table>
+          </table></div>
           <div className="muted small">
-            Kalorie z makro (4·B + 9·T + 4·W) dla celów: {Math.round(4 * (person.cele_dzienne.bialko.cel ?? 0) + 9 * (person.cele_dzienne.tluszcz.cel ?? 0) + 4 * (person.cele_dzienne.weglowodany.cel ?? 0))} kcal.
+            Kalorie pochodzą z tabel/etykiet produktów. Cele białka, tłuszczów i węglowodanów są sprawdzane osobno.
           </div>
-          <div className="row">
+          <details className="disclosure"><summary>Zaawansowane ustawienia porcji</summary><div className="row">
             <label className="field">
               <span>Tolerancja białka na posiłek [± g]</span>
               <input type="number" min={0} max={30} value={person.tolerancja_kotwicy_g ?? 5} style={{ width: 90 }}
@@ -168,6 +192,7 @@ export default function AssumptionsPage() {
               </label>
             ))}
           </div>
+          </details>
           <ProductChips label="Nie je (tylko ta osoba)" ids={person.wyklucza_produkty ?? []} products={resp.products} names={productName}
             onChange={(ids) => update((d) => { d.osoby[pi].wyklucza_produkty = ids; })} />
         </section>
@@ -200,7 +225,7 @@ export default function AssumptionsPage() {
         </div>
         <div className="field">
           <span>Stałe pozycje każdego dnia (dla każdej osoby)</span>
-          <table className="table">
+          <div className="table-scroll"><table className="table fixed-items-table">
             <thead><tr><th>Produkt</th><th>Gramy</th><th>Opis</th><th /></tr></thead>
             <tbody>
               {(data.dzien.stale_pozycje ?? []).map((fx, i) => (
@@ -216,7 +241,7 @@ export default function AssumptionsPage() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </table></div>
           <div><button className="btn small" onClick={() => update((d) => { (d.dzien.stale_pozycje ??= []).push({ produkt: resp.products[0].id, gramy: 10, opis: "" }); })}>+ Dodaj pozycję</button></div>
         </div>
         <div className="row" style={{ gap: 20, alignItems: "flex-start" }}>
@@ -342,17 +367,9 @@ export default function AssumptionsPage() {
           </div>
         </div>
         <div className="field">
-          <span>Jak liczyć kalorie</span>
-          <div className="row">
-            <label className="check">
-              <input type="radio" checked={(data.energia?.metoda ?? "makro_4_9_4") === "makro_4_9_4"} onChange={() => update((d) => { d.energia = { metoda: "makro_4_9_4" }; })} />
-              4·B + 9·T + 4·W (jak w celach)
-            </label>
-            <label className="check">
-              <input type="radio" checked={data.energia?.metoda === "etykieta"} onChange={() => update((d) => { d.energia = { metoda: "etykieta" }; })} />
-              z tabel/etykiet (ok. 2–3% więcej)
-            </label>
-          </div>
+          <span>Kalorie z tabel/etykiet</span>
+          <p className="muted">Cała aplikacja sumuje pole kcal produktów według gramatur. Skrót 4·B + 9·T + 4·W
+            nie zastępuje kalorii z tabel, bo pomija m.in. energię błonnika. Obowiązuje to także w podsumowaniach i eksportach.</p>
         </div>
       </section>
 
@@ -375,9 +392,9 @@ function BandRow({ label, unit, band, onChange, noTarget }: { label: string; uni
   return (
     <tr>
       <td>{label}</td>
-      <td><input type="number" value={Number.isNaN(band.min) ? "" : band.min} onChange={(e) => set("min", e.target.value)} /></td>
-      <td>{noTarget ? <span className="muted">—</span> : <input type="number" value={band.cel ?? ""} placeholder="środek" onChange={(e) => set("cel", e.target.value)} />}</td>
-      <td><input type="number" value={Number.isNaN(band.max) ? "" : band.max} onChange={(e) => set("max", e.target.value)} /></td>
+      <td><input type="number" aria-label={`${label} — minimum (${unit})`} value={Number.isNaN(band.min) ? "" : band.min} onChange={(e) => set("min", e.target.value)} /></td>
+      <td>{noTarget ? <span className="muted">—</span> : <input type="number" aria-label={`${label} — cel (${unit})`} value={band.cel ?? ""} placeholder="środek" onChange={(e) => set("cel", e.target.value)} />}</td>
+      <td><input type="number" aria-label={`${label} — maksimum (${unit})`} value={Number.isNaN(band.max) ? "" : band.max} onChange={(e) => set("max", e.target.value)} /></td>
       <td className="muted">{unit}</td>
     </tr>
   );

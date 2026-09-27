@@ -3,17 +3,18 @@
 from __future__ import annotations
 
 from collections.abc import Iterable
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 from pydantic import ValidationError
 
 from ..domain.assumptions import Assumptions
+from ..domain.diet import compatible, dish_compatible
 from ..domain.dish import DishStatus, DishTemplate, MealType, Role
 from ..domain.product import Category, Product, StoreProduct
 from ..textnorm import normalize
 from .paths import Paths
-from .yamlio import load_plain
+from .yamlio import dump_yaml, load_plain, load_yaml
 
 
 class DataError(ValueError):
@@ -89,10 +90,28 @@ def load_store_products(directory: Path, cache_dir: Path | None = None) -> list[
 
 
 def load_assumptions(path: Path, cache_dir: Path | None = None) -> Assumptions:
+    raw = load_plain(path, cache_dir)
+    energy = raw.get("energia", {}) if isinstance(raw, dict) else None
+    migrate = isinstance(energy, dict) and energy.get("metoda") in (None, "makro_4_9_4")
+    if migrate:
+        # Instalator zachowuje własny YAML użytkownika. Migrujemy wyłącznie metodę liczenia,
+        # nie cele ani gramatury. Błędna konfiguracja nie jest zapisywana.
+        raw = {**raw, "energia": {**energy, "metoda": "etykieta"}}
     try:
-        return Assumptions.model_validate(load_plain(path, cache_dir))
+        assumptions = Assumptions.model_validate(raw)
     except ValidationError as exc:
         raise DataError(f"{path.name}: {_format_validation(exc)}") from None
+    if migrate:
+        backup = path.with_name(path.name + ".przed-kaloriami-z-tabel.bak")
+        try:
+            with backup.open("xb") as f:
+                f.write(path.read_bytes())
+        except FileExistsError:
+            pass  # nie nadpisujemy pierwszej kopii przy kolejnych uruchomieniach
+        doc = load_yaml(path)
+        doc["energia"] = raw["energia"]
+        dump_yaml(doc, path)
+    return assumptions
 
 
 @dataclass
@@ -112,6 +131,7 @@ class Repository:
     dishes: dict[str, DishTemplate]
     assumptions: Assumptions
     store_products: list[StoreProduct] = field(default_factory=list)
+    dish_ratings: dict[str, int] = field(default_factory=dict)
 
     @classmethod
     def load(cls, paths: Paths | None = None, use_cache: bool = True) -> Repository:
@@ -133,7 +153,15 @@ class Repository:
         return (preferred or options or [None])[0]
 
     def approved_dishes(self) -> dict[str, DishTemplate]:
-        return {k: d for k, d in self.dishes.items() if d.status is DishStatus.APPROVED}
+        return {k: d for k, d in self.dishes.items()
+                if d.status is DishStatus.APPROVED and self.dish_ratings.get(k, 0) >= 0}
+
+    def for_planning(self) -> Repository:
+        """Oceny nie zmieniają zapisanych założeń ani starych planów; wyłączają też przekąski bilansujące."""
+        a = self.assumptions.model_copy(deep=True)
+        a.day.snacks.allowed = [d for d in a.day.snacks.allowed if self.dish_ratings.get(d, 0) >= 0
+                               and d in self.dishes and dish_compatible(self.dishes[d], self.products, a.diet)]
+        return replace(self, assumptions=a, dish_ratings=dict(self.dish_ratings))
 
     def check(self) -> CheckReport:
         rep = check_consistency(self.products, self.dishes, self.assumptions)
@@ -153,6 +181,10 @@ class Repository:
 
 def check_consistency(products: dict[str, Product], dishes: dict[str, DishTemplate], a: Assumptions) -> CheckReport:
     rep = CheckReport()
+
+    for item in a.day.fixed_items:
+        if item.product_id in products and not compatible(products[item.product_id], a.diet):
+            rep.errors.append(f"Stała pozycja „{products[item.product_id].name}” nie ma potwierdzonej zgodności z dietą {a.diet}. Usuń ją lub wybierz zgodny zamiennik w sekcji Dzień.")
 
     # aliasy: ten sam znormalizowany alias nie może wskazywać dwóch produktów
     alias_owner: dict[str, str] = {}

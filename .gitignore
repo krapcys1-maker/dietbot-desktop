@@ -26,4 +26,5 @@ wyniki/*
 *.db
 *.sqlite
 *.sqlite3
+zalozenia.yaml.przed-kaloriami-z-tabel.bak
 *.lnk

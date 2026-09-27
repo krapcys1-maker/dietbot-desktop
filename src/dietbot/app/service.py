@@ -7,14 +7,17 @@ import random
 import re
 import threading
 from collections.abc import Callable
+from dataclasses import replace
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
 from pydantic import ValidationError
 from ruamel.yaml.comments import CommentedMap, CommentedSeq
 
+from .. import __version__
 from ..checker.verify import verify_plan
 from ..domain.assumptions import DAY_LABELS_PL, Assumptions, Weekday
+from ..domain.diet import compatible, dish_compatible
 from ..domain.dish import MEAL_LABELS_PL, DishStatus, MealType, cuisine_label
 from ..domain.plan import WeekPlan
 from ..domain.product import CATEGORY_LABELS_PL, Category, Product, State, StoreProduct
@@ -35,6 +38,7 @@ from ..storage.yamlio import dump_yaml, load_yaml, to_plain
 from ..textfmt import plural_pl
 from ..textnorm import normalize
 from .jobs import Job, JobManager, UserError
+from .snapshots import capture, matches_current, restore
 from .store import PlanRecord, PlanStore
 from .validation import polish_errors
 from .views import assumptions_hash, dish_view, persons_view, plan_view, product_view
@@ -131,6 +135,11 @@ class DietService:
         self.repo = Repository.load(self.paths)
         self._pools: Pools | None = None
         self.store = PlanStore(db_path or self.paths.out / "dietbot.sqlite3")
+        self.repo.dish_ratings = self.store.ratings()
+        # Legacy records lack historical source tables: freeze today's view and say so explicitly.
+        for record in self.store.list(limit=-1):
+            if self.store.snapshot(record.id) is None:
+                self.store.freeze(record.id, capture(self.repo, record.plan, legacy=True))
         self.jobs = JobManager()
         self._llm: LLMClient | None = None
         self._llm_error: str | None = None
@@ -140,14 +149,15 @@ class DietService:
     def reload(self) -> None:
         with self._lock:
             self.repo = Repository.load(self.paths)
+            self.repo.dish_ratings = self.store.ratings()
             self._pools = None
             self.engine_cache.clear()
 
     def pools(self) -> Pools:
         with self._lock:
             if self._pools is None:
-                self._pools = build_pools(self.repo.approved_dishes(), self.repo.products, self.repo.assumptions,
-                                          self.settings)
+                self._pools = build_pools(self.repo.dishes, self.repo.products, self.repo.assumptions,
+                                          self.settings, ratings=self.repo.dish_ratings)
             return self._pools
 
     def llm(self) -> LLMClient | None:
@@ -174,7 +184,20 @@ class DietService:
         rec = self.store.get(plan_id)
         if rec is None:
             raise UserError("Nie ma takiego planu (mógł zostać usunięty).")
-        return rec
+        return self.checked_record(rec)
+
+    def checked_record(self, rec: PlanRecord) -> PlanRecord:
+        """Sprawdza gramatury wobec zapisanej kopii tabel i założeń; raport nie zastępuje obliczeń."""
+        repo = self.record_repo(rec)
+        report = verify_plan(rec.plan, repo.assumptions, repo.products, repo.dishes,
+                             group_tolerance=self.settings.group_ratio_tolerance)
+        if rec.report:
+            report.issues.extend(i for i in rec.report.issues if i.code in {"uwaga_kucharza", "zyczenie_pominiete"})
+        return replace(rec, report=report, ok=report.ok)
+
+    def record_repo(self, rec: PlanRecord) -> Repository:
+        snapshot = rec.snapshot or self.store.snapshot(rec.id)
+        return restore(snapshot, self.repo) if snapshot else self.repo
 
     def _ensure_exists(self, plan_id: str) -> None:
         """Zadanie w kolejce mogło przeżyć usunięcie planu — nowa wersja bez rodzica kończyłaby się śladem stosu."""
@@ -193,6 +216,7 @@ class DietService:
         token = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
         allowed = allowed_users()
         return {
+            "version": __version__,
             "products": len(repo.products), "dishes": len(repo.dishes), "approved_dishes": len(repo.approved_dishes()),
             "pools": {m.value: len(ids) for m, ids in pools.by_meal.items()},
             "batch_pools": {str(i): len(ids) for i, ids in pools.batch.items()},
@@ -265,7 +289,7 @@ class DietService:
             return excl
         progress("Szukam w bibliotece dań z życzeń: " + "; ".join(d.opis for d in excl.dishes))
         pools = build_pools(repo.approved_dishes(), repo.products, repo.assumptions, self.settings,
-                            extra_banned=excl.product_ids)
+                            extra_banned=excl.product_ids, ratings=repo.dish_ratings)
         try:
             excl.requested, cost = resolve_requested_dishes(llm, excl.dishes, pools, repo.approved_dishes(), repo.products)
         except LLMError as exc:
@@ -343,7 +367,7 @@ class DietService:
             if len(families) >= weeks:
                 break
         while families:
-            avoid = set().union(*families)
+            avoid = set().union(*families) - {d for d, rating in repo.dish_ratings.items() if rating > 0}
             pools = build_pools(repo.approved_dishes(), repo.products, repo.assumptions, self.settings, avoid=avoid)
             if all(len(ids) >= min_pool for ids in pools.by_meal.values()):
                 return avoid, len(families)
@@ -380,6 +404,9 @@ class DietService:
             monday = start - timedelta(days=start.weekday())
             raise UserError(f"Początek tygodnia musi być poniedziałkiem (np. {monday:%d.%m.%Y}).")
         seed = seed if seed is not None else random.randint(1, 1_000_000)
+        conflicts = self.repo.check().errors
+        if conflicts:
+            raise UserError("Popraw cele i preferencje przed generowaniem: " + "; ".join(conflicts[:4]))
 
         def run(progress: Callable[[str], None]) -> dict:
             fresh: set[str] = set()
@@ -417,7 +444,7 @@ class DietService:
             rec = PlanRecord(plan=out.plan, title=week_title(start, ds), source=comp.source, ok=out.ok,
                              report=out.report, composition=composition, log=out.log, wishes=wishes,
                              week_start=start, llm_cost_usd=out.llm_cost_usd, seconds=out.seconds,
-                             assumptions_hash=assumptions_hash(repo))
+                             assumptions_hash=assumptions_hash(repo), snapshot=capture(repo, out.plan))
             self.store.save(rec)
             self.store.set_setting("active_plan", rec.id)
             progress(f"Gotowe: {rec.title} ({'plan poprawny' if rec.ok else 'plan z uwagami'})")
@@ -427,18 +454,60 @@ class DietService:
 
     def plans(self) -> list[dict]:
         active = self.store.active()
-        return [{**r.summary(), "active": bool(active and r.id == active.id)} for r in self.store.list()]
+        records = self.store.list()
+        if active and all(r.id != active.id for r in records):
+            records.append(active)
+        return [{**self.checked_record(r).summary(), "active": bool(active and r.id == active.id)}
+                for r in records]
 
     def plan(self, plan_id: str) -> dict:
         rec = self._record(plan_id)
-        view = plan_view(rec, self.repo)
+        snapshot = rec.snapshot or self.store.snapshot(rec.id)
+        view = plan_view(rec, self.record_repo(rec))
+        view["assumptions_changed"] = not matches_current(snapshot, self.repo, rec.plan) if snapshot else False
+        view["snapshot_legacy"] = bool(snapshot and snapshot.get("legacy"))
+        view["snapshot_date"] = snapshot.get("captured_at") if snapshot else None
         active = self.store.active()
         view["active"] = bool(active and active.id == rec.id)
-        view["versions"] = [v.summary() for v in self.store.family(rec.family_id)]
+        view["versions"] = [self.checked_record(v).summary() for v in self.store.family(rec.family_id)]
+        view["saved_diet"] = self.store.saved_diets().get(rec.id)
         return view
 
+    def library(self) -> list[dict]:
+        saved = self.store.saved_diets()
+        active = self.store.active()
+        return [{**r.summary(), "saved_diet": saved.get(r.id), "active": bool(active and r.id == active.id)}
+                for r in self.store.list(limit=-1)]
+
+    def save_diet(self, plan_id: str, title: str) -> dict:
+        title = title.strip()
+        if not 2 <= len(title) <= 80:
+            raise UserError("Nazwa diety musi mieć od 2 do 80 znaków.")
+        self._ensure_exists(plan_id)
+        self.store.save_diet(plan_id, title)
+        return self.store.saved_diets()[plan_id]
+
+    def unsave_diet(self, plan_id: str) -> None:
+        self._ensure_exists(plan_id)
+        self.store.unsave_diet(plan_id)
+
+    def rate_dish(self, dish_id: str, rating: int) -> dict:
+        if dish_id not in self.repo.dishes:
+            raise UserError("Nie ma takiego dania.")
+        if rating not in (-1, 0, 1):
+            raise UserError("Nieznana ocena dania.")
+        with self._lock:
+            if self.jobs.busy():
+                raise UserError("Poczekaj na koniec układania lub zmiany planu, a potem oceń danie.")
+            self.store.rate_dish(dish_id, rating)
+            self.repo.dish_ratings = self.store.ratings()
+            self._pools = None
+            self.engine_cache.clear()
+        return {"dish_id": dish_id, "rating": rating}
+
     def active_plan(self) -> PlanRecord | None:
-        return self.store.active()
+        rec = self.store.active()
+        return self.checked_record(rec) if rec else None
 
     def set_active(self, plan_id: str) -> None:
         self._record(plan_id)
@@ -452,6 +521,8 @@ class DietService:
         self.store.rename(plan_id, title)
 
     def delete(self, plan_id: str) -> None:
+        if plan_id in self.store.saved_diets():
+            raise UserError("Ta wersja jest w Moich dietach. Najpierw usuń ją z zapisanych — nie kasuje to historii.")
         self._record(plan_id)
         self.store.delete(plan_id)
 
@@ -492,7 +563,7 @@ class DietService:
             view = dish_view(d, self.repo.products, pools.profiles.get(did))
             options.append({"id": did, "name": d.name, "description": d.description, "cuisine": cuisine_label(d.cuisine),
                             "tags": d.tags, "prep_minutes": d.prep_minutes, "profile": view["profile"], "notes": notes})
-        options.sort(key=lambda o: (len(o["notes"]), normalize(o["name"])))
+        options.sort(key=lambda o: (len(o["notes"]), self.repo.dish_ratings.get(o["id"], 0) != 1, normalize(o["name"])))
         return {"slot_key": slot_key, "meal": slot.meal.value, "meal_label": MEAL_LABELS_PL[slot.meal],
                 "days": [DAY_LABELS_PL[d] for d in slot.days],
                 "current": {"id": slot.dish_id, "name": current.name if current else slot.dish_id},
@@ -501,7 +572,7 @@ class DietService:
     def _resolve_block(self, rec: PlanRecord, comp: Composition, slot: SlotPlan,
                        progress: Callable[[str], None]) -> tuple[WeekPlan, object, BlockStatus]:
         """Przelicza tylko dni powiązane ze zmienionym posiłkiem — reszta tygodnia zostaje co do grama."""
-        repo = self.repo
+        repo = self.repo.for_planning()
         block_days = {int(d) for d in slot.days}
         changed = True
         while changed:  # dni połączone daniami na zapas tworzą jeden blok
@@ -517,7 +588,8 @@ class DietService:
         dishes = {**repo.approved_dishes(), **{s.dish_id: repo.dishes[s.dish_id] for s in comp.slots
                                                if s.dish_id in repo.dishes}}
         progress("Silnik liczy gramatury: " + ", ".join(DAY_LABELS_PL[Weekday(d)].lower() for d in sorted(block_days)))
-        res = solve_week(req, repo.assumptions, repo.products, dishes, self.settings, cache=self.engine_cache)
+        settings = self.settings.model_copy(update={"liked_dishes": {d for d, r in repo.dish_ratings.items() if r > 0}})
+        res = solve_week(req, repo.assumptions, repo.products, dishes, settings, cache=self.engine_cache)
         if res.plan is None:
             msgs = [b.message for b in res.blocks if b.message]
             raise UserError("Silnik nie znalazł rozwiązania dla tego dnia. " + "; ".join(msgs[:2]))
@@ -531,12 +603,17 @@ class DietService:
         plan.created_at, plan.engine, plan.input_hash = res.plan.created_at, res.plan.engine, None
         plan.comment = rec.plan.comment
         engine_totals = [t.model_dump(mode="json") for b in res.blocks for t in b.totals]
-        report = verify_plan(plan, repo.assumptions, repo.products, dishes, engine_totals,
+        # Pozostałe dni mogą zawierać wcześniej ocenione danie/przekąskę. Ocena blokuje nowe
+        # propozycje, ale nie unieważnia historycznych porcji, których tutaj nie zmieniamy.
+        report = verify_plan(plan, self.repo.assumptions, repo.products, self.repo.dishes, engine_totals,
                              group_tolerance=self.settings.group_ratio_tolerance)
         return plan, report, res.status
 
     def swap(self, plan_id: str, slot_key: str, dish_id: str) -> Job:
         rec = self._record(plan_id)
+        snapshot = rec.snapshot or self.store.snapshot(rec.id)
+        if snapshot and not matches_current(snapshot, self.repo, rec.plan):
+            raise UserError("Cele lub baza zmieniły się od zapisu tej diety. Najpierw utwórz nową wersję przyciskiem Przelicz; oryginał pozostanie bez zmian.")
         comp, slot = self._slot(rec, slot_key)
         dish = self.repo.dishes.get(dish_id)
         if dish is None:
@@ -567,7 +644,8 @@ class DietService:
                              week_start=rec.week_start, change_note=note, parent_id=rec.id,
                              # pozostałe dni pochodzą z poprzedniej wersji — jeśli liczono je według innych założeń, plan dalej
                              # wymaga przeliczenia (dziedziczymy znacznik założeń rodzica)
-                             assumptions_hash=rec.assumptions_hash or assumptions_hash(self.repo))
+                             assumptions_hash=rec.assumptions_hash or assumptions_hash(self.repo),
+                             snapshot=capture(self.repo, plan))
             self.store.save(new)
             if self.store.active() is None or self.store.get_setting("active_plan") in (None, rec.id):
                 self.store.set_setting("active_plan", new.id)
@@ -597,7 +675,8 @@ class DietService:
                              ok=out.ok, report=out.report, composition={**extras, **new_comp.to_dict()}, log=out.log,
                              wishes=rec.wishes, week_start=rec.week_start, parent_id=rec.id,
                              change_note="przeliczone według aktualnych założeń" + (" z naprawą" if repair else ""),
-                             llm_cost_usd=out.llm_cost_usd, seconds=out.seconds, assumptions_hash=assumptions_hash(repo))
+                             llm_cost_usd=out.llm_cost_usd, seconds=out.seconds, assumptions_hash=assumptions_hash(repo),
+                             snapshot=capture(repo, out.plan))
             self.store.save(new)
             if self.store.get_setting("active_plan") in (None, rec.id):
                 self.store.set_setting("active_plan", new.id)
@@ -607,20 +686,20 @@ class DietService:
 
     def shopping(self, plan_id: str) -> dict:
         rec = self._record(plan_id)
-        rows = build_shopping_list(rec.plan, self.repo.assumptions, self.repo.products, self.repo.store_products)
+        repo = self.record_repo(rec)
+        rows = build_shopping_list(rec.plan, repo.assumptions, repo.products, repo.store_products)
         groups: list[dict] = []
         for r in rows:
             if not groups or groups[-1]["category"] != r.group:
                 groups.append({"category": r.group, "label": r.group_label, "items": []})
             groups[-1]["items"].append(r.to_dict())
         return {"plan_id": rec.id, "title": rec.title, "days": len(rec.plan.days),
-                "persons": len(self.repo.assumptions.persons), "groups": groups}
+                "persons": len(repo.assumptions.persons), "groups": groups}
 
     def export(self, plan_id: str) -> dict:
         rec = self._record(plan_id)
-        repo = self.repo
-        report = rec.report or verify_plan(rec.plan, repo.assumptions, repo.products, repo.dishes,
-                                           group_tolerance=self.settings.group_ratio_tolerance)
+        repo = self.record_repo(rec)
+        report = rec.report
         plan_md = render_plan(rec.plan, repo.assumptions, repo.products, repo.dishes, report, title=rec.title)
         shop_md = render_shopping_list(rec.plan, repo.assumptions, repo.products, repo.store_products)
         out = self.paths.out
@@ -636,11 +715,10 @@ class DietService:
     def text_export(self, plan_id: str, kind: str) -> dict:
         """Treść całego tygodnia albo zakupów do zapisania w wybranym przez użytkownika miejscu."""
         rec = self._record(plan_id)
-        repo = self.repo
+        repo = self.record_repo(rec)
         stem = slug(rec.title) or "plan"
         if kind == "plan":
-            report = rec.report or verify_plan(rec.plan, repo.assumptions, repo.products, repo.dishes,
-                                               group_tolerance=self.settings.group_ratio_tolerance)
+            report = rec.report
             content = render_plan(rec.plan, repo.assumptions, repo.products, repo.dishes, report, title=rec.title)
             filename = f"jadlospis_{stem}_v{rec.version}.txt"
         elif kind == "shopping":
@@ -658,8 +736,11 @@ class DietService:
         return {
             "data": raw,
             "warnings": repo.assumptions.consistency_warnings(),
-            "snack_options": [{"id": i, "name": repo.dishes[i].name} for i in sorted(snack_ids)],
-            "products": [{"id": p.id, "name": p.name} for p in sorted(repo.products.values(), key=lambda p: normalize(p.name))],
+            "snack_options": [{"id": i, "name": repo.dishes[i].name,
+                               "diets": [d for d in ("tradycyjna", "wege", "wegan") if dish_compatible(repo.dishes[i], repo.products, d)]}
+                              for i in sorted(snack_ids)],
+            "products": [{"id": p.id, "name": p.name, "diets": [d for d in ("tradycyjna", "wege", "wegan") if compatible(p, d)]}
+                         for p in sorted(repo.products.values(), key=lambda p: normalize(p.name))],
             "categories": [{"id": c.value, "name": CATEGORY_LABELS_PL[c]} for c in Category],
             "cuisines": sorted({d.cuisine for d in repo.dishes.values()} | set(repo.assumptions.cuisines)),
             "cuisine_labels": {c: cuisine_label(c) for c in {d.cuisine for d in repo.dishes.values()}
@@ -681,6 +762,8 @@ class DietService:
         if errors or a is None:
             return {"ok": False, "errors": errors, "warnings": warnings}
         with self._lock:
+            if self.jobs.busy():
+                raise UserError("Poczekaj na zakończenie obliczeń przed zmianą celów.")
             doc = load_yaml(self.paths.assumptions)
             doc = merge_yaml(doc, data)
             dump_yaml(doc, self.paths.assumptions)
@@ -707,9 +790,11 @@ class DietService:
             prof = pools.profiles.get(d.id)
             is_snack = MealType.SNACK in d.meal_types
             available = (d.id in self.repo.assumptions.day.snacks.allowed) if is_snack else d.id in in_pool
+            available = available and self.repo.dish_ratings.get(d.id, 0) >= 0 and dish_compatible(d, self.repo.products, self.repo.assumptions.diet)
             out.append({"id": d.id, "name": d.name, "description": d.description,
                         "meal_types": [m.value for m in d.meal_types], "cuisine": cuisine_label(d.cuisine), "tags": d.tags,
                         "has_groups": bool(d.groups),
+                        "diets": [diet for diet in ("wege", "wegan") if dish_compatible(d, self.repo.products, diet)],
                         "status": d.status.value, "prep_minutes": d.prep_minutes, "in_pool": available,
                         "invented": (d.source or "").startswith("wymyślone"),
                         "excluded": pools.excluded.get(d.id, []),
@@ -802,6 +887,7 @@ class DietService:
                  "zrodlo": {"baza": "etykieta", **({"kod": ean} if ean else {}), "uwagi": note,
                             "pobrano": date.today().isoformat()},
                  "krok_g": payload.get("step_g") or 5}
+        entry["zgodnosc_diety"] = payload.get("dietary_class") or "nieznany"
         if payload.get("notes"):
             entry["uwagi"] = str(payload["notes"])
         try:

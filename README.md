@@ -1,192 +1,90 @@
-# DietBot — jadłospis na tydzień dla dwóch osób
+# Porcja · dobrze mieć plan
 
-Aplikacja układa **tygodniowy jadłospis dla Kobiety i Mężczyzny**: to samo danie, różne gramatury.
-Model językowy (DeepSeek) wybiera dania tak, żeby tydzień był smaczny i praktyczny, a **wszystkie liczby liczy
-deterministyczny silnik** (OR-Tools CP-SAT) i sprawdza je **niezależny weryfikator**. Wszystko po polsku, z listą
-zakupów podpowiadającą produkty z półek Lidla (i Kauflandu) w Rumunii.
+Tygodniowe menu, dopasowane porcje i jedna lista zakupów. **Bezpłatna aplikacja Windows po polsku**, która działa lokalnie — bez konta, abonamentu i obowiązkowego AI.
 
-> **Status projektu:** działająca aplikacja lokalna w wersji 0.1.1 dla Windows. Nie jest wyrobem medycznym ani zamiennikiem
-> porady lekarza lub dietetyka. Przed użyciem sprawdź cele żywieniowe i wygenerowany plan pod kątem swoich potrzeb.
+**[Pobierz Porcję 0.3.0 dla Windows](https://github.com/krapcys1-maker/dietbot-desktop/releases/download/v0.3.0/Porcja-Setup-0.3.0.exe)** · [Instrukcja](docs/INSTRUKCJA.md) · [Co nowego](CHANGELOG.md) · [Zgłoś problem](https://github.com/krapcys1-maker/dietbot-desktop/issues)
 
-## Instalator Windows
+![Pulpit Porcji: aktualny plan, dwa eksporty i najważniejsze funkcje](docs/media/porcja-pulpit.png)
 
-Pobierz `DietBot-Setup-0.1.1.exe` z [najnowszego wydania](https://github.com/krapcys1-maker/dietbot-desktop/releases/latest),
-uruchom instalator i otwórz DietBota ze skrótu w menu Start. Instalacja nie wymaga uprawnień administratora.
+## Zobacz, jak to wygląda
 
-Po pierwszym uruchomieniu przejdź do **Ustawienia → Model językowy**, wklej swój klucz API DeepSeek i kliknij
-**Zapisz klucz**. Klucz, konfiguracja, plany i wygenerowane dania są przechowywane wyłącznie na komputerze
-użytkownika w `%LOCALAPPDATA%\DietBot`.
+[![Krótka prezentacja Porcji po polsku — kliknij, aby pobrać film MP4](docs/media/porcja-preview.gif)](https://github.com/krapcys1-maker/dietbot-desktop/releases/download/v0.3.0/Porcja-demo-pl.mp4)
 
-Instalator nie jest jeszcze podpisany certyfikatem, dlatego Windows SmartScreen może przy pierwszym uruchomieniu
-wyświetlić ostrzeżenie. W takim przypadku wybierz **Więcej informacji → Uruchom mimo to**. Kod źródłowy instalatora
-znajduje się w `packaging/DietBot.iss`.
+[Obejrzyj lub pobierz film MP4](https://github.com/krapcys1-maker/dietbot-desktop/releases/download/v0.3.0/Porcja-demo-pl.mp4). Prezentacja zmontowana z prawdziwych ekranów wersji 0.3.0, na osobnym przykładowym profilu. Napisy po polsku, bez dźwięku. Nie zawiera prywatnych diet ani kluczy API.
 
-## Szybki start ze źródeł (Windows)
+## Od instalacji do pierwszego tygodnia
 
-Wymagania: Python 3.12, Node.js z npm oraz Microsoft Edge WebView2 Runtime (standardowo obecny w Windows 10/11).
+1. Pobierz **Porcja-Setup-0.3.0.exe** z [oficjalnego wydania](https://github.com/krapcys1-maker/dietbot-desktop/releases/tag/v0.3.0), uruchom instalator i otwórz **Porcję** z menu Start.
+2. W **Cele i preferencje** sprawdź osoby, cele oraz rodzaj diety. Domyślne ustawienia są przykładem, nie indywidualnym zaleceniem.
+3. W **Nowy plan** wybierz tydzień i kliknij **Ułóż mój plan**. Możesz planować bez klucza AI.
+4. Otwórz **Plan tygodnia**: przejrzyj posiłki, porcje i ewentualne uwagi. Nie każde połączenie ograniczeń da się spełnić.
+5. Kliknij **Eksportuj dietę** albo **Eksportuj listę zakupów**. W aplikacji Windows wybierzesz nazwę i miejsce zapisu pliku TXT — eksport obejmuje cały wybrany plan, nie tylko widoczny dzień.
 
-```powershell
-git clone https://github.com/krapcys1-maker/dietbot-desktop.git
-cd dietbot-desktop
-py -3.12 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -e ".[dev,app,build]"
-cd web
-npm ci
-npm run build
-cd ..
-Copy-Item .env.example .env
-.\.venv\Scripts\dietbot.exe aplikacja
-```
+Wymagania: Windows 10/11 x64 i Microsoft Edge WebView2 Runtime. Instalacja dla bieżącego użytkownika, bez uprawnień administratora. Python i Node.js nie są potrzebne do korzystania z instalatora.
 
-Lokalną paczkę i instalator można zbudować poleceniem:
+> Instalator nie jest podpisany certyfikatem. Windows może wyświetlić ostrzeżenie SmartScreen. Sprawdź źródło pliku i sumę SHA-256 dostępną w wydaniu; nie wyłączaj zabezpieczeń systemu.
 
-```powershell
-powershell -ExecutionPolicy Bypass -File packaging\zbuduj_instalator.ps1
-```
+## Co potrafi Porcja
 
-Skrypt wymaga Inno Setup 6. Wynikiem jest `release\DietBot-Setup-0.1.1.exe` oraz folder `dist\DietBot`.
-Nie kopiuj samego `DietBot.exe` — potrzebuje on plików z `dist\DietBot\_internal`.
-
-## Własny klucz API DeepSeek
-
-Każdy użytkownik korzysta ze swojego klucza. W wersji instalowanej wklej go w zakładce **Ustawienia**. Przy
-uruchamianiu aplikacji ze źródeł można także skopiować `.env.example` do `.env` i wpisać:
-
-```dotenv
-DEEPSEEK_API_KEY=tu_wpisz_wlasny_klucz
-```
-
-Plik `.env` jest ignorowany przez Git. Nie dodawaj go do commitów, nie wysyłaj razem z paczką i nie wklejaj
-klucza do zgłoszeń na GitHubie. Bez klucza aplikacja nadal potrafi ułożyć plan algorytmem lokalnym, ale czat,
-rozumienie życzeń i wymyślanie nowych dań są wyłączone. Klucz można utworzyć w
-[panelu DeepSeek](https://platform.deepseek.com/api_keys).
-
-## Uruchamianie
-
-| Sposób | Jak |
+| Funkcja | Jak pomaga |
 |---|---|
-| **Po instalacji** | skrót **DietBot** w menu Start |
-| **Okno aplikacji** (zalecane) | `.venv\Scripts\dietbot aplikacja` albo, po zbudowaniu paczki, `dist\DietBot\DietBot.exe` |
-| Z terminala, w oknie | `.venv\Scripts\dietbot aplikacja` |
-| W przeglądarce | `.venv\Scripts\dietbot serwer` → otwiera `http://127.0.0.1:8765` |
-| Tylko bot Telegram | `.venv\Scripts\dietbot telegram` |
-| Plan z terminala | `.venv\Scripts\dietbot plan generuj --zyczenia "więcej ryb"` |
+| Plan tygodnia | Wspólne dania z osobnymi gramaturami dla osób zapisanych w konfiguracji; domyślnie dwie osoby. |
+| Kalorie i makro | Kcal, białko, tłuszcze i węglowodany obliczane z gramatur i tabel produktów, z niezależnym weryfikatorem. |
+| Diety tradycyjna, wege i wegan | Wybór wspólny dla całego planu; zgodność sprawdzana na poziomie składników, także przekąsek i stałych pozycji. |
+| Biblioteka dań | Ponad 680 zatwierdzonych dań w bazie startowej, wyszukiwarka, filtry diety, ocen i czasu do 15 minut. |
+| Twoje upodobania | „Lubię” zwiększa szansę wyboru, „Nie lubię” wyklucza danie z nowych planów i zamian. Oceny są wspólne dla domowników. |
+| Moje diety | Zapis nazwanych tygodni, historia i powrót do wcześniejszych wersji. Nowe plany zachowują własne dane źródłowe do obliczeń. |
+| Proste zakupy | Połączone warianty produktów, bez dopisków sklepów, marek, przypraw i ziół. Odhaczanie kupionych ilości. |
+| Dwa eksporty | Osobno cały jadłospis z przepisami i gramaturami oraz cała lista zakupów do TXT. |
+| Opcjonalny kalkulator celów | Propozycja kcal i makro na podstawie wieku, wzrostu, masy, płci używanej we wzorze i aktywności. Można pozostać przy ręcznych celach. |
+| Własny DeepSeek | Opcjonalny czat, interpretacja życzeń i proponowanie nowych dań. Klucz wpisujesz w Ustawieniach. |
+| Czytelny interfejs | Pulpit, jasny i ciemny motyw, przewodnik oraz szczegóły schowane w rozwijanych sekcjach. |
 
-Aplikacja działa lokalnie (serwer tylko na `127.0.0.1`, okno na porcie 8765 — gdy zajęty, na dowolnym wolnym).
-Plany zapisują się w `wyniki\dietbot.sqlite3`, eksporty Markdown w `wyniki\`, dziennik błędów w `wyniki\dietbot.log`.
+### Zapis w aplikacji czy plik na dysku?
 
-## Co jest w aplikacji
+- **Zapisz dietę** — nadaje nazwę i dodaje plan do zakładki **Moje diety**.
+- **Eksportuj dietę** — zapisuje pełny plan do pliku TXT.
+- **Eksportuj listę zakupów** — zapisuje całą listę, również produkty już odhaczone.
 
-- **Tydzień** — dni z posiłkami, gramatury dla obu osób z miarami domowymi („≈ ¾ łyżki”, „2 kromki”),
-  pod każdym dniem suma (każdy posiłek, przekąski i stałe pozycje → razem dzień na tle widełek, sprawdzona
-  z weryfikatorem), na ostatnim dniu podsumowanie tygodnia (razem, średnio dziennie, dni w widełkach),
-  przekąski bilansujące z powodem, przygotowanie, gotowanie na zapas
-  („gotujesz raz, na wszystkie porcje”). Przycisk **Zamień** przelicza tylko dotknięte dni — reszta tygodnia
-  zostaje co do grama. Każda zmiana tworzy nową wersję planu (można wrócić).
-- **Nowy plan** — życzenia słowami („kuchnia włoska 2 razy, zupa, resztę wymyśl”, „bez ryb, w piątek pizza
-  z pizzerii”), postęp na żywo. Konkretne dania z życzeń („w 2 dni zupa pomidorowa, w piątek schabowy z piersi
-  kurczaka z ziemniakami i surówką”) program znajduje w bibliotece, a gdy ich nie ma — wymyśla, i przypina do
-  wskazanego dnia. Przekąski („w sobotę lody”, „popcorn do filmu”) trafiają do tego dnia jako przekąska z puli 20%. Opcja **Wymyśl nowe dania do tego tygodnia**: model wymyśla przepisy, kod, silnik
-  i kucharz je sprawdzają, a nowe dania trafiają do biblioteki i od razu do planu. Liczby z życzeń („2 razy”) są
-  pilnowane dokładnie.
-- **Zapis do pliku** — na ekranie pełnego tygodnia przycisk **Zapisz cały jadłospis** zapisuje wszystkie 7 dni
-  (posiłki, gramatury, przygotowanie i podsumowania) do pliku TXT. Osobny przycisk **Zapisz listę zakupów**
-  zapisuje kompletną listę z całego tygodnia. W obu przypadkach standardowe okno **Zapisz jako** pozwala wybrać
-  nazwę i dowolny folder.
-- **Zakupy** — lista z odhaczaniem, liczbą opakowań i nazwami z rumuńskich półek, kopiowanie do schowka, druk
-  oraz zapis całej listy do wybranego pliku TXT.
-  Jedzenie z pizzerii czy budki trafia do osobnej grupy „Na wynos — do zamówienia” (z liczbą kawałków).
-- **Czat** — „ile białka ma żona w środę?”, „zamień czwartkową kolację na coś z kurczakiem”,
-  „wymyśl mi naleśniki z serem na kolację”, „zmniejsz mi kalorie o 100” (zmiany założeń zawsze wymagają
-  kliknięcia **Zatwierdź**).
-- **Dania** — biblioteka ponad 650 dań z 13 kuchni (182 śniadania, 232 obiady i 38 zup na zapas, 193 kolacje,
-  12 przekąsek z puli 20%: lody, chipsy, popcorn, baton, sernik…;
-  także jedzenie na wynos: pizza z pizzerii, kebab, burger, sushi), przycisk **Wymyśl nowe dania**, zatwierdzanie
-  i odrzucanie, stałe proporcje mas przy przepisie.
-- **Produkty** — wartości na 100 g ze źródłem (BLS 4.0, Open Food Facts, etykiety), dodawanie produktu z etykiety.
-- **Założenia** — cele i widełki, białko na posiłek, limity masy talerza, przekąski, zasady tygodnia, zakazy, kuchnie.
-- **Ustawienia** — budżet modelu językowego, stan danych, instrukcja Telegrama.
+![Lista zakupów z kategoriami i odhaczaniem](docs/media/porcja-zakupy.png)
 
-## Zasady, których pilnuje program
+## Bezpłatna aplikacja, opcjonalne AI
 
-Z pliku `konfiguracja/zalozenia.yaml` (edycja w aplikacji albo w pliku):
+Porcja nie wymaga abonamentu ani klucza API do podstawowego planowania. Jeśli chcesz korzystać z AI, dodaj swój klucz w **Ustawienia → Twój pomocnik AI → Zapisz klucz**.
 
-- dzienne widełki kcal / białko / tłuszcz / węglowodany dla każdej osoby (twarde),
-- białko na posiłek: Kobieta 30–40 g, Mężczyzna 45–55 g (± tolerancja, posiłki z puli 20% zwolnione),
-- 3 posiłki + najwyżej 1 przekąska bilansująca na osobę dziennie, tylko gdy potrzebna (szejk białkowy WPC,
-  serek wiejski, skyr, orzechy, migdały, jabłko, banan),
-- stałe pozycje: mleko do kawy, kawa, siemię lniane,
-- 2–3 rzeczy z puli 20% w tygodniu (posiłki jak pizza albo przekąski jak lody, chipsy, popcorn; najwyżej
-  jedna dziennie), najwyżej 2 słodkie kolacje,
-- zupa na zapas we wtorek i środę, bez powtórek dań, najwyżej jeden posiłek z jajkami dziennie,
-- kolacja lżejsza niż obiad i bez „obiadowych” węglowodanów (ryż, ziemniaki, makaron; słodka kolacja jak ryż
-  na mleku z owocami może je mieć),
-- zakazy (rukola, płatki owsiane, słodkie śniadania i obiady), dozwolone źródła węglowodanów,
-- limit masy talerza (np. żeby zupa nie urosła do 2 kg),
-- **proporcje przepisu**: ciasto naleśnikowe, panierka, masa mielona czy surówka to „grupa” — silnik może zrobić
-  jej więcej albo mniej, ale udział każdego składnika zostaje jak w przepisie (±5% i 1 g na zaokrąglenie),
-- bez powtarzania dań z ostatnich 3 tygodni (dopóki w każdej puli zostaje co najmniej 40 dań),
-- **bilans makro dnia**: dania jednego dnia razem mają mieć rozkład energii zbliżony do celów (ok. 25% białka,
-  30% tłuszczu, 45% węglowodanów) — dzień z trzech tłustych dań nie zmieściłby się w celach bez okrajania porcji.
+**Opłaty za DeepSeek rozliczasz u dostawcy na własnym koncie.** Budżet i szacunki w aplikacji nie są gwarancją rachunku dostawcy. Bez klucza nie działają czat, rozumienie swobodnych życzeń i wymyślanie nowych dań przez model.
 
-Gdy czegoś nie da się spełnić, plan dostaje status z uwagami i dokładny opis problemu — program nie udaje,
-że jest dobrze.
+## Dane i prywatność
 
-## Jak powstaje tydzień (w skrócie)
+- Plany, oceny i ustawienia znajdują się na Twoim komputerze. Brak konta Porcji, telemetrii i synchronizacji w chmurze.
+- Przy włączonym AI odpowiedni kontekst zadania jest wysyłany do DeepSeek. Opcjonalny Telegram korzysta z usługi Telegram.
+- Klucz API jest lokalnie zapisany **jawnym tekstem w pliku `.env`**, nie w bezpiecznym magazynie Windows. Nie udostępniaj folderu danych.
+- Instalator i repozytorium nie zawierają Twojego klucza ani prywatnej bazy planów.
+- Dane wersji instalowanej: `%LOCALAPPDATA%\DietBot`. Nazwa techniczna `DietBot.exe` i ten katalog pozostają dla zgodności z wcześniejszymi wersjami.
 
-1. Model językowy wybiera dania z banku (albo najpierw wymyśla nowe) — kod pilnuje zasad tygodnia i życzeń,
-   a w dniach o złym rozkładzie makro wymienia jedno danie na podobne, lepiej zbalansowane.
-2. Silnik (OR-Tools CP-SAT) liczy gramatury obu osób w widełkach, kotwicach białka, limitach talerza i proporcjach mas.
-3. Dni, które się nie mieszczą, naprawia zamiana dania sprawdzona silnikiem.
-4. Niezależny weryfikator przelicza wszystko od zera.
-5. **Kontrola kucharza**: model czyta gotowe gramatury jak szef kuchni („30 g sosu sojowego to za dużo”); poważna
-   uwaga zawęża ten składnik i silnik liczy dzień od nowa — nowa wersja przechodzi przez weryfikator.
+Szczegóły kopii zapasowej, aktualizacji i usuwania klucza: [instrukcja](docs/INSTRUKCJA.md).
 
-## Model językowy i koszty
+## Co oznaczają liczby i status planu?
 
-Klucz trzymamy **wyłącznie lokalnie** w pliku `.env` (`DEEPSEEK_API_KEY=…`). Model, ceny i budżet są w
-`konfiguracja/llm.yaml` (budżet 5 $, rejestr wydatków `wyniki/llm_koszty.jsonl`). Typowy nowy plan kosztuje
-ok. 0,02–0,03 $, z wymyślaniem nowych dań ok. 0,05 $. Bez klucza aplikacja działa dalej: tydzień układa algorytm,
-czat i wymyślanie dań są wyłączone.
+Kalorie to suma wartości **kcal/100 g z bazy × gramatura/100**. Białko, tłuszcze i węglowodany liczone są osobno z tych samych produktów. Aplikacja nie podmienia kalorii skrótem 4×B + 9×T + 4×W.
 
-## Telegram (opcjonalnie)
+Źródła są zapisane przy produktach: m.in. BLS 4.0, etykiety i Open Food Facts. Obliczenia są zgodne z danymi użytymi w planie, co **nie oznacza laboratoryjnej dokładności konkretnego produktu ze sklepu**. Przyprawy oznaczone jako pomijalne nie wchodzą do sum.
 
-1. W Telegramie napisz do **@BotFather** `/newbot` i skopiuj token.
-2. W `.env` dopisz `TELEGRAM_BOT_TOKEN=…`.
-3. Uruchom aplikację, napisz do bota `/start` — odpowie Twoim numerem ID.
-4. W `.env` dopisz `TELEGRAM_ALLOWED_USERS=Twoje_ID,ID_żony` i uruchom aplikację ponownie.
+„Zgodny z założeniami” oznacza zgodność z regułami sprawdzanymi przez aplikację — nie pełną ocenę zdrowotną. Uproszczona lista zakupów łączy warianty, np. mozzarelli; kupienie innego wariantu niż w przepisie może zmienić rzeczywiste makro.
 
-Komendy: `/dzis`, `/jutro`, `/tydzien`, `/zakupy`, `/nowyplan życzenia`; zwykłe wiadomości trafiają do czatu.
-Bot odpowiada tylko osobom z listy.
+**Porcja nie jest wyrobem medycznym ani zamiennikiem lekarza lub dietetyka.** Nie bilansuje wszystkich witamin, minerałów i alergenów. Kalkulator jest orientacyjny i ma ograniczenia; [metodę i granice opisano w instrukcji](docs/INSTRUKCJA.md#kalkulator-celów). Przy szczególnych potrzebach żywieniowych używaj indywidualnie ustalonych celów i sprawdzaj etykiety.
 
-## Dane
+## Rozwój i dokumentacja
 
-| Folder | Zawartość |
-|---|---|
-| `dane/produkty/` | produkty z wartościami na 100 g i źródłem; `wlasne.yaml` — dodane z etykiety |
-| `dane/dania/` | biblioteka dań (składniki z rolami, typowymi porcjami i grupami proporcji, przygotowanie); `gen_*.yaml` — dania wymyślone przez model |
-| `dane/sklepy/` | produkty z półek w Rumunii (Lidl RO, Kaufland RO), opakowania |
-| `konfiguracja/` | `zalozenia.yaml` (cele i zasady), `llm.yaml` (model, budżet) |
-| `wyniki/` | plany (SQLite), eksporty, koszty LLM, dzienniki — poza gitem; `wyniki/cache/` to pamięć podręczna sparsowanych plików YAML (start w 0,3 s zamiast 3 s; można ją usunąć) |
+Porcja to nowa nazwa DietBota. Projekt jest we wczesnej fazie rozwoju; adres repozytorium pozostaje bez zmian.
 
-W instalacji Windows zapisywalne kopie tych katalogów znajdują się w `%LOCALAPPDATA%\DietBot`; pliki programu
-w katalogu instalacyjnym pozostają tylko do odczytu.
+- [Instrukcja użytkownika i FAQ](docs/INSTRUKCJA.md)
+- [Uruchamianie ze źródeł, testy i budowanie instalatora](docs/ROZWOJ.md)
+- [Historia zmian](CHANGELOG.md)
+- [Architektura](docs/ARCHITEKTURA.md) · [źródła danych i research](docs/RESEARCH.md)
+- [Plan dalszego rozwoju](docs/PLAN_ROZWOJU_2026-09-27.md)
+- [Materiały graficzne i licencje](docs/PORCJA_0.3.0.md#materiały-i-licencje)
 
-Więcej: [docs/ARCHITEKTURA.md](docs/ARCHITEKTURA.md) i [docs/RESEARCH.md](docs/RESEARCH.md).
+Zgłoszenia i propozycje po polsku są mile widziane. Podaj wersję, kroki odtworzenia i oczekiwany wynik. **Nie dołączaj klucza API, `.env`, prywatnej bazy ani danych zdrowotnych.**
 
-## Dla programisty
-
-```bash
-python -m venv .venv
-.venv\Scripts\pip install -e .[dev,app]
-.venv\Scripts\python -m pytest
-.venv\Scripts\ruff check src tests
-cd web && npm install && npm run build
-powershell -File packaging\zbuduj.ps1
-```
-
-Przydatne: `dietbot dane sprawdz` (spójność danych), `dietbot dane szukaj "twaróg półtłusty"` (dopasowanie nazwy),
-`dietbot dane audyt-dan` (test silnika dla każdego dania: stałe zestawy towarzyszy i 10 losowych, zbilansowanych
-dni; `--wycofaj` odrzuca dania, z którymi nie da się ułożyć poprawnego dnia), `dietbot dane wymysl-dania "pięć obiadów kuchni meksykańskiej"` albo `--plik zamowienia.yaml`
-(rozbudowa biblioteki), `dietbot dane przelicz-przyklady` (przelicza jadłospisy z folderu `diety`),
-`dietbot llm koszty`.
+Kod jest publicznie dostępny; repozytorium nie ma jeszcze odrębnej licencji na własny kod. Bezpłatne udostępnienie aplikacji nie oznacza automatycznie licencji MIT. Zależności, fonty, ikony i dane źródłowe zachowują własne warunki — informacje o nich znajdują się w dokumentacji i dołączonych plikach licencji.

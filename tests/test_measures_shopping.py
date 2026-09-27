@@ -9,7 +9,7 @@ import pytest
 from dietbot.domain.product import Product
 from dietbot.measures import household, plural_form
 from dietbot.report.markdown import fmt_amount, render_shopping_list
-from dietbot.shopping import NOT_BOUGHT, build_shopping_list, totals_grams
+from dietbot.shopping import NOT_BOUGHT, build_detailed_shopping_list, build_shopping_list, totals_grams
 
 
 def _product(measures: list[dict], **extra) -> Product:
@@ -78,7 +78,7 @@ def test_shopping_list_totals_and_stores(repo, week_result):
     plan = week_result.plan
     a = repo.assumptions
     totals = totals_grams(plan, a)
-    rows = build_shopping_list(plan, a, repo.products, repo.store_products)
+    rows = build_detailed_shopping_list(plan, a, repo.products, repo.store_products)
     by_id = {r.product_id: r for r in rows}
 
     # stałe pozycje: mleko do kawy dla obu osób na każdy dzień
@@ -90,13 +90,13 @@ def test_shopping_list_totals_and_stores(repo, week_result):
             assert pid not in by_id
         else:
             assert by_id[pid].grams == pytest.approx(grams)
-    # podpowiedź sklepu i liczba opakowań wystarcza na potrzebną ilość (z 2% luzu)
+    # podpowiedź sklepu i liczba opakowań wystarcza na całą potrzebną ilość
     with_store = [r for r in rows if r.store is not None and r.store.package_g]
     assert with_store, "brak podpowiedzi sklepowych na liście zakupów"
     for r in with_store:
         assert r.store.preferred and r.store.product_id == r.product_id
-        assert r.packs >= 1 and r.packs * r.store.package_g >= r.grams * 0.98
-        assert r.packs == max(1, math.ceil(r.grams / r.store.package_g - 0.02))
+        assert r.packs >= 1 and r.packs * r.store.package_g + 1e-7 >= r.grams
+        assert r.packs == max(1, math.ceil(round(r.grams / r.store.package_g, 9)))
     # płyny w ml/l, a nie w gramach
     liquids = [r for r in rows if repo.products[r.product_id].density_g_per_ml and not r.negligible]
     for r in liquids:
@@ -104,8 +104,8 @@ def test_shopping_list_totals_and_stores(repo, week_result):
 
     md = render_shopping_list(plan, a, repo.products, repo.store_products)
     assert md.startswith("# Lista zakupów")
-    assert "🛒" in md
-    for r in rows:
+    assert "🛒" not in md
+    for r in build_shopping_list(plan, a, repo.products, repo.store_products):
         assert r.name in md
 
 

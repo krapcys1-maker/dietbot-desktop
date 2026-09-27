@@ -17,7 +17,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastCtx.Provider value={push}>
       {children}
-      <div className="toast-wrap">
+      <div className="toast-wrap" aria-live="polite" aria-atomic="false">
         {toasts.map((t) => (
           <div key={t.id} className={`toast ${t.kind === "error" ? "error" : ""}`}>
             {t.text}
@@ -49,7 +49,7 @@ export function Loading({ label = "Wczytywanie…" }: { label?: string }) {
 
 export function ErrorBox({ error, onRetry }: { error: string; onRetry?: () => void }) {
   return (
-    <div className="alert error row">
+    <div className="alert error row" role="alert">
       <span className="grow">{error}</span>
       {onRetry && (
         <button className="btn small" onClick={onRetry}>
@@ -61,7 +61,7 @@ export function ErrorBox({ error, onRetry }: { error: string; onRetry?: () => vo
 }
 
 export function TagBadges({ tags, isTreat, isSweet }: { tags: string[]; isTreat?: boolean; isSweet?: boolean }) {
-  const shown = tags.filter((t) => TAG_NAMES[t]);
+  const shown = tags.filter((t) => TAG_NAMES[t] && !(t === "wege" && tags.includes("wegan")));
   return (
     <span className="row" style={{ gap: 5 }}>
       {(isTreat || tags.includes("pula_20")) && <span className="badge treat">pula 20%</span>}

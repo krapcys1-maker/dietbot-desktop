@@ -11,7 +11,7 @@ from ..domain.dish import MEAL_LABELS_PL, DishTemplate
 from ..domain.plan import WeekPlan
 from ..domain.product import Category, Product, StoreProduct
 from ..measures import household
-from ..shopping import build_shopping_list
+from ..shopping import SHOPPING_NOTE, SHOPPING_NUTRITION_NOTE, build_shopping_list
 from ..textfmt import fmt_num, plural_pl
 from .summary import day_summaries, week_summaries
 
@@ -34,7 +34,9 @@ def _status_icon(ok: bool) -> str:
 def render_plan(plan: WeekPlan, a: Assumptions, products: Mapping[str, Product], dishes: Mapping[str, DishTemplate],
                 report: VerificationReport, title: str = "Jadłospis na tydzień") -> str:
     persons = a.persons
-    lines: list[str] = [f"# {title}", ""]
+    lines: list[str] = [f"# {title}", "",
+                       "Kalorie: suma wartości kcal produktów z tabel/etykiet. Białko, tłuszcze i węglowodany "
+                       "są liczone osobno z tych samych gramatur (łącznie z przekąskami i stałymi pozycjami).", ""]
     errors = report.errors()
     warnings = [i for i in report.issues if i.severity.value == "ostrzezenie"]
     if not errors and not warnings:
@@ -232,7 +234,8 @@ def render_shopping_list(plan: WeekPlan, a: Assumptions, products: Mapping[str, 
     lines = ["# Lista zakupów", "",
              f"_Na {len(plan.days)} {plural_pl(len(plan.days), 'dzień', 'dni', 'dni')} dla "
              f"{len(a.persons)} {plural_pl(len(a.persons), 'osoby', 'osób', 'osób')}. "
-             "Ilości w stanie jak w przepisach (ryż i makaron suche, mięso surowe)._", ""]
+             "Ilości w stanie jak w przepisach (ryż i makaron suche, mięso surowe)._", "",
+             SHOPPING_NOTE, "", SHOPPING_NUTRITION_NOTE, ""]
     current = None
     for row in rows:
         if row.group != current:
@@ -240,14 +243,6 @@ def render_shopping_list(plan: WeekPlan, a: Assumptions, products: Mapping[str, 
                 lines.append("")
             lines += [f"## {row.group_label}", ""]
             current = row.group
-        if row.negligible:
-            lines.append(f"- [ ] {row.name}")
-            continue
-        shop = ""
-        if row.store is not None:
-            brand = f", {row.store.brand}" if row.store.brand else ""
-            packs = f" — {row.pack_text}" if row.pack_text else ""
-            shop = f"  \n  🛒 {row.store.store}: *{row.store.name_local}*{brand}{packs}"
-        lines.append(f"- [ ] {row.name} — {row.amount_text}{shop}")
+        lines.append(f"- [ ] {row.name} — {row.amount_text}")
     lines.append("")
     return "\n".join(lines) + "\n"

@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "../api";
+import PlateArt from "../components/PlateArt";
+import Icon from "../components/Icon";
 import { JobProgress, useToast } from "../components/ui";
 import type { Job, Status } from "../types";
 import { DAY_SHORT, go } from "../util";
@@ -23,16 +25,23 @@ export default function GeneratePage({ status }: { status: Status | null }) {
   const [invent, setInvent] = useState(false);
   const [job, setJob] = useState<Job | null>(null);
   const [finished, setFinished] = useState<Job | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const initializedDate = useRef(false);
+  const pending = useRef(false);
 
   useEffect(() => {
-    if (status && !weekStart) setWeekStart(status.default_week_start);
-  }, [status, weekStart]);
+    if (status && !initializedDate.current) {
+      initializedDate.current = true;
+      setWeekStart(status.default_week_start);
+    }
+  }, [status]);
 
   const llmAvailable = !!status?.llm.key_present && !!status?.llm.enabled;
 
   const toggleDay = (d: number) => setDays((ds) => (ds.includes(d) ? ds.filter((x) => x !== d) : [...ds, d].sort()));
 
   const start = async () => {
+    if (pending.current || (job && !finished)) return;
     if (days.length === 0) {
       toast("Wybierz przynajmniej jeden dzień.", "error");
       return;
@@ -41,12 +50,17 @@ export default function GeneratePage({ status }: { status: Status | null }) {
       toast("Początek tygodnia musi być poniedziałkiem — dni planu liczą się od poniedziałku.", "error");
       return;
     }
+    pending.current = true;
+    setSubmitting(true);
     try {
       setFinished(null);
-      const j = await api.generate({ wishes: wishes.trim() || undefined, days, avoid_recent: avoidRecent, use_llm: useLlm && llmAvailable, week_start: weekStart || undefined, invent: invent && useLlm && llmAvailable });
+      const j = await api.generate({ wishes: useLlm && llmAvailable ? wishes.trim() || undefined : undefined, days, avoid_recent: avoidRecent, use_llm: useLlm && llmAvailable, week_start: weekStart || undefined, invent: invent && useLlm && llmAvailable });
       setJob(j);
     } catch (e) {
       toast((e as Error).message, "error");
+    } finally {
+      pending.current = false;
+      setSubmitting(false);
     }
   };
 
@@ -54,19 +68,22 @@ export default function GeneratePage({ status }: { status: Status | null }) {
     <div className="page">
       <div className="page-head">
         <div>
-          <h1>Nowy plan tygodnia</h1>
-          <div className="sub">Model językowy układa dania, silnik liczy gramatury, a niezależny weryfikator sprawdza każdą liczbę.</div>
+          <span className="eyebrow">ZAPLANUJ COŚ DOBREGO</span>
+          <h1>Co jemy w tym tygodniu?</h1>
+          <div className="sub">Wybierz tydzień i opisz, na co masz ochotę. Porcje dopasujemy do zapisanych celów.</div>
         </div>
       </div>
 
-      <section className="card stack">
+      <div className="generation-layout">
+      <section className="card stack generation-form">
+        <h2><span className="section-number">1</span>Wybierz tydzień</h2>
         <div className="row" style={{ alignItems: "flex-end", gap: 18 }}>
           <label className="field">
             <span>Tydzień od (poniedziałek)</span>
             <input type="date" value={weekStart} onChange={(e) => setWeekStart(e.target.value)} />
           </label>
-          <div className="field">
-            <span>Dni</span>
+          <details className="disclosure">
+            <summary>Dni planu ({days.length} z 7)</summary>
             <div className="row">
               {DAY_SHORT.map((_, i) => (
                 <label key={i} className="check">
@@ -75,20 +92,21 @@ export default function GeneratePage({ status }: { status: Status | null }) {
                 </label>
               ))}
             </div>
-          </div>
+          </details>
         </div>
+        <h2><span className="section-number">2</span>Dodaj coś od siebie</h2>
         <label className="field">
           <span>Życzenia na ten tydzień (opcjonalnie)</span>
-          <textarea rows={3} maxLength={1000} placeholder="np. w 2 dni zupa pomidorowa, w piątek schabowy z kurczaka z ziemniakami i surówką, w sobotę pizza — konkretne dania program znajdzie w bibliotece albo wymyśli" value={wishes} onChange={(e) => setWishes(e.target.value)} />
+          <textarea disabled={!useLlm || !llmAvailable} rows={3} maxLength={1000} placeholder="Np. w piątek coś szybkiego, w weekend kuchnia włoska." value={wishes} onChange={(e) => setWishes(e.target.value)} />
         </label>
-        <div className="row small">
+        <details className="disclosure"><summary>Przykładowe życzenia</summary><div className="row small">
           {EXAMPLES.map((ex) => (
-            <button key={ex} className="btn small ghost" onClick={() => setWishes((w) => (w ? `${w}; ${ex.toLowerCase()}` : ex))}>
+            <button key={ex} disabled={!useLlm || !llmAvailable} className="btn small ghost" onClick={() => setWishes((w) => (w ? `${w}; ${ex.toLowerCase()}` : ex))}>
               + {ex}
             </button>
           ))}
-        </div>
-        <div className="row" style={{ gap: 22 }}>
+        </div></details>
+        <details className="disclosure"><summary>Opcje układania</summary><div className="stack">
           <label className="check">
             <input type="checkbox" checked={avoidRecent} onChange={(e) => setAvoidRecent(e.target.checked)} />
             Inne dania niż w poprzednim planie
@@ -99,17 +117,19 @@ export default function GeneratePage({ status }: { status: Status | null }) {
           </label>
           <label className="check" title={llmAvailable ? "" : "Brak klucza API — tydzień ułoży algorytm"}>
             <input type="checkbox" checked={useLlm && llmAvailable} disabled={!llmAvailable} onChange={(e) => setUseLlm(e.target.checked)} />
-            Układ przez model językowy {status ? `(${status.llm.model})` : ""}
+            Pomoc AI w wyborze dań {status ? `(${status.llm.model})` : ""}
           </label>
-        </div>
-        {!llmAvailable && status && <div className="alert info">Model językowy jest niedostępny — tydzień ułoży algorytm (bez życzeń słownych). Klucz API ustawia się w pliku .env.</div>}
+        </div></details>
+        {(!llmAvailable || !useLlm) && status && <div className="alert info">Plan ułoży algorytm — bez życzeń słownych. Własny klucz DeepSeek dodasz w <a href="#/ustawienia">Ustawieniach</a>. AI włączysz w opcjach układania.</div>}
         <div className="row">
-          <button className="btn primary" onClick={start} disabled={!!job && !finished}>
-            ✨ Ułóż plan
+          <button className="btn primary" onClick={start} disabled={!status || submitting || (!!job && !finished)}>
+            <Icon name="sparkles" />{submitting ? "Uruchamianie…" : "Ułóż mój plan"}
           </button>
           <span className="muted small">{invent ? "Z wymyślaniem nowych dań: zwykle 2–4 minuty." : "Zwykle 20–60 sekund."}</span>
         </div>
       </section>
+      <aside className="generation-aside"><PlateArt /><h2>Jeden plan.<br />Mniej codziennych decyzji.</h2><p>Dania i gramatury dobieramy według zapisanych celów. Gotowy tydzień możesz zmieniać, oceniać i zapisać razem z listą zakupów.</p><a href="#/zalozenia" className="text-link">Sprawdź cele i rodzaj diety <Icon name="arrow" /></a></aside>
+      </div>
 
       {job && (
         <section className="card stack">

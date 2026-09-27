@@ -14,6 +14,7 @@ import ortools
 
 from .. import __version__
 from ..domain.assumptions import Assumptions
+from ..domain.diet import compatible, dish_compatible
 from ..domain.dish import DishTemplate
 from ..domain.plan import PersonPortion, PlanItem, PlannedMeal, PlannedSnack, WeekPlan
 from ..domain.product import Product
@@ -181,9 +182,27 @@ def _solve_block(slots: Sequence[EngineSlot], assumptions: Assumptions, catalog:
                            deterministic_time=sol.deterministic_time, message=msg), [], []
 
     meals, snacks = _extract(bm, sol, slots, dishes)
+    totals, violations, anchors, binding, masses = analyze(bm, sol, slots, meals, snacks, dishes)
+
+    if violations or anchors or masses:
+        # Model z karami mógł utknąć poza celami, chociaż poprawne porcje istnieją.
+        # Przed diagnozą lub wymianą dań sprawdzamy te same dania z twardymi celami,
+        # zachowując funkcję jakości porcji. Nie poszerzamy żadnych limitów użytkownika.
+        bounded = BlockModel(slots, assumptions, catalog, dishes, settings,
+                             allow_snacks=allow_snacks).build(require_targets=True)
+        candidate = bounded.solve()
+        elapsed = sol.wall_ms + candidate.wall_ms
+        deterministic = sol.deterministic_time + candidate.deterministic_time
+        if candidate.feasible:
+            new_meals, new_snacks = _extract(bounded, candidate, slots, dishes)
+            checked = analyze(bounded, candidate, slots, new_meals, new_snacks, dishes)
+            if not checked[1] and not checked[2] and not checked[4]:
+                bm, sol, meals, snacks = bounded, candidate, new_meals, new_snacks
+                totals, violations, anchors, binding, masses = checked
+        sol.wall_ms, sol.deterministic_time = elapsed, deterministic
+
     for s in snacks:
         s.reason = snack_reason(assumptions, catalog, s, meals, snacks)
-    totals, violations, anchors, binding, masses = analyze(bm, sol, slots, meals, snacks, dishes)
 
     status = BlockStatus.HARD if violations else BlockStatus.SOFT if (anchors or masses) else BlockStatus.OK
     core: list[str] = []
@@ -229,6 +248,17 @@ def solve_week(request: EngineRequest, assumptions: Assumptions, products: Mappi
     `context` — gotowy `context_hash` tych samych założeń, produktów, dań i ustawień (wywołujący, który liczy
     wiele żądań na tych samych danych, np. sprawdzanie zamian, liczy go raz zamiast dla każdego żądania)."""
     settings = settings or EngineSettings()
+    if assumptions.diet != "tradycyjna":
+        assumptions = assumptions.model_copy(deep=True)
+        assumptions.day.snacks.allowed = [d for d in assumptions.day.snacks.allowed
+                                         if d in dishes and dish_compatible(dishes[d], products, assumptions.diet)]
+        for slot in request.slots:
+            for did in slot.candidates:
+                if did in dishes and not dish_compatible(dishes[did], products, assumptions.diet):
+                    raise EngineInputError(f"Danie {dishes[did].name} nie pasuje do diety {assumptions.diet}.")
+        for item in assumptions.day.fixed_items:
+            if item.product_id in products and not compatible(products[item.product_id], assumptions.diet):
+                raise EngineInputError(f"Stała pozycja {products[item.product_id].name} nie pasuje do diety {assumptions.diet}.")
     catalog = Catalog(products, assumptions.energy.method)
     for item in assumptions.day.fixed_items:
         catalog.product(item.product_id)  # wczesny, czytelny błąd przy braku produktu

@@ -18,7 +18,7 @@ BAND_TOLERANCE: dict[str, float] = {"kcal": 0.01, "protein": 0.001, "fat": 0.001
 class EnergyMethod(StrEnum):
     """Jak liczymy kcal w całym systemie (jedna, spójna metoda)."""
 
-    MACROS_4_9_4 = "makro_4_9_4"  # 4·B + 9·T + 4·W (+7·alkohol) — tak liczone są cele użytkownika
+    MACROS_4_9_4 = "makro_4_9_4"  # dawny format; tylko do porównywania historycznych obliczeń
     LABEL = "etykieta"  # wartość energetyczna z tabeli/etykiety (UE 1169/2011, błonnik 2 kcal/g)
 
 
