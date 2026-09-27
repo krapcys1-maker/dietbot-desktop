@@ -12,6 +12,7 @@ from ..domain.plan import PlanItem, PlannedMeal, WeekPlan
 from ..domain.product import CATEGORY_LABELS_PL, Category, Product
 from ..measures import household
 from ..planner.pools import DishProfile
+from ..report.batch import batch_recipe
 from ..report.summary import day_summaries, week_summaries
 from ..storage.repository import Repository
 from ..textfmt import fmt_num
@@ -164,6 +165,10 @@ def plan_view(rec: PlanRecord, repo: Repository) -> dict:
                                                "anchor_state": anchor, "mass_g": round(mass),
                                                "mass_cap_g": cap, "mass_over": bool(cap and mass > cap * 1.02)}
             first_batch_day = batch_first.get(m.batch_group) if m.batch_group else None
+            batch = batch_recipe(plan, m, dish, products, a.persons)
+            if batch:
+                batch["items"] = [{**i, "name": products[i["product_id"]].name if i["product_id"] in products else i["product_id"],
+                                   "amount": amount_text(products.get(i["product_id"]), i["grams"])} for i in batch["items"]]
             pot = None
             if m.batch_group and m.batch_pot_g and first_batch_day == int(day):
                 pot = [{"product_id": pid, "name": products[pid].name if pid in products else pid,
@@ -180,7 +185,8 @@ def plan_view(rec: PlanRecord, repo: Repository) -> dict:
                 "cuisine": cuisine_label(dish.cuisine) if dish else None, "tags": dish.tags if dish else [],
                 "is_treat": bool(dish and dish.is_treat), "is_sweet": bool(dish and dish.is_sweet),
                 "prep_minutes": dish.prep_minutes if dish else None,
-                "steps": dish.steps if dish else [],
+                "steps": batch["steps"] if batch else (dish.steps if dish else []),
+                "batch_recipe": batch,
                 "batch_group": m.batch_group,
                 "batch_days": [DAY_LABELS_PL[x.day] for x in plan.meals if m.batch_group and x.batch_group == m.batch_group],
                 "reheat": bool(m.batch_group and first_batch_day is not None and first_batch_day != int(day)),
@@ -262,7 +268,7 @@ def dish_view(dish: DishTemplate, products: Mapping[str, Product], profile: Dish
         "cuisine": cuisine_label(dish.cuisine), "cuisine_key": dish.cuisine, "tags": dish.tags,
         "status": dish.status.value, "prep_minutes": dish.prep_minutes,
         "is_treat": dish.is_treat, "is_sweet": dish.is_sweet, "is_batch": dish.is_batch, "batch_days": dish.batch_days,
-        "source": dish.source, "steps": dish.steps,
+        "source": dish.source, "steps": dish.steps, "culinary_notes": dish.culinary_notes,
         "ingredients": [{"product_id": i.product_id,
                          "name": products[i.product_id].name if i.product_id in products else i.product_id,
                          "role": i.role.value, "portioning": i.portioning.value, "typical_g": i.typical_g,

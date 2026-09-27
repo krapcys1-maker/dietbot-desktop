@@ -159,10 +159,11 @@ def test_generator_merges_repeated_ingredient(repo):
     assert flour.typical_g == 110 and dish.group_of("maka_pszenna").name == "ciasto na pierogi"
     # duży drugi raz (np. mąka i do ciasta, i do sosu) — produkt wypada z masy, żeby nie psuć proporcji
     ingredients[-1]["typowo_g"] = 60
-    dish, _ = validate_generated(GenDish.model_validate({**base, "id": "pierogi_z_miesem_testowe_2", "skladniki": ingredients}),
+    dish, reasons = validate_generated(GenDish.model_validate({**base, "id": "pierogi_z_miesem_testowe_2", "skladniki": ingredients}),
                                  repo.products, matcher, repo.assumptions, repo.dishes, settings, "test")
-    assert dish is not None and dish.group_of("maka_pszenna") is None
-    assert [g.name for g in dish.groups] == ["farsz"]  # ciasto z jednym składnikiem to nie masa
+    # Removing ambiguous flour from its group leaves the dough unprotected.
+    # Such a recipe must now be corrected, not accepted with freely varying flour.
+    assert dish is None and any("Brak chronionych proporcji" in r for r in reasons)
 
 
 def test_generator_rejects_sweet_lunch(repo):

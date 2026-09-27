@@ -170,6 +170,9 @@ class DishTemplate(DomainModel):
     batch_days: int | None = Field(default=None, alias="na_ile_dni", ge=2, le=4)
     source: str | None = Field(default=None, alias="zrodlo")
     status: DishStatus = Field(default=DishStatus.DRAFT)
+    culinary_version: int = 0  # zero in historical snapshots; never retroactively rewrite them
+    culinary_notes: list[str] = Field(default_factory=list)
+    culinary_errors: list[str] = Field(default_factory=list)
 
     @field_validator("id")
     @classmethod

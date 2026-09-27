@@ -14,7 +14,7 @@ import ortools
 
 from .. import __version__
 from ..domain.assumptions import Assumptions
-from ..domain.diet import compatible, dish_compatible
+from ..domain.diet import DIET_GENITIVE_PL, compatible, dish_compatible
 from ..domain.dish import DishTemplate
 from ..domain.plan import PersonPortion, PlanItem, PlannedMeal, PlannedSnack, WeekPlan
 from ..domain.product import Product
@@ -255,10 +255,10 @@ def solve_week(request: EngineRequest, assumptions: Assumptions, products: Mappi
         for slot in request.slots:
             for did in slot.candidates:
                 if did in dishes and not dish_compatible(dishes[did], products, assumptions.diet):
-                    raise EngineInputError(f"Danie {dishes[did].name} nie pasuje do diety {assumptions.diet}.")
+                    raise EngineInputError(f"Danie {dishes[did].name} nie pasuje do diety {DIET_GENITIVE_PL.get(assumptions.diet, assumptions.diet)}.")
         for item in assumptions.day.fixed_items:
             if item.product_id in products and not compatible(products[item.product_id], assumptions.diet):
-                raise EngineInputError(f"Stała pozycja {products[item.product_id].name} nie pasuje do diety {assumptions.diet}.")
+                raise EngineInputError(f"Stała pozycja {products[item.product_id].name} nie pasuje do diety {DIET_GENITIVE_PL.get(assumptions.diet, assumptions.diet)}.")
     catalog = Catalog(products, assumptions.energy.method)
     for item in assumptions.day.fixed_items:
         catalog.product(item.product_id)  # wczesny, czytelny błąd przy braku produktu

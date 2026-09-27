@@ -10,6 +10,11 @@ PLANT_IDS = frozenset(["bulka_pszenna", "chleb_pszenny", "chleb_zytni", "chleb_m
 VEGETARIAN_IDS = frozenset(["mleko_1_5", "mleko_3_5", "jogurt_naturalny_3_5", "jogurt_naturalny_1_5", "skyr_naturalny", "kefir", "maslanka", "smietana_10", "smietana_20", "smietanka_30", "twarozek_typu_quark_chudy", "ricotta", "mascarpone", "jajko_kurze", "zoltko_jaja", "bialka_jaj", "maslo", "miod", "makaron_jajeczny"])
 
 
+# Odmiana nazw diet do komunikatów („nie pasuje do diety wegańskiej”, „zgodność z dietą wegańską”).
+DIET_GENITIVE_PL = {"tradycyjna": "tradycyjnej", "wege": "wegetariańskiej", "wegan": "wegańskiej"}
+DIET_INSTRUMENTAL_PL = {"tradycyjna": "tradycyjną", "wege": "wegetariańską", "wegan": "wegańską"}
+
+
 def product_diet(product: Product) -> str:
     if product.category in {Category.MEAT, Category.POULTRY, Category.COLD_CUTS, Category.FISH}:
         return "zwierzecy"

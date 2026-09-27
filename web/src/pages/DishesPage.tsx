@@ -161,8 +161,12 @@ function DishDetailCard({ id, onChanged }: { id: string; onChanged: () => void }
             ))}
           </tbody>
         </table></div>
-        <div className="muted small">Gramatury w planie dobiera silnik do celów każdej osoby.</div>
+        <div className="muted small">Gramatury dopasowujemy do celów, zachowując zadeklarowane proporcje przepisu.</div>
       </div>
+      {d.culinary_notes?.length > 0 && <details className="group-box">
+        <summary>Zasady przygotowania i porcjowania</summary>
+        <ul>{d.culinary_notes.map((note, i) => <li key={i}>{note}</li>)}</ul>
+      </details>}
       {d.groups.length > 0 && (
         <div>
           <h3 style={{ marginBottom: 4 }}>Stałe proporcje</h3>

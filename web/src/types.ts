@@ -79,6 +79,9 @@ export interface Meal {
   prep_minutes: number | null;
   steps: string[];
   batch_group: string | null;
+  batch_recipe?: { title: string; instructions: string; days: string[]; portions_count: number; portions_text: string;
+    water: string | null; has_side: boolean;
+    items: { product_id: string; name: string; amount: string; side: boolean }[] } | null;
   batch_days: string[];
   reheat: boolean;
   pot: PotItem[] | null;
@@ -312,6 +315,7 @@ export interface DishDetail {
   batch_days: number | null;
   source: string | null;
   steps: string[];
+  culinary_notes: string[];
   ingredients: {
     product_id: string;
     name: string;

@@ -1,5 +1,47 @@
 # Historia zmian
 
+## 0.3.3 — więcej kuchni roślinnej i czytelniejsze komunikaty (27.09.2026)
+
+### Dieta wegańska i wegetariańska
+
+- Napój sojowy i owsiany (niesłodzone, z wapniem) w bazie produktów — mleko do kawy w stałych pozycjach można zastąpić zamiast je usuwać. Komunikat przy zmianie diety podpowiada zamiennik.
+- 14 nowych przepisów wegańskich, w tym dwie zupy na zapas. Nowe roślinne źródła białka: granulat sojowy, edamame i odżywka białkowa sojowa. Wartości z BLS 4.0.
+- Pule wegańskie: śniadania 8 → 12, obiady 12 → 16, kolacje 12 → 19, zupy na zapas 2 → 4. Każde nowe danie przeszło test silnika z losowymi, zbilansowanymi dniami.
+
+### Wygoda
+
+- Pole życzeń i opcje AI wyglądają na wyłączone, gdy nie ma klucza, a komunikat mówi wprost, czego brakuje.
+- Po kliknięciu **Ułóż mój plan** strona przewija się do postępu.
+- Motyw jasny/ciemny domyślnie idzie za ustawieniem Windows, dopóki nie wybierzesz go ręcznie.
+- Dziennik „Jak powstał ten plan” pokazuje nazwy dań i dni zamiast identyfikatorów technicznych.
+- Nazwy diet w komunikatach po polsku („nie pasuje do diety wegańskiej”), uwagi o danych z nazwami dań.
+- Przepis na zapas wspomina o pieczywie tylko wtedy, gdy jest w daniu; poprawna odmiana liczby porcji (np. „6 porcji”).
+
+### Projekt
+
+- Automatyczne testy w GitHub Actions (ruff, spójność danych, pytest na Windows, build interfejsu).
+- Nowy README ze schematem działania, galerią i streszczeniem po angielsku; CONTRIBUTING, SECURITY i szablony zgłoszeń.
+
+## 0.3.2 — jeden przepis na całe gotowanie (27.09.2026)
+
+- Dania na zapas pokazują od razu jedną tabelę ilości na wszystkie dni i osoby oraz przygotowanie całej partii.
+- Następnego dnia jest informacja o odgrzewaniu i wskazanie dnia z pełnym przepisem. Podział na osoby jest opisany osobno, a nie jako kolejna lista do gotowania.
+- Pełna ilość jest sumowana z faktycznie zapisanych porcji. Pieczywo podawane obok jest uwzględnione i oznaczone jako dodatek.
+- Historyczne przepisy z nieprzeliczonym litrażem wody otrzymują wskazówkę napełnienia całego garnka do przykrycia składników; aplikacja nie zgaduje litrów bez wydajności bazowego przepisu.
+- Ten sam układ działa w aplikacji i eksporcie, również dla wcześniej zapisanych diet. Nie zmienia gramatur, makr ani zakupów.
+
+## 0.3.1 — proporcje przepisu przed dopasowaniem kalorii (27.09.2026)
+
+- Pieczywo i główne nadzienie kanapek, wrapów i tostów są powiązane proporcją przepisu (±25%).
+- Zamknięte tosty z chleba tostowego: pary kromek i minimum 20 g sera na 50 g pieczywa. Poprawiona baza sera w tostach z szynką.
+- Uzupełnione grupy składników placków, krokietów i panierki; ścisłe masy mają maksymalnie 5% tolerancji udziału i 1 g na zaokrąglenie.
+- Nowe przepisy z rozpoznanym ciastem lub panierką bez wymaganych proporcji są odrzucane, zamiast swobodnie dobierać mąkę do kcal.
+- Niezależna kontrola proporcji nadzienia, brakujących składników i jednostek. Ograniczeń kulinarnych nie można „opłacić” dopasowaniem kalorii.
+- Eksport podaje wspólne ilości składników masy dla wszystkich osób, z instrukcją odważania roztrzepanego jajka.
+- Zmiany dotyczą nowych i przeliczonych diet. Historyczne wersje i lista zakupów pozostają bez zmian; „Przelicz i napraw” tworzy nową wersję.
+
+To kontrola zadeklarowanych proporcji, nie gwarancja jakości każdego przepisu ani próba praktycznego ugotowania wszystkich dań. Złożone przepisy nie są używane jako uproszczone przekąski bilansujące.
+
 ## 0.3.0 — Porcja (27.09.2026)
 
 Pierwsze publiczne wydanie pod nazwą Porcja. Zawiera także funkcje rozwijane lokalnie po publicznej wersji 0.1.1.

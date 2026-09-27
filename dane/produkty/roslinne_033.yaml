@@ -1,0 +1,98 @@
+# Produkty roślinne dodane w 0.3.3: zamienniki mleka (np. do kawy w stałych pozycjach) i roślinne źródła białka
+# do przepisów wegańskich. Wartości z BLS 4.0 (Max Rubner-Institut, CC BY 4.0), zaokrąglone jak w
+# `dietbot dane odswiez-bls`. Osobny plik: przy aktualizacji aplikacji trafia też do istniejących danych użytkownika.
+- id: napoj_sojowy
+  nazwa: Napój sojowy niesłodzony (z wapniem)
+  aliasy: [napój sojowy, mleko sojowe, napój sojowy bez cukru, băutură de soia, lapte de soia]
+  kategoria: napoje
+  stan: gotowy_do_jedzenia
+  zgodnosc_diety: wegan
+  zrodlo: {baza: BLS, kod: H841400, wersja: 4.0 (2025), nazwa_oryginalna: 'Sojadrink ungesüßt, angereichert mit Vitaminen
+      und Calcium | Soya drink unsweetened, fortified with vitamins and calcium', pobrano: '2026-09-27'}
+  krok_g: 10
+  gestosc_g_ml: 1.03
+  na_100g:
+    kcal: 30
+    bialko: 3.22
+    tluszcz: 1.3
+    weglowodany: 0.4
+    blonnik: 1.75
+    cukry: 0.39
+    kwasy_nasycone: 0.19
+    sol: 0.06
+- id: napoj_owsiany
+  nazwa: Napój owsiany niesłodzony (z wapniem)
+  aliasy: [napój owsiany, mleko owsiane, napój owsiany bez cukru, băutură de ovăz, lapte de ovăz]
+  kategoria: napoje
+  stan: gotowy_do_jedzenia
+  zgodnosc_diety: wegan
+  zrodlo: {baza: BLS, kod: C660200, wersja: 4.0 (2025), nazwa_oryginalna: 'Haferdrink ungesüßt, angereichert mit Vitaminen,
+      Calcium und Jod | Oat drink unsweetened, fortified with vitamins, calcium and iodine', pobrano: '2026-09-27'}
+  krok_g: 10
+  gestosc_g_ml: 1.03
+  na_100g:
+    kcal: 29
+    bialko: 0.74
+    tluszcz: 1.01
+    weglowodany: 4
+    blonnik: 0.45
+    cukry: 3.81
+    kwasy_nasycone: 0.11
+    sol: 0.12
+- id: granulat_sojowy
+  nazwa: Granulat sojowy (suchy)
+  aliasy: [granulat sojowy, mielone mięso sojowe, soja teksturyzowana, carne de soia, soia granulată]
+  kategoria: straczki
+  stan: suchy
+  zgodnosc_diety: wegan
+  zrodlo: {baza: BLS, kod: H765000, wersja: 4.0 (2025), nazwa_oryginalna: 'Sojaschnetzel/Sojagranulat, texturiert, trocken
+      | Plant-based mince, made from texturised soya protein, plain, dry', pobrano: '2026-09-27'}
+  krok_g: 5
+  max_porcja_g: 90
+  na_100g:
+    kcal: 351
+    bialko: 50.2
+    tluszcz: 6.74
+    weglowodany: 13.46
+    blonnik: 18.05
+    cukry: 13.46
+    kwasy_nasycone: 1.05
+    sol: 0
+- id: edamame
+  nazwa: Edamame (mrożone, łuskane)
+  aliasy: [edamame, soja edamame, fasolka edamame]
+  kategoria: straczki
+  stan: surowy
+  zgodnosc_diety: wegan
+  zrodlo: {baza: BLS, kod: G750100, wersja: 4.0 (2025), nazwa_oryginalna: Sojabohne unreif (Edamame) roh | Soya bean immature
+      (edamame) raw, pobrano: '2026-09-27'}
+  krok_g: 10
+  max_porcja_g: 250
+  na_100g:
+    kcal: 146
+    bialko: 13
+    tluszcz: 6.8
+    weglowodany: 6.2
+    blonnik: 4.2
+    cukry: 1.3
+    kwasy_nasycone: 0.79
+    sol: 0.04
+- id: odzywka_bialkowa_sojowa
+  nazwa: Odżywka białkowa sojowa (izolat, bez smaku)
+  aliasy: [odżywka białkowa sojowa, białko sojowe, izolat białka sojowego, proteină din soia]
+  kategoria: produkty_bialkowe
+  stan: gotowy_do_jedzenia
+  zgodnosc_diety: wegan
+  zrodlo: {baza: BLS, kod: H011000, wersja: 4.0 (2025), nazwa_oryginalna: Sojaproteinisolat | Soya bean protein isolate,
+    pobrano: '2026-09-27'}
+  krok_g: 5
+  max_porcja_g: 40
+  na_100g:
+    kcal: 384
+    bialko: 88.3
+    tluszcz: 3.39
+    weglowodany: 0
+    blonnik: 0
+    cukry: 0
+    kwasy_nasycone: 0.42
+    sol: 2.5
