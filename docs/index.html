@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Porcja — bezpłatny planer posiłków po polsku (Windows)</title>
+<meta name="description" content="Jadłospis na cały tydzień, porcje dopasowane do każdej osoby i jedna lista zakupów. Bezpłatna aplikacja na Windows po polsku: bez konta, abonamentu i obowiązkowego AI. Diety tradycyjna, wegetariańska i wegańska.">
+<link rel="canonical" href="https://krapcys1-maker.github.io/dietbot-desktop/">
+<meta name="theme-color" content="#244D3D">
+<link rel="icon" type="image/svg+xml" href="porcja.svg">
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pl_PL">
+<meta property="og:site_name" content="Porcja">
+<meta property="og:title" content="Porcja — dobrze mieć plan">
+<meta property="og:description" content="Bezpłatny planer posiłków po polsku: jadłospis na tydzień, osobne porcje dla każdej osoby i jedna lista zakupów. Windows, bez konta.">
+<meta property="og:url" content="https://krapcys1-maker.github.io/dietbot-desktop/">
+<meta property="og:image" content="https://krapcys1-maker.github.io/dietbot-desktop/media/social-preview.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="Porcja — dobrze mieć plan: ekran planu tygodnia z bilansem dnia dla dwóch osób">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Porcja — dobrze mieć plan">
+<meta name="twitter:description" content="Bezpłatny planer posiłków po polsku: jadłospis na tydzień, osobne porcje dla każdej osoby i jedna lista zakupów.">
+<meta name="twitter:image" content="https://krapcys1-maker.github.io/dietbot-desktop/media/social-preview.png">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Porcja",
+  "alternateName": "DietBot",
+  "description": "Bezpłatna aplikacja na Windows po polsku: jadłospis na tydzień, porcje dopasowane do każdej osoby i jedna lista zakupów. Działa lokalnie, bez konta i abonamentu.",
+  "applicationCategory": "LifestyleApplication",
+  "operatingSystem": "Windows 10, Windows 11",
+  "inLanguage": "pl",
+  "url": "https://krapcys1-maker.github.io/dietbot-desktop/",
+  "downloadUrl": "https://github.com/krapcys1-maker/dietbot-desktop/releases/latest",
+  "screenshot": "https://krapcys1-maker.github.io/dietbot-desktop/media/porcja-tydzien.png",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "PLN" }
+}
+</script>
+
+<style>
+@font-face{font-family:"DM Sans Variable";font-style:normal;font-display:swap;font-weight:100 1000;src:url(assets/fonts/dm-sans-latin-ext-wght-normal.woff2) format("woff2-variations");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"DM Sans Variable";font-style:normal;font-display:swap;font-weight:100 1000;src:url(assets/fonts/dm-sans-latin-wght-normal.woff2) format("woff2-variations");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Fraunces Variable";font-style:normal;font-display:swap;font-weight:100 900;src:url(assets/fonts/fraunces-latin-ext-wght-normal.woff2) format("woff2-variations");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Fraunces Variable";font-style:normal;font-display:swap;font-weight:100 900;src:url(assets/fonts/fraunces-latin-wght-normal.woff2) format("woff2-variations");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+:root{
+  --bg:#fbf8f1; --surface:#ffffff; --ink:#1f2a24; --muted:#59665e; --line:#e4e0d3;
+  --green:#244d3d; --green-ink:#ffffff; --sage:#c4d98c; --sage-soft:#eef3dc; --peach:#eca67f; --peach-soft:#fbe9dd;
+  --link:#1d6a4b; --shadow:0 1px 2px rgba(20,30,25,.06),0 14px 34px rgba(20,30,25,.09);
+  --serif:"Fraunces Variable",Georgia,"Times New Roman",serif;
+  --sans:"DM Sans Variable",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#131915; --surface:#1b231e; --ink:#e8eee9; --muted:#a4b0a8; --line:#2b352e;
+    --green:#c4d98c; --green-ink:#17221b; --sage:#c4d98c; --sage-soft:#243021; --peach:#eca67f; --peach-soft:#33261f;
+    --link:#9fd6b6; --shadow:0 1px 2px rgba(0,0,0,.35),0 14px 34px rgba(0,0,0,.35);
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1.0625rem/1.65 var(--sans);-webkit-font-smoothing:antialiased}
+img{max-width:100%;height:auto;display:block}
+a{color:var(--link)}
+a:focus-visible,summary:focus-visible,.btn:focus-visible{outline:3px solid var(--peach);outline-offset:3px;border-radius:8px}
+.skip{position:absolute;left:-999px;top:0;background:var(--green);color:var(--green-ink);padding:.6rem 1rem;z-index:10}
+.skip:focus{left:8px;top:8px}
+.wrap{width:min(1080px,100% - 2rem);margin-inline:auto}
+
+header.top{padding:1.1rem 0}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:.7rem;text-decoration:none;color:var(--ink)}
+.brand img{width:40px;height:40px}
+.brand b{font:600 1.7rem/1 var(--serif);letter-spacing:-.01em}
+.brand b i{font-style:normal;color:var(--peach)}
+nav.links{display:flex;gap:1.3rem;flex-wrap:wrap;font-size:.98rem}
+nav.links a{color:var(--muted);text-decoration:none}
+nav.links a:hover{color:var(--ink);text-decoration:underline}
+
+.hero{padding:2.2rem 0 3.2rem}
+.hero .wrap{display:grid;gap:2.4rem;align-items:center}
+@media (min-width:900px){.hero .wrap{grid-template-columns:1.02fr 1fr}}
+.eyebrow{font-size:.78rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0 0 .9rem}
+h1,h2,h3{font-family:var(--serif);font-weight:600;letter-spacing:-.015em;line-height:1.15;margin:0}
+h1{font-size:clamp(2.1rem,4.6vw,3.35rem)}
+h2{font-size:clamp(1.6rem,3vw,2.15rem);margin-bottom:.6rem}
+h3{font-size:1.25rem;margin-bottom:.35rem}
+.lead{font-size:1.2rem;color:var(--muted);margin:1.1rem 0 1.6rem;max-width:34em}
+.cta{display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 1.35rem;border-radius:999px;font-weight:700;text-decoration:none;font-size:1rem;border:2px solid var(--green)}
+.btn.primary{background:var(--green);color:var(--green-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ghost{color:var(--ink);border-color:var(--line);background:var(--surface)}
+.btn.ghost:hover{border-color:var(--green)}
+.fine{font-size:.9rem;color:var(--muted);margin:1rem 0 0;max-width:38em}
+.shot{border-radius:var(--radius,18px);overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line);background:var(--surface)}
+
+section{padding:3rem 0}
+section.alt{background:var(--sage-soft)}
+.sub{color:var(--muted);max-width:44em;margin:0 0 1.8rem}
+.grid{display:grid;gap:1.1rem}
+@media (min-width:760px){.grid.three{grid-template-columns:repeat(3,1fr)}.grid.two{grid-template-columns:repeat(2,1fr)}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1.35rem 1.35rem 1.45rem}
+.card p{margin:.3rem 0 0;color:var(--muted)}
+.num{display:inline-grid;place-items:center;width:2rem;height:2rem;border-radius:50%;background:var(--peach-soft);color:var(--ink);font-weight:700;margin-bottom:.7rem}
+
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:1rem}
+th,td{padding:.7rem 1rem;text-align:left;border-bottom:1px solid var(--line)}
+th:not(:first-child),td:not(:first-child){text-align:right;white-space:nowrap}
+thead th{background:var(--sage-soft);font-size:.86rem;letter-spacing:.03em}
+tbody tr:last-child td{border-bottom:0}
+tfoot td{font-weight:700;background:var(--peach-soft)}
+@media (max-width:560px){
+  table{min-width:0;font-size:.93rem}
+  th,td{padding:.6rem .55rem}
+  th:not(:first-child),td:not(:first-child){white-space:normal}
+}
+.note{font-size:.92rem;color:var(--muted);margin:.9rem 0 0}
+
+ul.tick{list-style:none;margin:0;padding:0;display:grid;gap:.7rem}
+ul.tick li{padding-left:1.9rem;position:relative}
+ul.tick li::before{content:"";position:absolute;left:0;top:.5em;width:1rem;height:1rem;border-radius:50%;background:var(--sage)}
+ul.cross li::before{background:var(--peach)}
+
+details{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.2rem 1.1rem;margin-bottom:.7rem}
+summary{cursor:pointer;font-weight:700;padding:.8rem 0;list-style-position:outside}
+details p{margin:.1rem 0 1rem;color:var(--muted)}
+
+footer{padding:2.2rem 0 3rem;border-top:1px solid var(--line);color:var(--muted);font-size:.95rem}
+footer .wrap{display:flex;gap:1rem 2rem;flex-wrap:wrap;justify-content:space-between}
+footer nav{display:flex;gap:1.2rem;flex-wrap:wrap}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<a class="skip" href="#tresc">Przejdź do treści</a>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="./" aria-label="Porcja — strona główna">
+      <img src="porcja.svg" width="40" height="40" alt="">
+      <b>porcja<i>.</i></b>
+    </a>
+    <nav class="links" aria-label="Główna nawigacja">
+      <a href="#jak-to-dziala">Jak to działa</a>
+      <a href="#przyklad">Przykład</a>
+      <a href="#pytania">Pytania</a>
+      <a href="https://github.com/krapcys1-maker/dietbot-desktop">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main id="tresc">
+  <div class="hero">
+    <div class="wrap">
+      <div>
+        <p class="eyebrow">Bezpłatny planer posiłków · Windows · po polsku</p>
+        <h1>Jadłospis na cały tydzień i jedna lista zakupów</h1>
+        <p class="lead">Porcja układa posiłki, dobiera porcje osobno dla każdej osoby i liczy kalorie oraz makro. Działa na Twoim komputerze — bez konta, abonamentu i obowiązkowego AI.</p>
+        <div class="cta">
+          <a class="btn primary" href="https://github.com/krapcys1-maker/dietbot-desktop/releases/latest">Pobierz dla Windows</a>
+          <a class="btn ghost" href="https://github.com/krapcys1-maker/dietbot-desktop/releases/download/v0.3.0/Porcja-demo-pl.mp4">Zobacz film · 44 s</a>
+        </div>
+        <p class="fine">Windows 10/11 (x64). Instalator nie jest jeszcze podpisany certyfikatem, więc Windows może pokazać ostrzeżenie SmartScreen. Pobieraj go tylko z oficjalnych wydań i <a href="https://github.com/krapcys1-maker/dietbot-desktop#od-instalacji-do-pierwszego-tygodnia">sprawdź sumę SHA-256</a>.</p>
+      </div>
+      <div class="shot">
+        <img src="media/porcja-tydzien.png" width="1280" height="720" alt="Plan tygodnia w Porcji: bilans dnia dla dwóch osób z celami kalorii, białka, tłuszczu i węglowodanów">
+      </div>
+    </div>
+  </div>
+
+  <section id="jak-to-dziala" class="alt">
+    <div class="wrap">
+      <h2>Jak to działa</h2>
+      <p class="sub">Trzy kroki od pustej kartki do gotowej listy zakupów. Podstawowe planowanie nie wymaga internetu ani klucza AI.</p>
+      <div class="grid three">
+        <div class="card"><span class="num">1</span><h3>Ustaw cele</h3><p>Wybierz dietę (tradycyjna, wegetariańska albo wegańska), dzienne widełki kcal i makro dla każdej osoby oraz zakazy. Nie znasz celów? Opcjonalny kalkulator podpowie wartości orientacyjne.</p></div>
+        <div class="card"><span class="num">2</span><h3>Ułóż tydzień</h3><p>Kliknij „Ułóż mój plan”. Program wybiera dania z biblioteki blisko 700 przepisów i dobiera gramatury tak, by każdy mieścił się w swoich widełkach.</p></div>
+        <div class="card"><span class="num">3</span><h3>Gotuj i kupuj</h3><p>Dostajesz plan z przepisami oraz jedną listę zakupów z połączonymi produktami. Odhaczaj w aplikacji albo zapisz oba dokumenty do plików TXT.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="przyklad">
+    <div class="wrap">
+      <h2>Ten sam posiłek, inne porcje</h2>
+      <p class="sub">Fragment prawdziwego planu ułożonego przez program bez AI (na przykładowych ustawieniach startowych — to nie jest zalecenie żywieniowe).</p>
+      <div class="tablewrap">
+        <table>
+          <thead><tr><th scope="col">Śniadanie: kanapka z kurczakiem teriyaki</th><th scope="col">Kobieta</th><th scope="col">Mężczyzna</th></tr></thead>
+          <tbody>
+            <tr><td>Pierś z kurczaka (surowa)</td><td>90 g</td><td>140 g</td></tr>
+            <tr><td>Bułka pszenna</td><td>80 g (≈ 1½ szt.)</td><td>120 g (≈ 2 szt.)</td></tr>
+            <tr><td>Sos sojowy</td><td>10 g</td><td>20 g</td></tr>
+            <tr><td>Ogórek świeży</td><td>30 g</td><td>50 g</td></tr>
+          </tbody>
+          <tfoot>
+            <tr><td>Cały dzień (z przekąską i stałymi pozycjami)</td><td>1666 kcal</td><td>2387 kcal</td></tr>
+            <tr><td>Widełki tej osoby</td><td>1600–1700 kcal</td><td>2350–2400 kcal</td></tr>
+          </tfoot>
+        </table>
+      </div>
+      <p class="note">Białko, tłuszcze i węglowodany są liczone osobno i też sprawdzane względem widełek. Gdy czegoś nie da się spełnić, plan dostaje czytelne uwagi zamiast „cichego” wyniku.</p>
+    </div>
+  </section>
+
+  <section class="alt">
+    <div class="wrap">
+      <h2>Liczby liczy kod, nie AI</h2>
+      <div class="grid two" style="margin-top:1.2rem">
+        <div class="card"><h3>Silnik i weryfikator</h3><p>Solver OR-Tools CP-SAT dobiera gramatury, a osobny weryfikator przelicza cały plan od zera z tabel produktów (m.in. BLS 4.0). To jego liczby widzisz w aplikacji.</p></div>
+        <div class="card"><h3>AI tylko na życzenie</h3><p>Własny klucz DeepSeek dodajesz wyłącznie wtedy, gdy chcesz czatu, życzeń pisanych zwykłym językiem lub nowych dań. Model nie podaje kalorii ani gramów. Koszt API rozliczasz u dostawcy.</p></div>
+      </div>
+      <p class="note">Wartości pochodzą z tabel i etykiet, więc są szacunkiem — konkretny produkt ze sklepu może się różnić. Porcja nie jest wyrobem medycznym i nie zastępuje lekarza ani dietetyka.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <div class="grid two">
+        <div>
+          <h2>Dla kogo</h2>
+          <ul class="tick">
+            <li>Dla <b>dwóch osób przy jednym stole</b>: wspólne dania, ale osobne gramatury dla każdej z nich.</li>
+            <li>Dla tych, którzy mają dość <b>Excela i kartek</b>: jeden tydzień, jedna lista zakupów.</li>
+            <li>Dla jedzących <b>wegetariańsko i wegańsko</b>: zgodność diety jest sprawdzana na poziomie składników.</li>
+            <li>Dla cenących <b>prywatność</b>: plany zostają na Twoim komputerze, bez konta i telemetrii.</li>
+          </ul>
+        </div>
+        <div>
+          <h2>Czego tu nie ma</h2>
+          <ul class="tick cross">
+            <li>Wersji na telefon, Maca ani Linuxa — instalator jest tylko dla <b>Windows 10/11</b>.</li>
+            <li>Dziennika jedzenia i skanera kodów kreskowych.</li>
+            <li>Podpisu instalatora certyfikatem — dlatego SmartScreen może pokazać ostrzeżenie.</li>
+            <li>Porad zdrowotnych: przy szczególnych potrzebach żywieniowych używaj celów ustalonych indywidualnie.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pytania" class="alt">
+    <div class="wrap">
+      <h2>Najczęstsze pytania</h2>
+      <div style="margin-top:1.2rem">
+        <details><summary>Ile to kosztuje?</summary><p>Nic. Aplikacja jest bezpłatna i nie ma abonamentu. Jedyny możliwy koszt to opcjonalne AI: własny klucz DeepSeek rozliczasz u dostawcy. Bez klucza planowanie, zakupy i eksporty działają normalnie.</p></details>
+        <details><summary>Gdzie są moje dane?</summary><p>Na Twoim komputerze, w folderze <code>%LOCALAPPDATA%\DietBot</code>. Porcja nie ma konta, telemetrii ani synchronizacji w chmurze. Tylko jeśli włączysz AI, kontekst zadania trafia do DeepSeek; opcjonalny bot Telegram korzysta z usługi Telegram. Klucz API jest zapisany lokalnie jawnym tekstem w pliku <code>.env</code>, więc nie udostępniaj tego folderu.</p></details>
+        <details><summary>Czy potrzebuję internetu?</summary><p>Do planowania, listy zakupów i eksportu nie. Internet jest potrzebny do pobrania instalatora oraz do opcjonalnych funkcji AI i Telegrama.</p></details>
+        <details><summary>Dlaczego Windows pokazuje ostrzeżenie?</summary><p>Instalator nie jest podpisany certyfikatem, więc Windows traktuje go jak plik od nieznanego wydawcy. Pobieraj go wyłącznie z <a href="https://github.com/krapcys1-maker/dietbot-desktop/releases">oficjalnych wydań</a> i porównaj sumę SHA-256 z plikiem <code>SHA256SUMS.txt</code> dołączonym do wydania. Kod jest publicznie dostępny, a instalator możesz zbudować samodzielnie.</p></details>
+        <details><summary>Czy to zastępuje dietetyka?</summary><p>Nie. Porcja nie jest wyrobem medycznym. Cele startowe są przykładem, kalkulator jest orientacyjny, a program nie bilansuje wszystkich witamin, minerałów i alergenów. <a href="https://github.com/krapcys1-maker/dietbot-desktop#co-oznaczają-liczby-i-status-planu">Szczegóły w README</a>.</p></details>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>Porcja to nowa nazwa DietBota · bezpłatna aplikacja w fazie rozwoju</div>
+    <nav aria-label="Stopka">
+      <a href="https://github.com/krapcys1-maker/dietbot-desktop">Kod na GitHubie</a>
+      <a href="https://github.com/krapcys1-maker/dietbot-desktop/blob/main/docs/INSTRUKCJA.md">Instrukcja</a>
+      <a href="https://github.com/krapcys1-maker/dietbot-desktop/blob/main/CHANGELOG.md">Historia zmian</a>
+      <a href="https://github.com/krapcys1-maker/dietbot-desktop/issues">Zgłoś problem</a>
+    </nav>
+  </div>
+</footer>
+</body>
+</html>
