@@ -2,6 +2,8 @@
 
 Wersja 2 · 13.09.2026 · dokument żywy (aktualizujemy przy każdej większej decyzji)
 
+> **Uwaga do wydania publicznego (Porcja).** Dokument opisuje architekturę techniczną z września 2026 i częściowo odzwierciedla pierwotne, prywatne założenia projektu: dwie osoby oraz zakupy w sklepach w Rumunii. W wydaniu publicznym lista zakupów jest uproszczona — łączy warianty produktów i nie pokazuje sklepów ani marek (zob. [historia zmian](../CHANGELOG.md)). Dane półkowe w `dane/sklepy` pozostają w repozytorium jako materiał źródłowy. Opis dla użytkowników: [README](../README.md#jak-to-działa).
+
 ## 1. Cel
 
 Aplikacja desktopowa (plus bot Telegram), która układa **tygodniowy jadłospis dla dwóch osób** (Kobieta i Mężczyzna)

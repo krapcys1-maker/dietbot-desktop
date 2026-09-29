@@ -25,6 +25,15 @@
 
 ![Pulpit Porcji: aktualny plan, dwa eksporty i najważniejsze funkcje](docs/media/porcja-pulpit.png)
 
+## Dla kogo jest Porcja
+
+- **Dla dwóch osób przy jednym stole** — wspólne dania, ale osobne gramatury dla każdej z nich.
+- **Dla tych, którzy mają dość Excela i kartek** — jeden tydzień i jedna lista zakupów.
+- **Dla jedzących wegetariańsko i wegańsko** — zgodność diety jest sprawdzana na poziomie składników.
+- **Dla cenących prywatność** — plany zostają na Twoim komputerze, bez konta i telemetrii.
+
+Porcja nie jest dziennikiem jedzenia ani skanerem kodów kreskowych, nie ma wersji mobilnej i nie zastępuje dietetyka.
+
 ## Co potrafi Porcja
 
 | Funkcja | Jak pomaga |
@@ -74,6 +83,12 @@ Wymagania: Windows 10/11 x64 i Microsoft Edge WebView2 Runtime (zwykle już zain
 
 > Instalator nie jest podpisany certyfikatem, więc Windows może pokazać ostrzeżenie SmartScreen. Pobieraj go tylko z oficjalnych wydań i porównaj sumę SHA-256 z pliku `SHA256SUMS.txt` w wydaniu. Nie wyłączaj zabezpieczeń systemu.
 
+Sumę pobranego pliku sprawdzisz w PowerShell:
+
+```powershell
+Get-FileHash .\Porcja-Setup-0.3.3.exe -Algorithm SHA256
+```
+
 ## Jak to działa
 
 Najważniejsza zasada: **liczby liczy kod, nie AI.** Model językowy (jeśli go włączysz) może zaproponować dania i napisać opis tygodnia, ale nigdy nie podaje kalorii ani gramów.
@@ -92,6 +107,19 @@ flowchart LR
 2. **Gramatury.** Silnik CP-SAT dobiera gramatury w krokach możliwych do odważenia (np. co 5–10 g, na sztuki albo kromki) tak, by każda osoba zmieściła się w swoich widełkach kcal, białka, tłuszczu i węglowodanów. Pilnuje realnych porcji i proporcji przepisu — np. ciasto naleśnikowe albo panierka są skalowane razem, a tost ma parzystą liczbę kromek.
 3. **Weryfikacja.** Osobny moduł przelicza cały plan od zera z tabel produktów. Jeśli coś się nie zgadza, planer wymienia problematyczne danie i liczy ponownie; gdy nie da się spełnić celów, plan dostaje czytelne uwagi zamiast „cichego” wyniku.
 4. **Wynik.** Jadłospis z przepisami, bilansem każdego dnia i całego tygodnia oraz lista zakupów z połączonymi wariantami produktów.
+
+**Przykład z prawdziwego planu** (Porcja 0.3.3, układ bez AI, przykładowe ustawienia startowe — to nie zalecenie żywieniowe):
+
+| Śniadanie: kanapka z kurczakiem teriyaki | Kobieta | Mężczyzna |
+|---|---:|---:|
+| Pierś z kurczaka (surowa) | 90 g | 140 g |
+| Bułka pszenna | 80 g (≈ 1½ szt.) | 120 g (≈ 2 szt.) |
+| Sos sojowy | 10 g | 20 g |
+| Ogórek świeży | 30 g | 50 g |
+| **Cały dzień** (z przekąską i stałymi pozycjami) | **1666 kcal** | **2387 kcal** |
+| Widełki tej osoby | 1600–1700 kcal | 2350–2400 kcal |
+
+To samo danie, inne porcje — a suma dnia mieści się w widełkach każdej osoby.
 
 Szczegóły: [architektura](docs/ARCHITEKTURA.md) · [źródła danych i research](docs/RESEARCH.md).
 
@@ -112,6 +140,32 @@ Kalorie to suma wartości **kcal/100 g z tabeli × gramatura/100** — aplikacja
 „Zgodny z założeniami” oznacza zgodność z regułami sprawdzanymi przez aplikację — nie pełną ocenę zdrowotną. Uproszczona lista zakupów łączy warianty, np. mozzarelli; kupienie innego wariantu niż w przepisie może zmienić rzeczywiste makro.
 
 **Porcja nie jest wyrobem medycznym ani zamiennikiem lekarza lub dietetyka.** Nie bilansuje wszystkich witamin, minerałów i alergenów. Kalkulator jest orientacyjny; [metodę i ograniczenia opisano w instrukcji](docs/INSTRUKCJA.md#kalkulator-celów). Przy szczególnych potrzebach żywieniowych używaj indywidualnie ustalonych celów i sprawdzaj etykiety.
+
+## Najczęstsze pytania
+
+<details>
+<summary><b>Czy potrzebuję internetu?</b></summary>
+
+Do planowania, listy zakupów i eksportu nie. Internet jest potrzebny do pobrania instalatora oraz do opcjonalnych funkcji: AI (DeepSeek) i Telegrama.
+</details>
+
+<details>
+<summary><b>Czy działa na Macu, Linuxie albo telefonie?</b></summary>
+
+Instalator jest tylko dla Windows 10/11 x64, wersji mobilnej nie ma. Ze źródeł można uruchomić lokalny serwer (`dietbot serwer`) i korzystać z aplikacji w przeglądarce — testy automatyczne przechodzą także na Linuxie — ale to nie jest oficjalnie wspierana ścieżka. Kroki: [docs/ROZWOJ.md](docs/ROZWOJ.md).
+</details>
+
+<details>
+<summary><b>Dlaczego Windows pokazuje ostrzeżenie SmartScreen?</b></summary>
+
+Instalator nie jest podpisany certyfikatem, więc Windows traktuje go jak plik od nieznanego wydawcy. Pobieraj go wyłącznie z [oficjalnych wydań](https://github.com/krapcys1-maker/dietbot-desktop/releases) i porównaj sumę SHA-256 (polecenie wyżej). Kod jest publicznie dostępny, a instalator możesz zbudować samodzielnie według [docs/ROZWOJ.md](docs/ROZWOJ.md).
+</details>
+
+<details>
+<summary><b>Czy to zastępuje dietetyka?</b></summary>
+
+Nie. Porcja nie jest wyrobem medycznym, a wartości są szacunkiem z tabel produktów — szczegóły w sekcji [Co oznaczają liczby i status planu?](#co-oznaczają-liczby-i-status-planu).
+</details>
 
 ## Rozwój
 
@@ -134,6 +188,14 @@ Zgłoszenia i propozycje po polsku są mile widziane. Podaj wersję, kroki odtwo
 
 Kod jest publicznie dostępny, ale repozytorium nie ma jeszcze odrębnej licencji na własny kod — bezpłatne udostępnienie aplikacji nie oznacza automatycznie licencji MIT. Zależności, fonty, ikony i dane źródłowe zachowują własne warunki; informacje o nich są w dokumentacji i dołączonych plikach licencji.
 
+## Pomóż innym znaleźć Porcję
+
+Porcja jest bezpłatna, więc najwięcej pomaga zwykłe polecenie:
+
+- zostaw ⭐ przy repozytorium — dzięki temu łatwiej trafia do osób szukających planera posiłków,
+- pokaż [44-sekundowy film](https://github.com/krapcys1-maker/dietbot-desktop/releases/download/v0.3.0/Porcja-demo-pl.mp4) komuś, kto co tydzień zastanawia się „co na obiad” i robi jedne zakupy na cały tydzień,
+- napisz w [zgłoszeniach](https://github.com/krapcys1-maker/dietbot-desktop/issues), czego brakuje — po polsku i bez danych prywatnych.
+
 ## In English
 
-**Porcja** ("portion") is a free, Polish-language Windows app that plans a week of meals for a household: one shared menu, individual portion sizes for each person, recipes, and a combined shopping list. Portions are computed by an integer optimisation engine (Google OR-Tools CP-SAT) so every person lands inside their own calorie and macro ranges, and an independent verifier recomputes every number from food tables (mainly BLS 4.0). An LLM (DeepSeek, bring your own key) is optional and never produces numbers — it only helps pick dishes and write text. Everything runs locally: no account, no telemetry. The UI is Polish only; the dish library (~700 recipes, traditional, vegetarian and vegan) and shopping hints target Poland and Romania.
+**Porcja** ("portion") is a free, Polish-language Windows app that plans a week of meals for a household: one shared menu, individual portion sizes for each person, recipes, and a combined shopping list. Portions are computed by an integer optimisation engine (Google OR-Tools CP-SAT) so every person lands inside their own calorie and macro ranges, and an independent verifier recomputes every number from food tables (mainly BLS 4.0). An LLM (DeepSeek, bring your own key) is optional and never produces numbers — it only helps pick dishes and write text. Everything runs locally: no account, no telemetry. The interface and recipes are in Polish only; the library holds nearly 700 approved dishes for traditional, vegetarian and vegan diets. The installer is not code-signed, and the repository has no license for its own code yet.
