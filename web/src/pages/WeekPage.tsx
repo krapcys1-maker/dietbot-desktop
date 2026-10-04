@@ -136,7 +136,7 @@ export default function WeekPage({ planId }: { planId?: string }) {
 
       {plan.assumptions_changed && (
         <div className="alert warn row no-print">
-          <span className="grow">Cele lub baza zmieniły się od zapisu. Ta dieta zachowuje zapisane dane, liczby i zakupy.
+          <span className="grow">Cele, preferencje z notatnika, przepisy lub zasady proporcji zmieniły się od zapisu. Ta dieta zachowuje zapisane dane, liczby i zakupy.
             Przelicz, aby utworzyć nową wersję według aktualnych ustawień.</span>
           <button className="btn small" onClick={() => startJob("recompute")}>Przelicz te same dania</button>
           <button className="btn small" onClick={() => startJob("repair")}>Przelicz i napraw</button>
@@ -495,8 +495,19 @@ function MealCard({ meal, persons, onSwap }: { meal: Meal; persons: Person[]; on
           {(por.mass_over || (por.anchor_state && por.anchor_state !== "ok")) && <small className="bad-text">Sprawdź szczegóły porcji</small>}</div>;
       })}</div>
       <DishRating id={meal.dish_id} name={meal.dish_name} />
+      {meal.batch_recipe && !meal.reheat && <div className="pot stack">
+        <h3>{meal.batch_recipe.title}</h3>
+        <p>{meal.batch_recipe.instructions}</p>
+        <table className="table"><thead><tr><th>Składnik</th><th>Łącznie na wszystkie dni i osoby</th></tr></thead>
+          <tbody>{meal.batch_recipe.items.map(i => <tr key={i.product_id}><td>{i.name}{i.side && <div className="muted small">Dodatek do podania osobno</div>}</td><td>{i.amount}</td></tr>)}
+          {meal.batch_recipe.water && <tr><td>Woda do gotowania</td><td>{meal.batch_recipe.water}</td></tr>}</tbody></table>
+        {meal.steps.length > 0 && <><b>Przygotowanie całej ilości — wykonujesz raz</b><ol className="steps">{meal.steps.map((s,i)=><li key={i}>{s}</li>)}</ol></>}
+      </div>}
+      {meal.reheat && <div className="alert info">Dziś tylko odgrzewasz przygotowane porcje. Nie gotujesz drugi raz.
+        Pełne składniki i przepis na całość znajdziesz przy dniu: {meal.batch_days[0]?.toLowerCase()}.{meal.batch_recipe?.has_side ? " Pieczywo podaj osobno." : ""}</div>}
       <details className="disclosure meal-ingredients">
-        <summary>Składniki i gramatury <span className="summary-hint">{rows.length} składników · porcje dla {persons.length} osób</span></summary>
+        <summary>{meal.batch_group ? "Podział gotowej partii — porcje na dzisiaj" : "Składniki i gramatury"} <span className="summary-hint">{rows.length} składników · porcje dla {persons.length} osób</span></summary>
+      {meal.batch_group && <p className="muted">Te ilości surowych składników są już zawarte w tabeli na całość. To nie jest druga lista do gotowania. Mięso i większe kawałki rozdziel według porcji.</p>}
       <div style={{ overflowX: "auto" }}>
         <table className="portions">
           <thead>
@@ -555,20 +566,20 @@ function MealCard({ meal, persons, onSwap }: { meal: Meal; persons: Person[]; on
           </tfoot>
         </table>
       </div>
-      {!meal.reheat && (meal.groups ?? []).map((g) => (
+      {!meal.batch_group && (meal.groups ?? []).map((g) => (
         <div key={g.name} className="group-box">
           <b>{g.name.charAt(0).toUpperCase() + g.name.slice(1)}</b> — przygotuj razem ({num(g.total_g)} g, proporcje z przepisu):{" "}
           {g.items.map((i) => `${i.name.toLowerCase()} ${i.amount}${i.household ? ` (≈ ${i.household})` : ""}`).join(", ")}
         </div>
       ))}
-      {meal.pot && meal.pot.length > 0 && (
+      {!meal.batch_recipe && meal.pot && meal.pot.length > 0 && (
         <div className="pot">
           <b>Gotujesz raz, na wszystkie porcje:</b>{" "}
           {meal.pot.map((p) => `${p.name.toLowerCase()} ${p.amount}${p.household ? ` (≈ ${p.household})` : ""}`).join(", ")}
         </div>
       )}
       </details>
-      {meal.reheat ? (
+      {meal.batch_recipe ? null : meal.reheat ? (
         <div className="muted">Odgrzewasz porcję ugotowaną wcześniej.</div>
       ) : (
         meal.steps.length > 0 && (

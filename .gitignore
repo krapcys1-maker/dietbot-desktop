@@ -28,3 +28,6 @@ wyniki/*
 *.sqlite3
 zalozenia.yaml.przed-kaloriami-z-tabel.bak
 *.lnk
+
+# Lokalne ustawienia narzędzi (ścieżki z tego komputera)
+.claude/

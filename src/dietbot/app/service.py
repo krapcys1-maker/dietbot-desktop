@@ -20,6 +20,7 @@ from ..domain.assumptions import DAY_LABELS_PL, Assumptions, Weekday
 from ..domain.diet import compatible, dish_compatible
 from ..domain.dish import MEAL_LABELS_PL, DishStatus, MealType, cuisine_label
 from ..domain.plan import WeekPlan
+from ..domain.preferences import AppliedPreferences
 from ..domain.product import CATEGORY_LABELS_PL, Category, Product, State, StoreProduct
 from ..engine import BlockStatus, EngineRequest, solve_week
 from ..engine.settings import EngineSettings
@@ -132,10 +133,11 @@ class DietService:
         self.settings = EngineSettings(use_alternates=False, conflict_core=False)
         self.engine_cache: dict = {}
         self._lock = threading.RLock()
-        self.repo = Repository.load(self.paths)
-        self._pools: Pools | None = None
         self.store = PlanStore(db_path or self.paths.out / "dietbot.sqlite3")
-        self.repo.dish_ratings = self.store.ratings()
+        self.raw_assumptions: Assumptions | None = None  # założenia z pliku, przed zasadami z notatnika
+        self.preferences: AppliedPreferences | None = None
+        self.repo = self._load_repo()
+        self._pools: Pools | None = None
         # Legacy records lack historical source tables: freeze today's view and say so explicitly.
         for record in self.store.list(limit=-1):
             if self.store.snapshot(record.id) is None:
@@ -146,12 +148,31 @@ class DietService:
         self.pending_changes: dict[str, dict] = {}  # propozycje zmian założeń z czatu, czekające na potwierdzenie
 
     # ------------------------------------------------------------------ podstawy
+    def _load_repo(self) -> Repository:
+        """Dane z plików + oceny dań + zasady z notatnika preferencji nałożone na założenia."""
+        from .notebook import apply_to_repo, load_rules
+
+        repo = Repository.load(self.paths)
+        repo.dish_ratings = self.store.ratings()
+        self.raw_assumptions = repo.assumptions
+        try:
+            self.preferences = apply_to_repo(repo, load_rules(self.store.pref_rules()))
+        except (ValidationError, ValueError) as exc:  # zasada sprzeczna z założeniami nie może zablokować aplikacji
+            repo.assumptions = self.raw_assumptions
+            self.preferences = AppliedPreferences(assumptions=repo.assumptions,
+                                                  problems=[f"Zasady z notatnika nie pasują do założeń: {exc}"])
+        return repo
+
     def reload(self) -> None:
         with self._lock:
-            self.repo = Repository.load(self.paths)
-            self.repo.dish_ratings = self.store.ratings()
+            self.repo = self._load_repo()
             self._pools = None
             self.engine_cache.clear()
+
+    def llm_ready(self) -> bool:
+        """Czy jest klucz i model językowy nie jest wyłączony (bez łączenia się z usługą)."""
+        settings = LLMSettings.load(self.paths)
+        return self.use_llm and bool(os.environ.get(settings.api_key_env, "").strip())
 
     def pools(self) -> Pools:
         with self._lock:
@@ -722,7 +743,8 @@ class DietService:
             content = render_plan(rec.plan, repo.assumptions, repo.products, repo.dishes, report, title=rec.title)
             filename = f"jadlospis_{stem}_v{rec.version}.txt"
         elif kind == "shopping":
-            content = render_shopping_list(rec.plan, repo.assumptions, repo.products, repo.store_products)
+            content = render_shopping_list(rec.plan, repo.assumptions, repo.products, repo.store_products,
+                                           bullets=False)
             filename = f"lista_zakupow_{stem}_v{rec.version}.txt"
         else:
             raise UserError("Nieznany rodzaj pliku do zapisania.")

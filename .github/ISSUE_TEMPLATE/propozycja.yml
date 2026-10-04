@@ -1,0 +1,27 @@
+name: Propozycja
+description: Pomysł na nową funkcję albo usprawnienie Porcji
+title: "[Propozycja] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: "Dziękuję za pomysł! Nie dołączaj klucza API, pliku .env, prywatnej bazy ani danych zdrowotnych."
+  - type: textarea
+    id: problem
+    attributes:
+      label: Jaki problem rozwiązuje propozycja?
+      description: Np. „Przy diecie wegańskiej co tydzień widzę te same śniadania”.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Jak to mogłoby działać?
+      description: Opisz, co widzisz na ekranie i co się dzieje po kliknięciu.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Obecne obejście (opcjonalnie)
+      description: Jak radzisz sobie dziś bez tej funkcji?

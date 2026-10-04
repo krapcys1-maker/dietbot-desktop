@@ -83,6 +83,31 @@ class ApiKeyIn(BaseModel):
     key: str = Field(min_length=20, max_length=256)
 
 
+class NoteIn(BaseModel):
+    text: str = Field(min_length=1, max_length=2000)
+    plan_id: str | None = None
+
+
+class RuleIn(BaseModel):
+    typ: Literal["zakaz_produktu", "limit_porcji", "zamiana_makro", "wskazowka"]
+    produkt: str | None = None
+    kategoria: str | None = None
+    osoby: list[str] = Field(default_factory=list)
+    posilki: list[str] = Field(default_factory=list)
+    gramy: dict[str, float | None] = Field(default_factory=dict)
+    z: str | None = None
+    na: str | None = None
+    tekst: str | None = Field(default=None, max_length=300)
+
+
+class ActiveIn(BaseModel):
+    active: bool
+
+
+class ProgramNoteIn(BaseModel):
+    status: Literal["nowa", "zrobione", "usunieta"]
+
+
 class SaveTextIn(BaseModel):
     kind: Literal["plan", "shopping"]
 
@@ -119,7 +144,7 @@ def create_app(service: DietService) -> FastAPI:
         if origin and request.method not in ("GET", "HEAD", "OPTIONS"):
             supplied, expected = urlsplit(origin), urlsplit(str(request.base_url))
             if (supplied.scheme, supplied.netloc) != (expected.scheme, expected.netloc):
-                return JSONResponse(status_code=403, content={"detail": "Żądanie spoza aplikacji DietBot."})
+                return JSONResponse(status_code=403, content={"detail": "Żądanie spoza aplikacji Porcja."})
         return await call_next(request)
 
     @app.exception_handler(Exception)
@@ -287,6 +312,58 @@ def create_app(service: DietService) -> FastAPI:
     def add_product(body: dict) -> dict:
         return s.add_product(body)
 
+    # ---------------------------------------------------------------- notatnik preferencji
+    from .notebook import Notebook
+
+    notebook = Notebook(s)
+
+    @app.get("/api/notatnik")
+    def notebook_view() -> dict:
+        return notebook.view()
+
+    @app.post("/api/notatnik/uwaga")
+    def notebook_note(body: NoteIn) -> dict:
+        return notebook.add_comment(body.text, plan_id=body.plan_id)
+
+    @app.post("/api/notatnik/zasady")
+    def notebook_add_rule(body: RuleIn) -> dict:
+        return notebook.manual_rule(body.model_dump())
+
+    @app.patch("/api/notatnik/zasady/{rule_id}")
+    def notebook_rule_active(rule_id: str, body: ActiveIn) -> dict:
+        return notebook.set_active(rule_id, body.active)
+
+    @app.delete("/api/notatnik/zasady/{rule_id}")
+    def notebook_delete_rule(rule_id: str) -> dict:
+        return notebook.delete_rule(rule_id)
+
+    @app.post("/api/notatnik/nawyki")
+    def notebook_habits() -> dict:
+        return notebook.analyze_habits()
+
+    @app.post("/api/notatnik/propozycje/{proposal_id}")
+    def notebook_apply_proposal(proposal_id: str) -> dict:
+        return notebook.apply_proposal(proposal_id)
+
+    @app.post("/api/notatnik/do-poprawy/z-analizy/{index}")
+    def notebook_program_from_habits(index: int) -> dict:
+        return notebook.add_program_note_from_habits(index)
+
+    @app.patch("/api/notatnik/do-poprawy/{note_id}")
+    def notebook_program_note(note_id: str, body: ProgramNoteIn) -> dict:
+        return notebook.set_program_note(note_id, body.status)
+
+    @app.get("/api/notatnik/tekst")
+    def notebook_text() -> dict:
+        return {"content": notebook.export_text()}
+
+    @app.post("/api/notatnik/zapisz-plik")
+    def notebook_save_file() -> dict:
+        filename = f"notatnik_preferencji_{date.today():%Y-%m-%d}.txt"
+        path = save_text_as(filename, "Zapisz notatnik preferencji", notebook.export_text())
+        return {"saved": path is not None, "path": str(path) if path else None,
+                "filename": path.name if path else filename}
+
     # ---------------------------------------------------------------- czat i koszty
     @app.get("/api/czat")
     def chat_history() -> list[dict]:
@@ -337,7 +414,7 @@ def create_app(service: DietService) -> FastAPI:
     else:
         @app.get("/", response_class=HTMLResponse)
         def no_ui() -> str:
-            return ("<meta charset='utf-8'><h1>DietBot</h1><p>Interfejs nie jest zbudowany. "
+            return ("<meta charset='utf-8'><h1>Porcja</h1><p>Interfejs nie jest zbudowany. "
                     "Uruchom <code>npm run build</code> w folderze <code>web</code>. API: <a href='/api/docs'>/api/docs</a></p>")
 
     return app

@@ -15,7 +15,7 @@ from ..engine import BlockStatus, EngineRequest, EngineResult, EngineSettings, s
 from ..llm.client import LLMClient, LLMError
 from ..storage.repository import Repository
 from ..textfmt import fmt_num
-from .autofix import autofix_composition, rebalance_days
+from .autofix import autofix_composition, rebalance_days, replace_disallowed
 from .compose import (
     COMPOSE_SYSTEM,
     Composition,
@@ -158,7 +158,8 @@ class WeekPlanner:
         if self.llm is not None:
             shown = prompt_pools(pools, dishes, seed, focus=must_use | wish_focus(wishes, pools, dishes),
                                  cuisines={c for c, n in (cuisine_counts or {}).items() if n > 0})
-            prompt = build_compose_prompt(shown, a, days, wishes, avoid, must_use, cuisine_counts, pins)
+            prompt = build_compose_prompt(shown, a, days, wishes, avoid, must_use, cuisine_counts, pins,
+                                          self.repo.preference_hints)
             log.append("Lista dań dla modelu: " + ", ".join(f"{MEAL_LABELS_PL[m].lower()} {len(ids)} z {len(pools.by_meal[m])}"
                                                            for m, ids in shown.by_meal.items()))
             messages_note = ""
@@ -306,6 +307,13 @@ class WeekPlanner:
         t0 = t0 if t0 is not None else time.perf_counter()
         log = log if log is not None else LiveLog()
         a = self.repo.assumptions
+        if repair:
+            # dania, które przestały pasować (np. nowa zasada z notatnika: zakaz produktu, limit porcji, ocena 👎) —
+            # silnik policzyłby je bez odchyleń, a weryfikator i tak by je odrzucił
+            pools = pools or self.pools(extra_banned=extra_banned)
+            replaced = replace_disallowed(comp, pools, self.repo.approved_dishes(), a, keep)
+            for note in replaced:
+                log.append(f"Zamiana na dozwolone danie — {note}")
         dishes = self.dishes_for(comp)
         log.append("Silnik liczy gramatury…")
         result = self._solve(comp)
@@ -334,6 +342,18 @@ class WeekPlanner:
             log.append(f"    sprawdzono {len(options)} zamian, w pełni działających: {len(working)}")
             swaps: dict[str, str] = {}
             block_of = {o.slot_key: tuple(o.block_days) for o in options}
+            current = {s.key: s.dish_id for s in comp.slots}
+
+            def swap_text(key: str, dish_id: str, current: dict[str, str] = current) -> str:
+                # dziennik czyta użytkownik („Jak powstał ten plan”) — nazwy dań i dni zamiast identyfikatorów
+                try:
+                    where = slot_label(key)
+                except (ValueError, KeyError):
+                    where = key
+                old = self.repo.dishes.get(current.get(key, ""))
+                new = self.repo.dishes.get(dish_id)
+                return (f"{where}: {old.name if old else current.get(key, '?')} → "
+                        f"{new.name if new else dish_id}")
             llm_blocks: set[tuple[int, ...]] = set()
             if self.llm is not None and working:
                 try:
@@ -347,16 +367,16 @@ class WeekPlanner:
                         if (sw.slot, sw.danie) in valid and block not in llm_blocks and sw.danie not in swaps.values():
                             swaps[sw.slot] = sw.danie
                             llm_blocks.add(block)
-                            log.append(f"    zamiana {sw.slot} → {sw.danie}: {sw.uzasadnienie}")
+                            log.append(f"    zamiana {swap_text(sw.slot, sw.danie)}: {sw.uzasadnienie}")
                         else:
-                            log.append(f"    pominięto propozycję modelu {sw.slot} → {sw.danie}")
+                            log.append(f"    pominięto propozycję modelu {swap_text(sw.slot, sw.danie)}")
                 except LLMError as exc:
                     log.append(f"    model językowy niedostępny przy naprawie ({exc})")
             for key, cand in select_swaps(result, options).items():
                 if block_of.get(key) in llm_blocks or cand in swaps.values():
                     continue
                 swaps[key] = cand
-                log.append(f"    zamiana {key} → {cand} (według silnika)")
+                log.append(f"    zamiana {swap_text(key, cand)} (według silnika)")
             if not swaps:
                 log.append("    żadna zamiana nie poprawia planu")
                 break

@@ -19,7 +19,7 @@ from ortools.sat.python import cp_model
 from ..domain.assumptions import Assumptions, Weekday
 from ..domain.dish import DishIngredient, DishTemplate, MealType, Portioning
 from .catalog import Catalog, EngineInputError
-from .portions import StepBounds, grams_range, is_fixed, person_bounds
+from .portions import StepBounds, cap_conflict, grams_range, is_fixed, person_bounds
 from .settings import SCALE, EngineSettings
 from .types import EngineSlot
 
@@ -236,12 +236,18 @@ class BlockModel:
             raise EngineInputError(f"danie {dish_id}: {person.name} wyklucza obowiązkowy składnik {ing.product_id}")
         return True
 
-    def _fixed_grams(self, ing: DishIngredient, product, pid: str) -> float:
-        """Stała ilość składnika (przyprawa lub produkt pomijalny) dla osoby — z limitem porcji produktu,
-        zaokrąglona jak gramatury w planie."""
+    def _cap(self, pid: str, product, meal: MealType) -> float | None:
+        return self.a.person(pid).portion_cap(product, meal)
+
+    def _fixed_grams(self, ing: DishIngredient, product, pid: str, meal: MealType) -> float:
+        """Stała ilość składnika (przyprawa lub produkt pomijalny) dla osoby — z limitem porcji produktu i limitem
+        z preferencji osoby, zaokrąglona jak gramatury w planie."""
         _, typical, _ = grams_range(ing, self.scales[pid], self.settings)
         if product.max_portion_g is not None and ing.max_g is None:
             typical = min(typical, product.max_portion_g)
+        cap = self._cap(pid, product, meal)
+        if cap is not None:
+            typical = min(typical, cap)
         return round(typical, 1)
 
     def _build_slot(self, slot: EngineSlot) -> None:
@@ -276,6 +282,8 @@ class BlockModel:
                           hi=1 if self.fixed_choices[key] == dish_id else 0)
             if rank:
                 self._cost_add(y, rank * self.settings.alternate_rank_cost)
+            if dish.culinary_errors:
+                self._row({y: 1}, hi=0)
 
             grouped = dish.grouped_products()
             for ing in dish.ingredients:
@@ -284,7 +292,7 @@ class BlockModel:
                 if is_fixed(ing, product):
                     fixed = {}
                     for pid in self.person_ids:
-                        typical = self._fixed_grams(ing, product, pid)
+                        typical = self._fixed_grams(ing, product, pid, slot.meal)
                         fixed[pid] = typical
                         fixed_mass[(dish_id, pid)] = fixed_mass.get((dish_id, pid), 0.0) + typical
                         # stała ilość wchodzi do bilansu razem z wyborem dania: produkt pomijalny (sól, suszone zioła)
@@ -302,7 +310,8 @@ class BlockModel:
                     shared_vars: dict[str, int] = {}
                     excluded = {pid for pid in self.person_ids if self._excludes(pid, dish_id, ing)}
                     for pid in self.person_ids:
-                        b = person_bounds(ing, product, self.scales[pid], self.settings, in_group)
+                        b = person_bounds(ing, product, self.scales[pid], self.settings, in_group,
+                                          self._cap(pid, product, slot.meal))
                         if pid in excluded:
                             b = StepBounds(b.step_g, 0, 0, 0)
                         v = self._bounded_var(f"g|{key}|{dish_id}|{ing.product_id}|{pid}", b, y, f"{group_base}:{pid}", first)
@@ -323,7 +332,9 @@ class BlockModel:
                         bound = tol * max(s_ref, s_p)
                         self._row(row, lo=-bound, hi=bound, group=f"proporcja_garnka:{key}:{dish_id}:{ing.product_id}")
                 elif ing.portioning is Portioning.EQUAL:
-                    b = person_bounds(ing, product, 1.0, self.settings, in_group)
+                    # po równo: wszyscy dostają tyle samo, więc obowiązuje najostrzejszy limit porcji
+                    caps = [c for c in (self._cap(pid, product, slot.meal) for pid in self.person_ids) if c is not None]
+                    b = person_bounds(ing, product, 1.0, self.settings, in_group, min(caps) if caps else None)
                     if any(self._excludes(pid, dish_id, ing) for pid in self.person_ids):
                         b = StepBounds(b.step_g, 0, 0, 0)  # po równo: gdy ktoś nie je składnika, nikt go nie dostaje
                     v = self._bounded_var(f"eq|{key}|{dish_id}|{ing.product_id}", b, y, group_base, first)
@@ -333,7 +344,8 @@ class BlockModel:
                 else:
                     iv = None
                     for pid in self.person_ids:
-                        b = person_bounds(ing, product, self.scales[pid], self.settings, in_group)
+                        b = person_bounds(ing, product, self.scales[pid], self.settings, in_group,
+                                          self._cap(pid, product, slot.meal))
                         if self._excludes(pid, dish_id, ing):
                             b = StepBounds(b.step_g, 0, 0, 0)
                         v = self._bounded_var(f"q|{key}|{dish_id}|{ing.product_id}|{pid}", b, y, f"{group_base}:{pid}", first)
@@ -361,13 +373,13 @@ class BlockModel:
                     grp = f"proporcja:{key}:{dish_id}:{r_i}:{pid}"
                     if ratio.min is not None:
                         row = Expr()
-                        row.merge(num, 100)
-                        row.merge(den, -round(ratio.min * 100))
+                        row.merge(num, GROUP_PRECISION)
+                        row.merge(den, -math.ceil(ratio.min * GROUP_PRECISION - 1e-8))
                         self._row(row.coefs, lo=0, group=grp)
                     if ratio.max is not None:
                         row = Expr()
-                        row.merge(num, 100)
-                        row.merge(den, -round(ratio.max * 100))
+                        row.merge(num, GROUP_PRECISION)
+                        row.merge(den, -math.floor(ratio.max * GROUP_PRECISION + 1e-8))
                         self._row(row.coefs, hi=0, group=grp)
 
             # grupy (ciasto, panierka, sos): udział składnika w masie grupy jak w przepisie, dla każdej osoby.
@@ -470,8 +482,16 @@ class BlockModel:
                 dish = self.dishes.get(dish_id)
                 if dish is None:
                     raise EngineInputError(f"przekąska '{dish_id}' z założeń nie istnieje w bibliotece dań")
+                # Balancing snacks use a simpler portion model. A compound recipe
+                # must use a regular meal slot, never bypass its cooking rules here.
+                if dish.culinary_errors or dish.groups or dish.ratios:
+                    continue
                 if any(i.product_id in person.excluded_products and not i.optional for i in dish.ingredients):
                     continue
+                if any(cap_conflict(i, self.catalog.product(i.product_id), self.scales[pid], self.settings, False,
+                                    self._cap(pid, self.catalog.product(i.product_id), MealType.SNACK))
+                       for i in dish.ingredients if not is_fixed(i, self.catalog.product(i.product_id))):
+                    continue  # limit porcji z preferencji nie pozwala zrobić tej przekąski
                 z = self._new_bool(f"z|{int(day)}|{pid}|{dish_id}")
                 if self.snacks_fixed:
                     on = 1 if self.fixed_snacks.get((int(day), pid)) == dish_id else 0
@@ -483,13 +503,14 @@ class BlockModel:
                 for ing in dish.ingredients:
                     product = self.catalog.product(ing.product_id)
                     if is_fixed(ing, product):
-                        typical = self._fixed_grams(ing, product, pid)
+                        typical = self._fixed_grams(ing, product, pid, MealType.SNACK)
                         items.append(IngVar(key, dish_id, ing.product_id, "fixed", None, None, {}, {pid: typical}))
                         facts = self.catalog.facts(ing.product_id)
                         for metric in METRICS:  # stała ilość liczy się razem z wyborem przekąski
                             self._expr((int(day), pid, metric)).add(z, facts.metric(metric) * typical * SCALE[metric])
                         continue
-                    b = person_bounds(ing, product, self.scales[pid], self.settings)
+                    b = person_bounds(ing, product, self.scales[pid], self.settings,
+                                      cap_g=self._cap(pid, product, MealType.SNACK))
                     v = self._bounded_var(f"s|{key}|{ing.product_id}", b, z, None)
                     self._realism(v, z, b, b.default_g)
                     items.append(IngVar(key, dish_id, ing.product_id, "person", v, b, {pid: b.step_g}))

@@ -9,9 +9,11 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from ..domain.assumptions import Assumptions
-from ..domain.diet import compatible, dish_compatible
+from ..domain.culinary import protect_recipe
+from ..domain.diet import DIET_INSTRUMENTAL_PL, compatible, dish_compatible
 from ..domain.dish import DishStatus, DishTemplate, MealType, Role
 from ..domain.product import Category, Product, StoreProduct
+from ..textfmt import fmt_num
 from ..textnorm import normalize
 from .paths import Paths
 from .yamlio import dump_yaml, load_plain, load_yaml
@@ -132,6 +134,8 @@ class Repository:
     assumptions: Assumptions
     store_products: list[StoreProduct] = field(default_factory=list)
     dish_ratings: dict[str, int] = field(default_factory=dict)
+    # wskazówki z notatnika preferencji dla układającego tydzień (założenia z zasadami nakłada usługa aplikacji)
+    preference_hints: list[str] = field(default_factory=list)
 
     @classmethod
     def load(cls, paths: Paths | None = None, use_cache: bool = True) -> Repository:
@@ -139,10 +143,12 @@ class Repository:
         i przeładowania po edycji jednego pliku trwają ułamek sekundy zamiast kilku sekund."""
         paths = paths or Paths.discover()
         cache = paths.cache if use_cache else None
+        products = load_products(paths.products_dir, cache)
+        dishes = load_dishes(paths.dishes_dir, cache)
         return cls(
             paths=paths,
-            products=load_products(paths.products_dir, cache),
-            dishes=load_dishes(paths.dishes_dir, cache),
+            products=products,
+            dishes={k: protect_recipe(d, products) for k, d in dishes.items()},
             assumptions=load_assumptions(paths.assumptions, cache),
             store_products=load_store_products(paths.stores_dir, cache),
         )
@@ -184,7 +190,8 @@ def check_consistency(products: dict[str, Product], dishes: dict[str, DishTempla
 
     for item in a.day.fixed_items:
         if item.product_id in products and not compatible(products[item.product_id], a.diet):
-            rep.errors.append(f"Stała pozycja „{products[item.product_id].name}” nie ma potwierdzonej zgodności z dietą {a.diet}. Usuń ją lub wybierz zgodny zamiennik w sekcji Dzień.")
+            rep.errors.append(f"Stała pozycja „{products[item.product_id].name}” nie ma potwierdzonej zgodności z dietą {DIET_INSTRUMENTAL_PL.get(a.diet, a.diet)}. "
+                              "Usuń ją lub wybierz zgodny zamiennik w sekcji Dzień (np. napój sojowy zamiast mleka).")
 
     # aliasy: ten sam znormalizowany alias nie może wskazywać dwóch produktów
     alias_owner: dict[str, str] = {}
@@ -214,7 +221,7 @@ def check_consistency(products: dict[str, Product], dishes: dict[str, DishTempla
             if ing.unit and product.measure(ing.unit) is None:
                 rep.errors.append(f"danie {d.id}: produkt {ing.product_id} nie ma miary '{ing.unit}'")
             if ing.role is Role.SPICE and not product.negligible and ing.typical_g > 5:
-                rep.warnings.append(f"danie {d.id}: {ing.product_id} jako przyprawa w ilości {ing.typical_g} g")
+                rep.warnings.append(f"Danie „{d.name}”: {product.name.lower()} jako przyprawa w ilości {fmt_num(ing.typical_g)} g")
         if MealType.SNACK in d.meal_types and len(d.meal_types) > 1:
             rep.warnings.append(f"danie {d.id}: przekąska oznaczona też jako posiłek główny")
 

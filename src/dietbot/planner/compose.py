@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import random
 import re
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 
 from pydantic import BaseModel, Field, field_validator
@@ -583,7 +583,9 @@ def composition_from_llm(choice: WeekChoice, a: Assumptions, days: list[Weekday]
 def build_compose_prompt(pools: Pools, a: Assumptions, days: list[Weekday], wishes: str | None,
                          avoid: set[str] | None = None, prefer: set[str] | None = None,
                          cuisine_counts: Mapping[str, int] | None = None,
-                         pins: Mapping[str, list[Weekday]] | None = None) -> str:
+                         pins: Mapping[str, list[Weekday]] | None = None,
+                         hints: Sequence[str] | None = None) -> str:
+    """`hints` — stałe wskazówki domowników z notatnika preferencji (miękkie, jak życzenia na każdy tydzień)."""
     meal_blocks = []
     for meal in a.day.meals:
         lines = [pools.profiles[d].line() for d in pools.by_meal.get(meal, [])]
@@ -619,6 +621,9 @@ def build_compose_prompt(pools: Pools, a: Assumptions, days: list[Weekday], wish
         "Ocena jest preferencją, nie nakazem umieszczenia dania w każdym tygodniu.",
     ]
     text = "Zasady:\n- " + "\n- ".join(rules)
+    if hints:
+        text += ("\n\nSTAŁE PREFERENCJE DOMOWNIKÓW z ich notatnika (uwzględniaj w każdym tygodniu, jeśli nie łamią "
+                 "zasad; gramatury i tak dobiera program):\n- " + "\n- ".join(hints))
     if wishes:
         text += f"\n\nŻyczenia domowników na ten tydzień (uwzględnij, jeśli nie łamią zasad): {wishes}"
     if cuisine_counts:

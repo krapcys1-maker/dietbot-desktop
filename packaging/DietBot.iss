@@ -1,5 +1,5 @@
 #define MyAppName "Porcja"
-#define MyAppVersion "0.3.0"
+#define MyAppVersion "0.4.0"
 #define MyAppPublisher "krapcys1-maker"
 #define MyAppExeName "DietBot.exe"
 
@@ -29,6 +29,11 @@ Name: "polish"; MessagesFile: "compiler:Languages\Polish.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "Utwórz skrót na pulpicie"; GroupDescription: "Dodatkowe skróty:"; Flags: unchecked
+
+[InstallDelete]
+; Skróty z czasów nazwy DietBot (do 0.2.0) — po aktualizacji zostaje tylko „Porcja”.
+Type: files; Name: "{autodesktop}\DietBot.lnk"
+Type: files; Name: "{autoprograms}\DietBot.lnk"
 
 [Files]
 Source: "..\dist\DietBot\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs

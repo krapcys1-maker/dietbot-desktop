@@ -1,3 +1,3 @@
 """DietBot — tygodniowy jadłospis: LLM układa, deterministyczny silnik liczy."""
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"

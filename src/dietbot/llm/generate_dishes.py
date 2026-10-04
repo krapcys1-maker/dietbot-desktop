@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field, ValidationError
 from rapidfuzz import fuzz
 
 from ..domain.assumptions import Assumptions
+from ..domain.culinary import protect_recipe
 from ..domain.dish import (
     DishIngredient,
     DishStatus,
@@ -79,7 +80,10 @@ MASY I PROPORCJE: składnikom jednej masy (ciasto, panierka, masa mielona, farsz
 pole "grupa" i to samo porcjowanie. Program może zrobić więcej albo mniej masy, ale zachowa proporcje z Twoich gramatur,
 więc typowe gramatury składników masy muszą oddawać prawdziwy przepis, np. ciasto naleśnikowe: mąka 60 g, mleko 150 g,
 jajko 30 g, olej 5 g; panierka do kotleta 150 g: jajko 15 g, bułka tarta 20 g, mąka 8 g (mięso w tej samej grupie).
-Przyprawy nie należą do grup. Danie bez wyraźnej masy (np. kanapki, sałatka z kawałków) nie potrzebuje grup.
+Przyprawy nie należą do grup. Ciasto, placki i panierka MUSZĄ mieć grupę obejmującą wszystkie składniki masy;
+w panierce także mięso. Brak proporcji powoduje odrzucenie przepisu. Nie dobieraj niezależnie mąki, jajek i mleka
+pod makro. Kanapki nie potrzebują grupy masy, ale pieczywo i główne nadzienie muszą mieć rozsądną proporcję:
+program zachowa ją (±25%). Zamknięty tost: 2 kromki (50 g) i co najmniej 20 g sera, jeśli jest serowy.
 Nazwy grup po polsku z polskimi znakami (np. "ciasto naleśnikowe", "surówka"). Każdy produkt tylko RAZ na liście
 składników — gdy mąka jest w cieście i do podsypania, podaj ją raz, łącznie.
 Śniadania i obiady są WYTRAWNE (bez cukru, dżemu, słodkich dodatków); na słodko wyłącznie kolacje z tagiem slodkie.
@@ -371,6 +375,8 @@ def validate_generated(gen: GenDish, products: Mapping[str, Product], matcher: P
         )
     except ValidationError as exc:
         return None, [f"struktura: {e['msg']}" for e in exc.errors()]
+    dish = protect_recipe(dish, products)
+    reasons.extend(dish.culinary_errors)
     if MealType.SNACK in dish.meal_types:
         reasons.append("generator nie tworzy przekąsek")
     if dish.is_batch and (MealType.LUNCH not in dish.meal_types or DishTag.SOUP.value not in dish.tags):

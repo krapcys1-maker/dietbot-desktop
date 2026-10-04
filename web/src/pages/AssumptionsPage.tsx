@@ -133,7 +133,7 @@ export default function AssumptionsPage() {
         </label>
         {data.rodzaj_diety && data.rodzaj_diety !== "tradycyjna" && <>
           <p className="muted">Sprawdzamy składniki, przekąski i stałe pozycje. Produkty złożone o nieznanym składzie są pomijane. Wybieraj pieczywo i makaron bez jaj/mleka; nazwa „wege” na daniu nie wystarcza. To filtr składników, nie audyt wszystkich witamin i minerałów diety.</p>
-          {data.rodzaj_diety === "wegan" && <p className="alert info small">Przy diecie wegańskiej trzeba zadbać m.in. o wiarygodne źródło witaminy B12. DietBot nie bilansuje witamin ani minerałów. <a href="https://www.nhs.uk/live-well/eat-well/how-to-eat-a-balanced-diet/the-vegan-diet/" target="_blank" rel="noreferrer">Informacje NHS o diecie wegańskiej</a>.</p>}
+          {data.rodzaj_diety === "wegan" && <p className="alert info small">Przy diecie wegańskiej trzeba zadbać m.in. o wiarygodne źródło witaminy B12. Porcja nie bilansuje witamin ani minerałów. <a href="https://www.nhs.uk/live-well/eat-well/how-to-eat-a-balanced-diet/the-vegan-diet/" target="_blank" rel="noreferrer">Informacje NHS o diecie wegańskiej</a>.</p>}
           {(data.dzien.stale_pozycje ?? []).filter(f => !resp.products.find(p => p.id === f.produkt)?.diets.includes(data.rodzaj_diety!)).map(f => <div className="alert warn row" key={f.produkt}>
             <span className="grow">Stała pozycja „{productName[f.produkt]}” nie pasuje do wybranej diety. Zmień ją w sekcji Dzień albo usuń.</span>
             <button className="btn small" onClick={() => update(d => { d.dzien.stale_pozycje = d.dzien.stale_pozycje?.filter(x => x.produkt !== f.produkt); })}>Usuń tę stałą pozycję</button>
