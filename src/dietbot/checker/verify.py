@@ -338,10 +338,16 @@ def verify_plan(
         for portion in m.portions:
             excluded = banned | (set(a.person(portion.person_id).excluded_products) if portion.person_id in person_ids
                                  else set())
+            person = a.person(portion.person_id) if portion.person_id in person_ids else None
             for it in portion.items:
                 if it.product_id in excluded and it.grams > 0:
                     err("zakazany_produkt", f"{label}: zakazany produkt '{it.product_id}'", day=m.day, meal=m.meal,
                         person_id=portion.person_id)
+                cap = person.portion_cap(products[it.product_id], m.meal)                     if person is not None and it.product_id in products else None
+                if cap is not None and it.grams > cap + GROUP_ROUNDING_G:
+                    err("limit_porcji", f"{label}, {person.name}: {products[it.product_id].name.lower()} "
+                                        f"{fmt_num(it.grams)} g — więcej niż limit {fmt_num(cap)} g z preferencji",
+                        day=m.day, meal=m.meal, person_id=portion.person_id)
         if dish is None:
             continue
         for tag in a.prohibitions.dish_tags_by_meal.get(m.meal, []):
@@ -374,6 +380,13 @@ def verify_plan(
             err("przekaski_limit", f"{DAY_LABELS_PL[Weekday(day)]}: {count} przekąski dla {pid}, maksimum "
                                    f"{a.day.snacks.max_per_person_per_day}", day=Weekday(day), person_id=pid)
     for s in plan.snacks:
+        person = a.person(s.person_id) if s.person_id in person_ids else None
+        for it in s.items:
+            cap = person.portion_cap(products[it.product_id], MealType.SNACK)                 if person is not None and it.product_id in products else None
+            if cap is not None and it.grams > cap + GROUP_ROUNDING_G:
+                err("limit_porcji", f"{DAY_LABELS_PL[s.day]}, przekąska, {person.name}: "
+                                    f"{products[it.product_id].name.lower()} {fmt_num(it.grams)} g — więcej niż limit "
+                                    f"{fmt_num(cap)} g z preferencji", day=s.day, person_id=s.person_id)
         if s.dish_id not in a.day.snacks.allowed:
             err("przekaska_niedozwolona", f"{DAY_LABELS_PL[s.day]}: przekąska '{s.dish_id}' spoza dozwolonej listy",
                 day=s.day, person_id=s.person_id)

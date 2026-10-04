@@ -136,7 +136,7 @@ export default function WeekPage({ planId }: { planId?: string }) {
 
       {plan.assumptions_changed && (
         <div className="alert warn row no-print">
-          <span className="grow">Cele, przepisy lub zasady proporcji zmieniły się od zapisu. Ta dieta zachowuje zapisane dane, liczby i zakupy.
+          <span className="grow">Cele, preferencje z notatnika, przepisy lub zasady proporcji zmieniły się od zapisu. Ta dieta zachowuje zapisane dane, liczby i zakupy.
             Przelicz, aby utworzyć nową wersję według aktualnych ustawień.</span>
           <button className="btn small" onClick={() => startJob("recompute")}>Przelicz te same dania</button>
           <button className="btn small" onClick={() => startJob("repair")}>Przelicz i napraw</button>

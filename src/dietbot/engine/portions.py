@@ -76,14 +76,41 @@ def to_steps(lo_g: float, typical_g: float, hi_g: float, step_g: float, optional
 
 
 def person_bounds(ing: DishIngredient, product: Product, scale: float, settings: EngineSettings,
-                  in_group: bool = False) -> StepBounds:
-    """`in_group` — składnik grupy proporcji (ciasto, panierka): ważony co GROUP_MEMBER_STEP_G, bez jednostek sztuk."""
+                  in_group: bool = False, cap_g: float | None = None) -> StepBounds:
+    """`in_group` — składnik grupy proporcji (ciasto, panierka): ważony co GROUP_MEMBER_STEP_G, bez jednostek sztuk.
+    `cap_g` — limit porcji z preferencji osoby; obowiązuje także wtedy, gdy przepis podaje własne maksimum."""
     lo, typical, hi = grams_range(ing, scale, settings)
     if product.max_portion_g is not None and ing.max_g is None:
         # limit produktu obowiązuje, chyba że danie jawnie podaje własne maksimum
         hi = min(hi, product.max_portion_g)
         typical = min(typical, hi)
         lo = min(lo, hi)
+    if cap_g is not None:
+        hi = min(hi, cap_g)
+        typical = min(typical, hi)
+        lo = min(lo, hi)
     step = (ing.step_g or GROUP_MEMBER_STEP_G) if in_group else step_for(ing, product)
-    return to_steps(lo, typical, hi, step, ing.optional)
+    bounds = to_steps(lo, typical, hi, step, ing.optional)
+    if cap_g is not None:
+        top = math.floor(cap_g / step + _EPS)
+        if top < 1 and not ing.optional:
+            # najmniejsza porcja to jeden krok (np. całe jajko), a limit jest mniejszy — składnik obowiązkowy się nie zmieści
+            raise EngineInputError(f"składnik {ing.product_id}: najmniejsza porcja {step:g} g przekracza limit "
+                                   f"{cap_g:g} g z preferencji")
+        if bounds.hi > top:
+            # minimum przepisu zaokrąglone w górę do kroku mogło przekroczyć limit — limit domownika jest ważniejszy
+            bounds = StepBounds(step_g=step, lo=min(bounds.lo, top), hi=top, default=min(bounds.default, top))
+    return bounds
+
+
+def cap_conflict(ing: DishIngredient, product: Product, scale: float, settings: EngineSettings,
+                 in_group: bool, cap_g: float | None) -> bool:
+    """Czy limit porcji wyklucza obowiązkowy składnik (najmniejszy krok jest większy niż limit)."""
+    if cap_g is None or ing.optional:
+        return False
+    try:
+        person_bounds(ing, product, scale, settings, in_group, cap_g)
+    except EngineInputError:
+        return True
+    return False
 

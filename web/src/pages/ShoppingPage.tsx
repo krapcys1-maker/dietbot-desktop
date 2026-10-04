@@ -44,8 +44,10 @@ export default function ShoppingPage({ planId }: { planId?: string }) {
       lines.push("", g.label.toUpperCase());
       for (const it of g.items) {
         if (done.includes(it.produkt)) continue;
-        const remaining = Math.round((it.gramy - (bought[it.produkt] ?? 0)) * 10) / 10;
-        lines.push(`- ${it.nazwa} — ${remaining} g do kupienia`);
+        // bez „- ” i „[ ]” — notatki w telefonie same robią z wierszy listę do odhaczania
+        const part = bought[it.produkt] ?? 0;
+        const remaining = Math.round((it.gramy - part) * 10) / 10;
+        lines.push(part > 0 ? `${it.nazwa} — jeszcze ${remaining} g` : `${it.nazwa} — ${it.ilosc}`);
       }
     }
     try {

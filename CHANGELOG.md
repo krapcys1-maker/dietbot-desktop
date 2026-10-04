@@ -1,5 +1,36 @@
 # Historia zmian
 
+## 0.4.0 — notatnik preferencji (04.10.2026)
+
+### Notatnik preferencji
+
+- Nowa zakładka **Notatnik preferencji**. Piszesz uwagę zwykłym językiem, a Porcja zapisuje z niej zasady stosowane w każdym nowym planie:
+  - **zakaz produktu** albo całej kategorii (np. bez białek jaj kurzych);
+  - **limit porcji na osobę**, np. ryż suchy najwyżej 65 g i 105 g na obiad;
+  - **mniej węglowodanów, więcej białka** — widełki przesuwają się bez zmiany kalorii, więc silnik nie musi sztywno trzymać dotychczasowych węglowodanów;
+  - **wskazówki** dla układającego tydzień (np. „mniej dań z jajkami na kolację”).
+- Model językowy tylko rozpoznaje, czego dotyczy uwaga. Program dopasowuje produkty do bazy i przyjmuje wyłącznie liczby, które padły w uwadze. Brakujące liczby liczy sam: limit „mniej niż dotąd” z ostatnich planów, a zamianę makro jako ok. 4% energii dnia.
+- Uwagi do działania aplikacji (np. wygląd eksportu) trafiają na osobną listę **Do poprawy w programie**. Można ją skopiować albo zapisać do TXT dla twórcy. Program sam niczego w sobie nie przeprogramowuje.
+- **Analiza nawyków** zbiera oceny 👍/👎, ręczne zamiany dań, uwagi i życzenia. Opisuje wzorce i proponuje zasady — dodajesz tylko wybrane.
+- Zasady można wyłączyć, usunąć albo dodać ręcznie (także bez klucza AI). Plik założeń pozostaje bez zmian; tabela pokazuje widełki przed zasadami i po nich.
+- Czat i Telegram: „zapamiętaj, że…” zapisuje uwagę w notatniku.
+
+### Silnik i naprawa planu
+
+- Limity porcji osób są twardym ograniczeniem silnika i są sprawdzane przez niezależny weryfikator. Dania, których nie da się zrobić w limicie, odpadają z puli danego posiłku.
+- **Przelicz i napraw** najpierw wymienia dania, które przestały pasować do zasad (zakaz, limit, 👎), na najbardziej podobne dozwolone, a dopiero potem liczy gramatury.
+- Komunikaty o wykluczeniu dań podają nazwy produktów zamiast identyfikatorów.
+
+### Lista zakupów
+
+- Eksport TXT i „Kopiuj pozostałe zakupy” bez „- [ ]” i „- ” przed pozycjami — notatki w telefonie same tworzą z wierszy listę do odhaczania.
+
+### Instalator
+
+- Aktualizacja usuwa stary skrót „DietBot” z pulpitu i menu Start (zostaje „Porcja”).
+
+Test 6 kolejnych tygodni bez AI (domyślne cele): bez zasad 6/6 poprawnych planów, ryż na obiad średnio 72 g i 110 g (maks. 95 g i 120 g), białka jaj 8 razy. Z zasadami 65/105 g ryżu, zamianą węglowodanów na białko i zakazem białek jaj: 6/6, ryż średnio 59 g i 91 g (maks. 65 g i 105 g), białko średnio 107 g i 157 g (wcześniej 103 g i 149 g), białka jaj 0 razy.
+
 ## 0.3.3 — więcej kuchni roślinnej i czytelniejsze komunikaty (27.09.2026)
 
 ### Dieta wegańska i wegetariańska

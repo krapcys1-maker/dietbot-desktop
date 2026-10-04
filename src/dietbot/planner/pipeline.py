@@ -15,7 +15,7 @@ from ..engine import BlockStatus, EngineRequest, EngineResult, EngineSettings, s
 from ..llm.client import LLMClient, LLMError
 from ..storage.repository import Repository
 from ..textfmt import fmt_num
-from .autofix import autofix_composition, rebalance_days
+from .autofix import autofix_composition, rebalance_days, replace_disallowed
 from .compose import (
     COMPOSE_SYSTEM,
     Composition,
@@ -158,7 +158,8 @@ class WeekPlanner:
         if self.llm is not None:
             shown = prompt_pools(pools, dishes, seed, focus=must_use | wish_focus(wishes, pools, dishes),
                                  cuisines={c for c, n in (cuisine_counts or {}).items() if n > 0})
-            prompt = build_compose_prompt(shown, a, days, wishes, avoid, must_use, cuisine_counts, pins)
+            prompt = build_compose_prompt(shown, a, days, wishes, avoid, must_use, cuisine_counts, pins,
+                                          self.repo.preference_hints)
             log.append("Lista dań dla modelu: " + ", ".join(f"{MEAL_LABELS_PL[m].lower()} {len(ids)} z {len(pools.by_meal[m])}"
                                                            for m, ids in shown.by_meal.items()))
             messages_note = ""
@@ -306,6 +307,13 @@ class WeekPlanner:
         t0 = t0 if t0 is not None else time.perf_counter()
         log = log if log is not None else LiveLog()
         a = self.repo.assumptions
+        if repair:
+            # dania, które przestały pasować (np. nowa zasada z notatnika: zakaz produktu, limit porcji, ocena 👎) —
+            # silnik policzyłby je bez odchyleń, a weryfikator i tak by je odrzucił
+            pools = pools or self.pools(extra_banned=extra_banned)
+            replaced = replace_disallowed(comp, pools, self.repo.approved_dishes(), a, keep)
+            for note in replaced:
+                log.append(f"Zamiana na dozwolone danie — {note}")
         dishes = self.dishes_for(comp)
         log.append("Silnik liczy gramatury…")
         result = self._solve(comp)

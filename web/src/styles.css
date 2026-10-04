@@ -382,3 +382,9 @@ input[type="checkbox"] { accent-color: var(--primary); width: 16px; height: 16px
   .table td, .table th { padding: 5px 3px; }
   .secondary-actions { margin-left: auto; }
 }
+
+/* notatnik preferencji: wiersze nie są klikalne; na telefonie przyciski pod opisem */
+.nb-item { cursor: default; }
+.nb-item:hover { border-color: var(--border); }
+details.nb-item > summary { cursor: pointer; }
+@media (max-width: 620px) { .nb-item { flex-direction: column; align-items: stretch; } }

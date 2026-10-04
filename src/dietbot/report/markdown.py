@@ -261,7 +261,9 @@ def week_facts(plan: WeekPlan, a: Assumptions, dishes: Mapping[str, DishTemplate
 
 
 def render_shopping_list(plan: WeekPlan, a: Assumptions, products: Mapping[str, Product],
-                         store_products: Sequence[StoreProduct] = ()) -> str:
+                         store_products: Sequence[StoreProduct] = (), bullets: bool = True) -> str:
+    """`bullets=False` — same pozycje bez znaczników listy (np. do wklejenia w notatki telefonu, które same dodają
+    pola do odhaczania; „- [ ]” przeszkadzało tam domownikom)."""
     rows = build_shopping_list(plan, a, products, store_products)
     lines = ["# Lista zakupów", "",
              f"_Na {len(plan.days)} {plural_pl(len(plan.days), 'dzień', 'dni', 'dni')} dla "
@@ -275,6 +277,6 @@ def render_shopping_list(plan: WeekPlan, a: Assumptions, products: Mapping[str, 
                 lines.append("")
             lines += [f"## {row.group_label}", ""]
             current = row.group
-        lines.append(f"- [ ] {row.name} — {row.amount_text}")
+        lines.append(f"{'- ' if bullets else ''}{row.name} — {row.amount_text}")
     lines.append("")
     return "\n".join(lines) + "\n"

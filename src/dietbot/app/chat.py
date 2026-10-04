@@ -52,7 +52,7 @@ class FactRequest(BaseModel):
 
 
 class ChatAction(BaseModel):
-    typ: Literal["odpowiedz", "pokaz", "generuj", "wymysl_dania", "zamien", "zmien_zalozenia"]
+    typ: Literal["odpowiedz", "pokaz", "generuj", "wymysl_dania", "zamien", "zmien_zalozenia", "zapamietaj"]
     tekst: str = Field(description="krótka odpowiedź po polsku, BEZ cyfr i liczebników — liczby dopisze program")
     fakty: list[FactRequest] = Field(default_factory=list, max_length=6)
     zyczenia: str | None = Field(default=None, description="dla generuj i wymysl_dania: życzenia/prośba słowami użytkownika")
@@ -95,6 +95,9 @@ Twoje zadanie: zrozumieć wiadomość i wybrać jedną akcję:
   DOZWOLONE ZMIANY; przy liczbach wybierz "ustaw" (nowa wartość) albo "zwieksz"/"zmniejsz" (o ile). Prośba typu
   „zmniejsz kalorie o sto” dotyczy CAŁYCH widełek (ścieżka bez .min/.cel/.max). Program pokaże różnice i poprosi
   użytkownika o potwierdzenie.
+- "zapamietaj" — trwała preferencja albo uwaga do przyszłych planów, bez liczbowych zmian celów: „za dużo ryżu na
+  obiad, wolę więcej mięsa”, „nie dawaj białek jaj”, „nie lubimy tego dania”, „lista zakupów jest niewygodna”. Program
+  zapisze ją w notatniku preferencji; w "zyczenia" przepisz całą uwagę słowami użytkownika.
 - "odpowiedz" — rozmowa, porady kulinarne i wyjaśnienia działania aplikacji, gdy użytkownik o nic nie prosi
   (nie wymyśla dań, nie zmienia planu ani założeń).
 Pole "tekst": krótko i życzliwie po polsku, bez cyfr i liczebników. Nie obiecuj, że coś już zrobiłeś — program wykona akcję."""
@@ -179,6 +182,8 @@ class ChatAssistant:
                 return self._swap(action, rec, text)
             if action.typ == "zmien_zalozenia":
                 return self._propose(action, rec)
+            if action.typ == "zapamietaj":
+                return self._remember(action.zyczenia or text, rec)
         except UserError as exc:
             return self._reply(f"{action.tekst}\n\n⚠️ {exc}" if action.tekst else f"⚠️ {exc}", rec)
         except KeyError as exc:  # plan liczony dla osób lub dań, których już nie ma (zmienione założenia/biblioteka)
@@ -379,6 +384,31 @@ class ChatAssistant:
         return self._reply(text, rec, {"job_id": job.id, "kind": "zamiana", "dish_id": pick.danie})
 
     # ------------------------------------------------------------------ zmiany założeń (z potwierdzeniem)
+    def _remember(self, text: str, rec: PlanRecord | None) -> dict:
+        """Uwaga trafia do notatnika preferencji; odpowiedź składa program z wyniku analizy (opisy zasad z liczbami)."""
+        from .notebook import Notebook
+
+        out = Notebook(self.s).add_comment(text, plan_id=rec.id if rec else None, channel=self.channel)
+        a = out.get("analysis") or {}
+        parts = ["Zapisałem w notatniku preferencji."]
+        if a.get("summary"):
+            parts.append(a["summary"])
+        if a.get("rules_added"):
+            parts.append("Nowe zasady:\n" + "\n".join(f"- {r['description']}" for r in a["rules_added"]))
+        if a.get("rules_kept"):
+            parts.append("Bez zmian (już zapisane):\n" + "\n".join(f"- {r}" for r in a["rules_kept"]))
+        if a.get("rules_removed"):
+            parts.append("Usunięte lub zastąpione:\n" + "\n".join(f"- {r}" for r in a["rules_removed"]))
+        if a.get("ratings"):
+            parts.append("Oceny dań: " + ", ".join(("👍 " if r["rating"] > 0 else "👎 ") + r["name"] for r in a["ratings"]))
+        if a.get("program_notes"):
+            parts.append("Do poprawy w programie:\n" + "\n".join(f"- {x}" for x in a["program_notes"]))
+        if a.get("problems"):
+            parts.append("Uwagi: " + "; ".join(a["problems"]))
+        if a.get("rules_added"):
+            parts.append("Zasady działają w nowych planach — aktualny plan przelicz w zakładce Plan tygodnia.")
+        return self._reply("\n\n".join(parts), rec, {"kind": "notatnik", "note_id": out.get("note_id")})
+
     def _propose(self, action: ChatAction, rec: PlanRecord | None) -> dict:
         s = self.s
         if not action.zmiany:

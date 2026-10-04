@@ -5,12 +5,12 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 
-from ..domain.assumptions import Assumptions
+from ..domain.assumptions import Assumptions, Person
 from ..domain.diet import DIET_INSTRUMENTAL_PL, dish_compatible
 from ..domain.dish import DishStatus, DishTemplate, MealType, Role
 from ..domain.product import Category, Product
 from ..engine.catalog import Catalog
-from ..engine.portions import grams_range, is_fixed, person_bounds
+from ..engine.portions import cap_conflict, grams_range, is_fixed, person_bounds
 from ..engine.settings import EngineSettings
 from .balance import DEFAULT_TARGET, MacroSplit, macro_labels, target_split
 
@@ -101,7 +101,10 @@ def _typical_nutrition(dish: DishTemplate, catalog: Catalog, settings: EngineSet
     return out
 
 
-def protein_range(dish: DishTemplate, catalog: Catalog, settings: EngineSettings, scale: float) -> tuple[float, float]:
+def protein_range(dish: DishTemplate, catalog: Catalog, settings: EngineSettings, scale: float,
+                  person: Person | None = None) -> tuple[float, float]:
+    """Białko dania przy najmniejszych i największych porcjach; z limitami porcji osoby (najostrzejszymi spośród
+    posiłków dania), gdy podano `person`."""
     lo = hi = 0.0
     for ing in dish.ingredients:
         product = catalog.product(ing.product_id)
@@ -110,10 +113,37 @@ def protein_range(dish: DishTemplate, catalog: Catalog, settings: EngineSettings
             _, typical, _ = grams_range(ing, scale, settings)
             lo, hi = lo + p * typical, hi + p * typical
             continue
-        b = person_bounds(ing, product, scale, settings, ing.product_id in dish.grouped_products())
+        cap = _dish_cap(person, product, dish) if person is not None else None
+        if cap_conflict(ing, product, scale, settings, ing.product_id in dish.grouped_products(), cap):
+            cap = None  # takie danie odpada w pulach z powodu limitu; zakres białka liczymy bez niego
+        b = person_bounds(ing, product, scale, settings, ing.product_id in dish.grouped_products(), cap)
         lo += p * b.lo_g
         hi += p * b.hi_g
     return lo, hi
+
+
+def _dish_cap(person: Person, product: Product, dish: DishTemplate) -> float | None:
+    caps = [c for c in (person.portion_cap(product, m) for m in dish.meal_types) if c is not None]
+    return min(caps) if caps else None
+
+
+def cap_conflicts(dish: DishTemplate, products: Mapping[str, Product], a: Assumptions, meal: MealType,
+                  settings: EngineSettings) -> list[str]:
+    """Obowiązkowe składniki, których najmniejsza porcja przekracza limit porcji osoby w tym posiłku."""
+    out: list[str] = []
+    grouped = dish.grouped_products()
+    for person in a.persons:
+        if not person.portion_caps:
+            continue
+        scale = person.energy_center / settings.reference_kcal
+        for ing in dish.ingredients:
+            product = products[ing.product_id]
+            if is_fixed(ing, product):
+                continue
+            cap = person.portion_cap(product, meal)
+            if cap_conflict(ing, product, scale, settings, ing.product_id in grouped, cap):
+                out.append(f"{person.name}: {product.name.lower()} — limit {cap:g} g z preferencji")
+    return out
 
 
 def build_pools(dishes: Mapping[str, DishTemplate], products: Mapping[str, Product], a: Assumptions,
@@ -149,10 +179,10 @@ def build_pools(dishes: Mapping[str, DishTemplate], products: Mapping[str, Produ
             if ing.optional:
                 continue
             if ing.product_id in banned:
-                reasons.append(f"zakazany produkt: {ing.product_id}")
+                reasons.append(f"zakazany produkt: {products[ing.product_id].name.lower()}")
             for person in a.persons:
                 if ing.product_id in person.excluded_products:
-                    reasons.append(f"{person.name} nie je: {ing.product_id}")
+                    reasons.append(f"{person.name} nie je: {products[ing.product_id].name.lower()}")
         if not dish.is_treat and allowed_carbs:
             for ing in dish.ingredients:
                 if ing.role is Role.CARBS and products[ing.product_id].category.value not in allowed_carbs:
@@ -180,7 +210,7 @@ def build_pools(dishes: Mapping[str, DishTemplate], products: Mapping[str, Produ
         )
         for person in a.persons:
             scale = person.energy_center / settings.reference_kcal
-            profile.protein_range[person.id] = protein_range(dish, catalog, settings, scale)
+            profile.protein_range[person.id] = protein_range(dish, catalog, settings, scale, person)
             if not dish.is_treat and MealType.SNACK not in dish.meal_types:
                 lo, hi = profile.protein_range[person.id]
                 tol = person.protein_anchor_tolerance
@@ -201,6 +231,10 @@ def build_pools(dishes: Mapping[str, DishTemplate], products: Mapping[str, Produ
                 continue
             if forbidden_tags.get(meal, set()) & set(dish.tags):
                 continue
+            conflicts = cap_conflicts(dish, products, a, meal, settings) if not reasons else []
+            if conflicts:
+                meal_notes.append("limit porcji: " + "; ".join(conflicts))
+                continue
             # słodka kolacja (np. ryż na mleku z owocami z założeń domowników) nie jest „obiadowa”
             if meal is MealType.SUPPER and lunch_like and not dish.is_treat and not dish.is_sweet:
                 meal_notes.append("kolacja z ryżem/ziemniakami/makaronem to danie obiadowe")
@@ -217,7 +251,8 @@ def build_pools(dishes: Mapping[str, DishTemplate], products: Mapping[str, Produ
     batch: dict[int, list[str]] = {}
     for idx, rule in enumerate(a.week.batch):
         batch[idx] = [d.id for d in dishes.values() if d.id not in excluded and d.is_batch and rule.tag in d.tags
-                      and rule.meal in d.meal_types and (d.batch_days or 0) >= len(rule.days)]
+                      and rule.meal in d.meal_types and (d.batch_days or 0) >= len(rule.days)
+                      and not cap_conflicts(d, products, a, rule.meal, settings)]
         batch[idx].sort()
     treat_snacks = sorted(d.id for d in dishes.values() if d.id not in excluded and d.id in profiles and d.is_treat
                           and MealType.SNACK in d.meal_types)

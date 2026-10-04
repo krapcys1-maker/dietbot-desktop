@@ -7,6 +7,7 @@ import Brand from "./components/Brand";
 import HomePage from "./pages/HomePage";
 import HelpPage from "./pages/HelpPage";
 import LibraryPage from "./pages/LibraryPage";
+import NotebookPage from "./pages/NotebookPage";
 import AssumptionsPage from "./pages/AssumptionsPage";
 import ChatPage from "./pages/ChatPage";
 import DishesPage from "./pages/DishesPage";
@@ -93,6 +94,9 @@ export default function App() {
     case "zalozenia":
       content = <AssumptionsPage />;
       break;
+    case "notatnik":
+      content = <NotebookPage />;
+      break;
     case "ustawienia":
       content = <SettingsPage status={status} onStatusChange={setStatus} />;
       break;
@@ -120,6 +124,7 @@ export default function App() {
             </a>
           ))}
           <div className="nav-section">Dopasuj do siebie</div>
+          <a href="#/notatnik" className={`nav-item ${page === "notatnik" ? "active" : ""}`} aria-current={page === "notatnik" ? "page" : undefined}><Icon name="notebook" />Notatnik preferencji</a>
           <a href="#/zalozenia" className={`nav-item ${page === "zalozenia" ? "active" : ""}`}><Icon name="target" />Cele i preferencje</a>
           <a href="#/ustawienia" className={`nav-item ${page === "ustawienia" ? "active" : ""}`}><Icon name="settings" />Ustawienia</a>
           <details className="nav-extra" key={page === "czat" || page === "produkty" ? "extra" : "main"} open={page === "czat" || page === "produkty" ? true : undefined}>
@@ -137,7 +142,7 @@ export default function App() {
           )}
         </nav>
         <main className="main" id="main-content" tabIndex={-1}>
-          <div className="topbar no-print"><span>Twoja przestrzeń <span className="topbar-divider">/</span> <b>{NAV.find(n => n.key === page)?.label ?? ({ nowy: "Nowy plan", zalozenia: "Cele i preferencje", ustawienia: "Ustawienia", pomoc: "Pomoc", czat: "Asystent", produkty: "Produkty" } as Record<string, string>)[page] ?? "Plan tygodnia"}</b></span>
+          <div className="topbar no-print"><span>Twoja przestrzeń <span className="topbar-divider">/</span> <b>{NAV.find(n => n.key === page)?.label ?? ({ nowy: "Nowy plan", notatnik: "Notatnik preferencji", zalozenia: "Cele i preferencje", ustawienia: "Ustawienia", pomoc: "Pomoc", czat: "Asystent", produkty: "Produkty" } as Record<string, string>)[page] ?? "Plan tygodnia"}</b></span>
             <div className="row"><a href="#/ustawienia" className="connection-label"><span className={`live-dot ${status?.llm.key_present && status?.llm.enabled ? "" : "neutral"}`} />{status ? status.llm.key_present && status.llm.enabled ? "AI dostępne" : "Tryb bez AI" : "Łączenie…"}</a><button className="btn icon-button" aria-label={theme === "light" ? "Włącz ciemny motyw" : "Włącz jasny motyw"} onClick={toggleTheme}><Icon name={theme === "light" ? "moon" : "sun"} /></button></div>
           </div>
           {content}

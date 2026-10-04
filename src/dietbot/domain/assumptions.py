@@ -10,6 +10,7 @@ from pydantic import Field, field_validator, model_validator
 from .common import DomainModel, check_slug
 from .dish import MealType
 from .nutrition import EnergyMethod
+from .product import Category, Product
 
 # średnia gęstość energii domowych dań z biblioteki to ok. 1,1–1,4 kcal/g (obiady i kolacje ok. 1,1) — powyżej tej wartości
 # dzień nie zmieści się w limitach masy talerza bez dużych odchyleń (testy wariantów celów, 13.09.2026)
@@ -93,6 +94,26 @@ class DailyTargets(DomainModel):
         return getattr(self, metric)
 
 
+class PortionCap(DomainModel):
+    """Największa porcja produktu (albo całej kategorii, np. ryżu) w jednym posiłku osoby — z preferencji domowników."""
+
+    product_id: str | None = Field(default=None, alias="produkt")
+    category: Category | None = Field(default=None, alias="kategoria")
+    meals: list[MealType] = Field(default_factory=list, alias="posilki")  # puste = każdy posiłek
+    max_g: float = Field(alias="maks_g", gt=0, le=2000)
+
+    @model_validator(mode="after")
+    def _target(self) -> PortionCap:
+        if (self.product_id is None) == (self.category is None):
+            raise ValueError("limit porcji dotyczy produktu albo kategorii (dokładnie jednego z nich)")
+        return self
+
+    def applies(self, product: Product, meal: MealType | None) -> bool:
+        if meal is not None and self.meals and meal not in self.meals:
+            return False
+        return product.id == self.product_id if self.product_id else product.category is self.category
+
+
 class Person(DomainModel):
     id: str
     name: str = Field(alias="nazwa")
@@ -103,6 +124,13 @@ class Person(DomainModel):
     excluded_products: list[str] = Field(default_factory=list, alias="wyklucza_produkty")
     # największa rozsądna masa talerza (wszystkie składniki razem) — chroni przed np. 2 kg zupy na obiad
     max_meal_mass_g: dict[MealType, float] = Field(default_factory=dict, alias="maks_masa_posilku_g")
+    # np. „ryż suchy najwyżej 65 g na posiłek” — twardy limit silnika, ważniejszy niż typowa porcja z przepisu
+    portion_caps: list[PortionCap] = Field(default_factory=list, alias="limity_porcji")
+
+    def portion_cap(self, product: Product, meal: MealType | None = None) -> float | None:
+        """Najostrzejszy limit porcji produktu w posiłku (None = brak limitu). `meal` None = limity każdego posiłku."""
+        caps = [c.max_g for c in self.portion_caps if c.applies(product, meal)]
+        return min(caps) if caps else None
 
     @field_validator("max_meal_mass_g")
     @classmethod

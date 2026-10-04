@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/krapcys1-maker/dietbot-desktop/releases/download/v0.3.3/Porcja-Setup-0.3.3.exe"><b>Pobierz Porcję 0.3.3 dla Windows</b></a>
+  <a href="https://github.com/krapcys1-maker/dietbot-desktop/releases/download/v0.4.0/Porcja-Setup-0.4.0.exe"><b>Pobierz Porcję 0.4.0 dla Windows</b></a>
   · <a href="docs/INSTRUKCJA.md">Instrukcja</a>
   · <a href="CHANGELOG.md">Co nowego</a>
   · <a href="https://github.com/krapcys1-maker/dietbot-desktop/issues">Zgłoś problem</a>
@@ -35,8 +35,9 @@
 | **Biblioteka dań** | Blisko 700 zatwierdzonych przepisów z 13 kuchni, w tym ponad 50 wegańskich. Wyszukiwarka, filtry diety, ocen i dań do 15 minut. |
 | **Gotowanie na zapas** | Zupa na wtorek i środę: jedna tabela ilości na całą partię i przepis wykonywany raz; drugiego dnia tylko odgrzewasz. |
 | **Twoje upodobania** | „Lubię” zwiększa szansę wyboru, „Nie lubię” wyklucza danie z nowych planów i zamian. |
+| **Notatnik preferencji** | Piszesz uwagę („za dużo ryżu na obiad, wolę więcej mięsa”, „nie dawaj białek jaj”), a Porcja zapisuje z niej zasady: zakaz produktu, limit porcji na osobę, mniej węglowodanów kosztem białka. Liczby bierze z Twoich słów albo liczy sama. Analiza nawyków podpowiada kolejne zasady. Uwagi do działania aplikacji trafiają na osobną listę dla twórcy. |
 | **Moje diety** | Nazwane tygodnie, historia i wersje. Zapisany plan zachowuje dane, z których go policzono. |
-| **Proste zakupy** | Połączone warianty produktów, bez marek, przypraw i ziół. Odhaczanie kupionych ilości. |
+| **Proste zakupy** | Połączone warianty produktów, bez marek, przypraw i ziół. Odhaczanie kupionych ilości. Eksport bez znaczników listy — wklejasz do notatek w telefonie i od razu masz listę do odhaczania. |
 | **Dwa eksporty** | Cały jadłospis z przepisami i gramaturami oraz cała lista zakupów — do plików TXT. |
 | **Kalkulator celów** | Opcjonalna, orientacyjna propozycja kcal i makro z wieku, wzrostu, masy i aktywności. |
 | **Własny DeepSeek (opcja)** | Czat, życzenia pisane zwykłym językiem („w piątek pizza, bez ryb”) i wymyślanie nowych dań. |
@@ -64,7 +65,7 @@
 
 ## Od instalacji do pierwszego tygodnia
 
-1. Pobierz **Porcja-Setup-0.3.3.exe** z [najnowszego wydania](https://github.com/krapcys1-maker/dietbot-desktop/releases/latest), uruchom instalator i otwórz **Porcję** z menu Start.
+1. Pobierz **Porcja-Setup-0.4.0.exe** z [najnowszego wydania](https://github.com/krapcys1-maker/dietbot-desktop/releases/latest), uruchom instalator i otwórz **Porcję** z menu Start.
 2. W **Cele i preferencje** sprawdź osoby, cele oraz rodzaj diety. Domyślne ustawienia są przykładem, nie indywidualnym zaleceniem.
 3. W **Nowy plan** wybierz tydzień i kliknij **Ułóż mój plan** — zwykle 20–60 sekund, bez klucza AI.
 4. Otwórz **Plan tygodnia**: przejrzyj posiłki, porcje i ewentualne uwagi. Danie możesz zamienić albo ocenić.

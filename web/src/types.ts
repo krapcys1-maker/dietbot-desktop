@@ -444,3 +444,83 @@ export interface Costs {
   by_task: { task: string; calls: number; cost_usd: number; failed: number }[];
   recent: Record<string, unknown>[];
 }
+
+// ---------------------------------------------------------------- notatnik preferencji
+export type RuleKind = "zakaz_produktu" | "limit_porcji" | "zamiana_makro" | "wskazowka";
+
+export interface PreferenceRule {
+  id: string;
+  kind: RuleKind;
+  kind_label: string;
+  description: string;
+  active: boolean;
+  source: string;
+  created_at: string;
+  data: Record<string, unknown>;
+}
+
+export interface NoteAnalysis {
+  summary: string | null;
+  rules_added?: { id: string; kind: RuleKind; description: string }[];
+  rules_removed?: string[];
+  rules_kept?: string[];
+  ratings?: { dish_id: string; name: string; rating: number }[];
+  program_notes?: string[];
+  problems?: string[];
+  cost_usd?: number;
+}
+
+export interface PreferenceNote {
+  id: string;
+  created_at: string;
+  channel: string;
+  plan_id: string | null;
+  text: string;
+  analysis: NoteAnalysis | null;
+}
+
+export interface ProgramNote {
+  id: string;
+  created_at: string;
+  note_id: string | null;
+  text: string;
+  status: "nowa" | "zrobione";
+}
+
+export interface HabitsAnalysis {
+  created_at: string;
+  stats: string[];
+  observations: string[];
+  proposals: { id: string; description: string; applied: boolean; rule: Record<string, unknown> }[];
+  program_notes: string[];
+  problems: string[];
+  cost_usd?: number;
+}
+
+export interface NotebookView {
+  rules: PreferenceRule[];
+  effects: string[];
+  problems: string[];
+  targets: { person: string; metric: string; before: string; after: string }[];
+  notes: PreferenceNote[];
+  program_notes: ProgramNote[];
+  habits: HabitsAnalysis | null;
+  llm_available: boolean;
+  persons: { id: string; name: string }[];
+  categories: { id: string; name: string }[];
+  meals: { id: string; name: string }[];
+  macros: { id: string; name: string }[];
+  analysis?: NoteAnalysis;
+}
+
+export interface RuleInput {
+  typ: RuleKind;
+  produkt?: string | null;
+  kategoria?: string | null;
+  osoby?: string[];
+  posilki?: string[];
+  gramy?: Record<string, number | null>;
+  z?: string | null;
+  na?: string | null;
+  tekst?: string | null;
+}

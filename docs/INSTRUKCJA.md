@@ -4,7 +4,7 @@
 
 ## Instalacja i aktualizacja
 
-Pobierz `Porcja-Setup-0.3.3.exe` z [najnowszego wydania](https://github.com/krapcys1-maker/dietbot-desktop/releases/latest). Zamknij aplikację, uruchom instalator i otwórz **Porcję** w menu Start. Opcjonalnie zaznacz utworzenie skrótu na pulpicie.
+Pobierz `Porcja-Setup-0.4.0.exe` z [najnowszego wydania](https://github.com/krapcys1-maker/dietbot-desktop/releases/latest). Zamknij aplikację, uruchom instalator i otwórz **Porcję** w menu Start. Opcjonalnie zaznacz utworzenie skrótu na pulpicie.
 
 Instalator zawiera program oraz jego zależności. **Nie kopiuj samego `DietBot.exe`** z katalogu kompilacji: potrzebuje również folderu `_internal`. Do przekazania aplikacji innej osobie służy instalator, nie Twój folder danych.
 
@@ -54,6 +54,8 @@ Lista sumuje produkty ze wszystkich dni, osób, przekąsek i stałych pozycji. �
 
 Odhaczanie zapamiętuje kupioną ilość. Jeśli w kolejnej wersji potrzeba więcej, pozycja pojawi się ponownie do dokupienia. W **Więcej** możesz wybrać plan, skopiować pozostałe zakupy i wyczyścić odhaczenia. Eksport zawsze obejmuje całość.
 
+Od 0.4.0 eksport TXT i kopiowanie podają pozycje bez „- [ ]” i „- ” (np. `Jogurt — 410 g`). Po wklejeniu do notatek w telefonie każdą linię zamienisz w punkt do odhaczania.
+
 Uproszczona nazwa nie zmienia składnika użytego w obliczeniach. Wybór innego wariantu sklepowego może zmienić rzeczywiste kcal i makro — sprawdź etykietę oraz gramatury w przepisie.
 
 ## Oceny i biblioteka dań
@@ -62,7 +64,24 @@ Uproszczona nazwa nie zmienia składnika użytego w obliczeniach. Wybór innego 
 - **Nie lubię** wyklucza konkretne danie z kolejnych planów, zamian i przekąsek bilansujących.
 - Ponowne kliknięcie tej samej oceny ją usuwa. Oceny są wspólne dla osób z konfiguracji, zapisują się lokalnie i nie zmieniają starych planów.
 
-To zapamiętywanie konkretnych ocen, nie automatyczne rozpoznawanie alergii czy nielubianych składników. Podczas układania planu zmiana ocen jest zablokowana. Biblioteka pozwala filtrować dietę, ocenę i czas przygotowania; filtr **do 15 minut** sprawdza rzeczywisty czas w przepisie.
+## Notatnik preferencji (od 0.4.0)
+
+W **Dopasuj do siebie → Notatnik preferencji** napisz uwagę zwykłym językiem, np. „na obiad za dużo ryżu — wolałbym 65 g żonie i 105 g mnie, w zamian więcej mięsa” albo „nie dawaj samych białek jaj”. Po kliknięciu **Zapisz i przeanalizuj** Porcja pokazuje, co zrozumiała, i zapisuje zasady:
+
+| Zasada | Co robi |
+|---|---|
+| **Zakaz produktu** | Produkt (albo cała kategoria) nie trafia do nowych planów; dania, w których jest obowiązkowy, odpadają. |
+| **Limit porcji** | Największa porcja produktu lub kategorii na posiłek, osobno dla każdej osoby (np. ryż suchy 65 g i 105 g na obiad). Silnik nie przekroczy limitu, a weryfikator to sprawdza. |
+| **Mniej węglowodanów, więcej białka** | Przesuwa widełki dzienne bez zmiany kalorii: dolna granica węglowodanów w dół, górna granica białka w górę. Silnik ma więcej swobody i chętniej dokłada mięsa niż ryżu. |
+| **Wskazówka** | Miękka preferencja dla układającego tydzień (np. „mniej dań z jajkami na kolację”). |
+
+Liczby w zasadach pochodzą z Twojej uwagi. Gdy ich nie podasz, liczy je program, np. limit „mniej niż dotąd” na podstawie ostatnich planów. Model językowy tylko rozpoznaje treść uwagi. Bez klucza AI uwaga zapisze się jako notatka, a zasadę dodasz ręcznie w **Dodaj zasadę ręcznie**.
+
+Zasady obowiązują w nowych planach i zamianach. Zapisany wcześniej tydzień pokaże informację o zmianie ustawień. **Przelicz i napraw** utworzy nową wersję: najpierw wymieni dania, które przestały pasować (np. z białkami jaj), potem przeliczy gramatury. Plik założeń się nie zmienia — zasady można wyłączyć albo usunąć.
+
+Uwagi o samej aplikacji (np. „lista zakupów ma niewygodny format”) trafiają na listę **Do poprawy w programie**. Program ich sam nie wprowadza; skopiuj je albo zapisz notatnik do TXT i przekaż twórcy. **Przeanalizuj nawyki** opisuje wzorce z ocen, zamian dań i uwag oraz proponuje zasady — dodajesz tylko te, które chcesz. W czacie i Telegramie wystarczy napisać „zapamiętaj, że…”.
+
+To zapamiętywanie konkretnych ocen i zasad, nie automatyczne rozpoznawanie alergii. Podczas układania planu zmiana ocen jest zablokowana. Biblioteka pozwala filtrować dietę, ocenę i czas przygotowania; filtr **do 15 minut** sprawdza rzeczywisty czas w przepisie.
 
 ## Wege i wegan
 

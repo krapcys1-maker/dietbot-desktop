@@ -134,6 +134,8 @@ class Repository:
     assumptions: Assumptions
     store_products: list[StoreProduct] = field(default_factory=list)
     dish_ratings: dict[str, int] = field(default_factory=dict)
+    # wskazówki z notatnika preferencji dla układającego tydzień (założenia z zasadami nakłada usługa aplikacji)
+    preference_hints: list[str] = field(default_factory=list)
 
     @classmethod
     def load(cls, paths: Paths | None = None, use_cache: bool = True) -> Repository:
