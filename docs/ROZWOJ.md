@@ -32,7 +32,7 @@ npm run build
 cd ..
 ```
 
-Testy obejmują m.in. obliczenia z tabel, zakupy, oceny, zapisane diety, filtry diet, kalkulator, kopie danych planu oraz tożsamość instalatora. Nie zastępują testu uruchomienia gotowego EXE. Przed wydaniem sprawdź również nowy plan, zamianę dania, zapis w bibliotece i oba eksporty przez systemowy dialog.
+Te same kroki (plus `ruff check` i `dietbot dane sprawdz`) wykonuje GitHub Actions dla każdego pushu i pull requesta — [workflow `testy.yml`](../.github/workflows/testy.yml). Testy obejmują m.in. obliczenia z tabel, zakupy, oceny, zapisane diety, filtry diet, kalkulator, kopie danych planu oraz tożsamość instalatora. Nie zastępują testu uruchomienia gotowego EXE. Przed wydaniem sprawdź również nowy plan, zamianę dania, zapis w bibliotece i oba eksporty przez systemowy dialog.
 
 ## Budowa Windows
 
@@ -42,7 +42,7 @@ Zainstaluj Inno Setup 6, potem:
 powershell -ExecutionPolicy Bypass -File packaging\zbuduj_instalator.ps1
 ```
 
-Wyniki: `release\Porcja-Setup-0.3.0.exe` i folder `dist\DietBot`. Do uruchomienia paczki potrzebny jest cały folder, nie sam EXE. Instalator jest niepodpisany. Wersję utrzymuj spójnie w `pyproject.toml`, `src/dietbot/__init__.py`, `web/package.json`, lockfile, skryptach oraz metadanych Windows.
+Wyniki: `release\Porcja-Setup-0.5.0.exe` i folder `dist\DietBot`. Do uruchomienia paczki potrzebny jest cały folder, nie sam EXE. Instalator jest niepodpisany. Wersję utrzymuj spójnie w `pyproject.toml`, `src/dietbot/__init__.py`, `web/package.json`, lockfile, skryptach oraz metadanych Windows.
 
 Nie zmieniaj AppId, technicznej nazwy `DietBot.exe` ani katalogu danych bez migracji: obecna zgodność pozwala aktualizować wcześniejsze instalacje. Nie nadpisuj własnych plików użytkownika przy dodawaniu danych startowych.
 

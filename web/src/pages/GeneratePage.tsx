@@ -28,6 +28,12 @@ export default function GeneratePage({ status }: { status: Status | null }) {
   const [submitting, setSubmitting] = useState(false);
   const initializedDate = useRef(false);
   const pending = useRef(false);
+  const progressRef = useRef<HTMLElement>(null);
+
+  // postęp pojawia się pod formularzem — przewijamy do niego, żeby było widać, że plan się układa
+  useEffect(() => {
+    if (job) progressRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [job?.id]);
 
   useEffect(() => {
     if (status && !initializedDate.current) {
@@ -120,7 +126,10 @@ export default function GeneratePage({ status }: { status: Status | null }) {
             Pomoc AI w wyborze dań {status ? `(${status.llm.model})` : ""}
           </label>
         </div></details>
-        {(!llmAvailable || !useLlm) && status && <div className="alert info">Plan ułoży algorytm — bez życzeń słownych. Własny klucz DeepSeek dodasz w <a href="#/ustawienia">Ustawieniach</a>. AI włączysz w opcjach układania.</div>}
+        {status && !llmAvailable && <div className="alert info">Plan ułoży algorytm z biblioteki dań — życzenia słowne i wymyślanie dań wymagają AI. {status.llm.key_present
+          ? <>AI jest wyłączone w tej sesji aplikacji — szczegóły w <a href="#/ustawienia">Ustawieniach</a>.</>
+          : <>Aby z nich korzystać, dodaj własny klucz DeepSeek w <a href="#/ustawienia">Ustawieniach</a>.</>}</div>}
+        {status && llmAvailable && !useLlm && <div className="alert info">Plan ułoży algorytm — bez życzeń słownych. Pomoc AI włączysz w opcjach układania.</div>}
         <div className="row">
           <button className="btn primary" onClick={start} disabled={!status || submitting || (!!job && !finished)}>
             <Icon name="sparkles" />{submitting ? "Uruchamianie…" : "Ułóż mój plan"}
@@ -132,7 +141,7 @@ export default function GeneratePage({ status }: { status: Status | null }) {
       </div>
 
       {job && (
-        <section className="card stack">
+        <section className="card stack" ref={progressRef}>
           <h2>Postęp</h2>
           <JobProgress jobId={job.id} onDone={(j) => setFinished(j)} />
           {finished?.status === "gotowe" && !!finished.result?.new_dishes?.length && (
@@ -146,7 +155,7 @@ export default function GeneratePage({ status }: { status: Status | null }) {
                 Zobacz plan →
               </button>
               <button className="btn" onClick={() => go("zakupy", finished.result!.plan_id!)}>
-                🛒 Lista zakupów
+                <Icon name="basket" />Lista zakupów
               </button>
             </div>
           )}

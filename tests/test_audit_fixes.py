@@ -163,9 +163,13 @@ def test_yaml_cache_roundtrip(tmp_path):
     cache = tmp_path / "cache"
     first = load_plain(path, cache)
     assert first == [{"id": "a", "x": 1}, {"id": "b", "x": [1, 2]}]
-    assert list(cache.glob("*.pkl"))
+    assert list(cache.glob("*.json")) and not list(cache.glob("*.pkl"))  # JSON, nie pickle (audyt N4)
     assert load_plain(path, cache) == first  # z pamięci podręcznej
     time.sleep(0.01)
     path.write_text("- {id: c, x: 3}\n", encoding="utf-8")
     assert load_plain(path, cache) == [{"id": "c", "x": 3}]  # zmiana pliku unieważnia wpis
     assert load_plain(path, None) == [{"id": "c", "x": 3}]
+    # ta sama treść z innym czasem modyfikacji i daty YAML przechodzą przez pamięć podręczną bez zmian
+    path.write_text("- {id: d, sprawdzono: 2026-09-13}\n", encoding="utf-8")
+    first = load_plain(path, cache)
+    assert load_plain(path, cache) == first and first[0]["sprawdzono"].isoformat() == "2026-09-13"

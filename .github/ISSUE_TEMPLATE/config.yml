@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Instrukcja i FAQ
+    url: https://github.com/krapcys1-maker/dietbot-desktop/blob/main/docs/INSTRUKCJA.md
+    about: Instalacja, eksporty, kopia zapasowa, klucz AI i najczęstsze pytania.
+  - name: Zgłoś lukę bezpieczeństwa (prywatnie)
+    url: https://github.com/krapcys1-maker/dietbot-desktop/security/advisories/new
+    about: Podatności zgłaszaj prywatnie, nie w publicznym zgłoszeniu.

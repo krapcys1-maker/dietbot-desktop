@@ -3,6 +3,8 @@ $ProjectRoot = Split-Path $PSScriptRoot -Parent
 Set-Location $ProjectRoot
 
 & (Join-Path $PSScriptRoot "zbuduj.ps1")
+.\.venv\Scripts\python.exe packaging\sprawdz_paczke.py
+if ($LASTEXITCODE -ne 0) { throw "Paczka zawiera pliki spoza repozytorium albo brakuje danych." }
 
 $Candidates = @(
     (Join-Path ${env:ProgramFiles(x86)} "Inno Setup 6\ISCC.exe"),
@@ -20,4 +22,4 @@ if (-not $Compiler) {
 
 & $Compiler (Join-Path $PSScriptRoot "DietBot.iss")
 if ($LASTEXITCODE -ne 0) { throw "Budowanie instalatora nie powiodlo sie." }
-Write-Host "Gotowe: release\Porcja-Setup-0.3.0.exe"
+Write-Host "Gotowe: release\Porcja-Setup-0.5.0.exe"

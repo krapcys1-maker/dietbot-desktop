@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hmac
 import logging
 import os
 import sys
@@ -19,7 +20,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from ..domain.goal_calculator import GoalInput, calculate_goals
 from .file_dialogs import save_text_as
-from .jobs import UserError
+from .jobs import NotFound, UserError
 from .service import DietService
 from .validation import polish_error_list
 
@@ -51,6 +52,8 @@ class RecomputeIn(BaseModel):
 
 class AssumptionsIn(BaseModel):
     data: dict
+    version: str | None = None  # wersja pliku z chwili wczytania formularza
+    confirm_low_kcal: bool = False
 
 
 class DishPatchIn(BaseModel):
@@ -83,6 +86,31 @@ class ApiKeyIn(BaseModel):
     key: str = Field(min_length=20, max_length=256)
 
 
+class NoteIn(BaseModel):
+    text: str = Field(min_length=1, max_length=2000)
+    plan_id: str | None = None
+
+
+class RuleIn(BaseModel):
+    typ: Literal["zakaz_produktu", "limit_porcji", "zamiana_makro", "wskazowka"]
+    produkt: str | None = None
+    kategoria: str | None = None
+    osoby: list[str] = Field(default_factory=list)
+    posilki: list[str] = Field(default_factory=list)
+    gramy: dict[str, float | None] = Field(default_factory=dict)
+    z: str | None = None
+    na: str | None = None
+    tekst: str | None = Field(default=None, max_length=300)
+
+
+class ActiveIn(BaseModel):
+    active: bool
+
+
+class ProgramNoteIn(BaseModel):
+    status: Literal["nowa", "zrobione", "usunieta"]
+
+
 class SaveTextIn(BaseModel):
     kind: Literal["plan", "shopping"]
 
@@ -98,14 +126,39 @@ def web_dist_dir() -> Path | None:
     return None
 
 
-def create_app(service: DietService) -> FastAPI:
-    app = FastAPI(title="DietBot", docs_url="/api/docs", openapi_url="/api/openapi.json", redoc_url=None)
-    app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost", "testserver"])
+# Strona aplikacji ładuje wyłącznie własne pliki; nie da się jej osadzić w ramce obcej strony.
+CONTENT_SECURITY_POLICY = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
+                           "img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; "
+                           "base-uri 'self'; form-action 'self'; frame-ancestors 'none'")
+
+
+def create_app(service: DietService, session_token: str | None = None, docs: bool | None = None) -> FastAPI:
+    """`session_token` — gdy podany, każde żądanie /api/ musi mieć nagłówek X-Porcja-Token (okno aplikacji dostaje
+    token w adresie). `docs` — dokumentacja API (domyślnie tylko w trybie deweloperskim, nie w wersji instalowanej)."""
+    docs = (not getattr(sys, "frozen", False)) if docs is None else docs
+    app = FastAPI(title="Porcja", docs_url="/api/docs" if docs else None,
+                  openapi_url="/api/openapi.json" if docs else None, redoc_url=None)
+    # bez „testserver”: jednoczłonową nazwę hosta można podsunąć przeglądarce (audyt 09.10.2026, S5)
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost"])
     app.state.service = service
+
+    @app.middleware("http")
+    async def _session_and_headers(request: Request, call_next):
+        if session_token and request.url.path.startswith("/api/"):
+            supplied = request.headers.get("x-porcja-token", "")
+            if not hmac.compare_digest(supplied.encode("utf-8"), session_token.encode("utf-8")):
+                return JSONResponse(status_code=401, content={
+                    "detail": "Brak dostępu do Porcji — otwórz aplikację z jej okna albo skrótu."})
+        response = await call_next(request)
+        response.headers.setdefault("Content-Security-Policy", CONTENT_SECURITY_POLICY)
+        response.headers.setdefault("X-Frame-Options", "DENY")
+        response.headers.setdefault("X-Content-Type-Options", "nosniff")
+        response.headers.setdefault("Referrer-Policy", "no-referrer")
+        return response
 
     @app.exception_handler(UserError)
     async def _user_error(_: Request, exc: UserError) -> JSONResponse:
-        return JSONResponse(status_code=400, content={"detail": str(exc)})
+        return JSONResponse(status_code=404 if isinstance(exc, NotFound) else 400, content={"detail": str(exc)})
 
     @app.exception_handler(RequestValidationError)
     async def _bad_request(_: Request, exc: RequestValidationError) -> JSONResponse:
@@ -119,7 +172,7 @@ def create_app(service: DietService) -> FastAPI:
         if origin and request.method not in ("GET", "HEAD", "OPTIONS"):
             supplied, expected = urlsplit(origin), urlsplit(str(request.base_url))
             if (supplied.scheme, supplied.netloc) != (expected.scheme, expected.netloc):
-                return JSONResponse(status_code=403, content={"detail": "Żądanie spoza aplikacji DietBot."})
+                return JSONResponse(status_code=403, content={"detail": "Żądanie spoza aplikacji Porcja."})
         return await call_next(request)
 
     @app.exception_handler(Exception)
@@ -146,6 +199,13 @@ def create_app(service: DietService) -> FastAPI:
         return j.to_dict(since=max(0, od))
 
     # ---------------------------------------------------------------- plany
+    @app.post("/api/zadania/{job_id}/przerwij")
+    def cancel_job(job_id: str) -> dict:
+        job = s.jobs.cancel(job_id)
+        if job is None:
+            raise HTTPException(404, "Nie ma takiego zadania")
+        return job.to_dict()
+
     @app.get("/api/diety")
     def library() -> list[dict]:
         return s.library()
@@ -252,7 +312,7 @@ def create_app(service: DietService) -> FastAPI:
 
     @app.put("/api/zalozenia")
     def save_assumptions(body: AssumptionsIn) -> dict:
-        return s.save_assumptions(body.data)
+        return s.save_assumptions(body.data, expected_version=body.version, confirm_low_kcal=body.confirm_low_kcal)
 
     # ---------------------------------------------------------------- dania i produkty
     @app.get("/api/dania")
@@ -286,6 +346,58 @@ def create_app(service: DietService) -> FastAPI:
     @app.post("/api/produkty")
     def add_product(body: dict) -> dict:
         return s.add_product(body)
+
+    # ---------------------------------------------------------------- notatnik preferencji
+    from .notebook import Notebook
+
+    notebook = Notebook(s)
+
+    @app.get("/api/notatnik")
+    def notebook_view() -> dict:
+        return notebook.view()
+
+    @app.post("/api/notatnik/uwaga")
+    def notebook_note(body: NoteIn) -> dict:
+        return notebook.add_comment(body.text, plan_id=body.plan_id)
+
+    @app.post("/api/notatnik/zasady")
+    def notebook_add_rule(body: RuleIn) -> dict:
+        return notebook.manual_rule(body.model_dump())
+
+    @app.patch("/api/notatnik/zasady/{rule_id}")
+    def notebook_rule_active(rule_id: str, body: ActiveIn) -> dict:
+        return notebook.set_active(rule_id, body.active)
+
+    @app.delete("/api/notatnik/zasady/{rule_id}")
+    def notebook_delete_rule(rule_id: str) -> dict:
+        return notebook.delete_rule(rule_id)
+
+    @app.post("/api/notatnik/nawyki")
+    def notebook_habits() -> dict:
+        return notebook.analyze_habits()
+
+    @app.post("/api/notatnik/propozycje/{proposal_id}")
+    def notebook_apply_proposal(proposal_id: str) -> dict:
+        return notebook.apply_proposal(proposal_id)
+
+    @app.post("/api/notatnik/do-poprawy/z-analizy/{index}")
+    def notebook_program_from_habits(index: int) -> dict:
+        return notebook.add_program_note_from_habits(index)
+
+    @app.patch("/api/notatnik/do-poprawy/{note_id}")
+    def notebook_program_note(note_id: str, body: ProgramNoteIn) -> dict:
+        return notebook.set_program_note(note_id, body.status)
+
+    @app.get("/api/notatnik/tekst")
+    def notebook_text() -> dict:
+        return {"content": notebook.export_text()}
+
+    @app.post("/api/notatnik/zapisz-plik")
+    def notebook_save_file() -> dict:
+        filename = f"notatnik_preferencji_{date.today():%Y-%m-%d}.txt"
+        path = save_text_as(filename, "Zapisz notatnik preferencji", notebook.export_text())
+        return {"saved": path is not None, "path": str(path) if path else None,
+                "filename": path.name if path else filename}
 
     # ---------------------------------------------------------------- czat i koszty
     @app.get("/api/czat")
@@ -337,7 +449,7 @@ def create_app(service: DietService) -> FastAPI:
     else:
         @app.get("/", response_class=HTMLResponse)
         def no_ui() -> str:
-            return ("<meta charset='utf-8'><h1>DietBot</h1><p>Interfejs nie jest zbudowany. "
+            return ("<meta charset='utf-8'><h1>Porcja</h1><p>Interfejs nie jest zbudowany. "
                     "Uruchom <code>npm run build</code> w folderze <code>web</code>. API: <a href='/api/docs'>/api/docs</a></p>")
 
     return app

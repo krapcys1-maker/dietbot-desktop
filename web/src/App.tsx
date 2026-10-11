@@ -4,9 +4,11 @@ import { ToastProvider } from "./components/ui";
 import { RatingsProvider } from "./components/DishRating";
 import Icon from "./components/Icon";
 import Brand from "./components/Brand";
+import ErrorBoundary from "./components/ErrorBoundary";
 import HomePage from "./pages/HomePage";
 import HelpPage from "./pages/HelpPage";
 import LibraryPage from "./pages/LibraryPage";
+import NotebookPage from "./pages/NotebookPage";
 import AssumptionsPage from "./pages/AssumptionsPage";
 import ChatPage from "./pages/ChatPage";
 import DishesPage from "./pages/DishesPage";
@@ -30,9 +32,33 @@ export default function App() {
   const route = useRoute();
   const page = route[0] || "start";
   const [status, setStatus] = useState<Status | null>(null);
+  const [noAccess, setNoAccess] = useState(false);
+  useEffect(() => {
+    const onDenied = () => setNoAccess(true);
+    window.addEventListener("porcja:brak-dostepu", onDenied);
+    return () => window.removeEventListener("porcja:brak-dostepu", onDenied);
+  }, []);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [theme, setTheme] = useState(() => loadLocal<string>("porcja:theme", "light") === "dark" ? "dark" : "light");
-  useEffect(() => { document.documentElement.dataset.theme = theme; saveLocal("porcja:theme", theme); }, [theme]);
+  // bez własnego wyboru motyw idzie za ustawieniem systemu (Windows: tryb ciemny aplikacji)
+  const systemTheme = () => (window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  // „porcja:theme” zapisywało się dawniej przy każdym starcie, więc „light” nie musiało być wyborem użytkownika
+  const [chosenTheme, setChosenTheme] = useState(() => loadLocal<string | null>("porcja:motyw", null)
+    ?? (loadLocal<string | null>("porcja:theme", null) === "dark" ? "dark" : null));
+  const [theme, setTheme] = useState(() => chosenTheme === "dark" || chosenTheme === "light" ? chosenTheme : systemTheme());
+  useEffect(() => { document.documentElement.dataset.theme = theme; }, [theme]);
+  useEffect(() => {
+    if (chosenTheme || !window.matchMedia) return;
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const follow = () => setTheme(media.matches ? "dark" : "light");
+    media.addEventListener?.("change", follow);
+    return () => media.removeEventListener?.("change", follow);
+  }, [chosenTheme]);
+  const toggleTheme = () => {
+    const next = theme === "light" ? "dark" : "light";
+    setTheme(next);
+    setChosenTheme(next);
+    saveLocal("porcja:motyw", next);
+  };
   useEffect(() => { setMenuOpen(false); document.querySelector(".main")?.scrollTo(0, 0); }, [page]);
 
   useEffect(() => {
@@ -45,6 +71,19 @@ export default function App() {
       clearInterval(t);
     };
   }, [page]);
+
+  if (noAccess) {
+    return (
+      <div className="page error-screen">
+        <div className="card stack">
+          <Brand />
+          <h2>Brak dostępu do Porcji</h2>
+          <p className="muted">Ta strona została otwarta bez klucza sesji. Dla bezpieczeństwa dane są dostępne tylko w oknie
+            aplikacji — otwórz Porcję ze skrótu na pulpicie albo z menu Start.</p>
+        </div>
+      </div>
+    );
+  }
 
   let content;
   switch (page) {
@@ -75,6 +114,9 @@ export default function App() {
     case "zalozenia":
       content = <AssumptionsPage />;
       break;
+    case "notatnik":
+      content = <NotebookPage />;
+      break;
     case "ustawienia":
       content = <SettingsPage status={status} onStatusChange={setStatus} />;
       break;
@@ -102,6 +144,7 @@ export default function App() {
             </a>
           ))}
           <div className="nav-section">Dopasuj do siebie</div>
+          <a href="#/notatnik" className={`nav-item ${page === "notatnik" ? "active" : ""}`} aria-current={page === "notatnik" ? "page" : undefined}><Icon name="notebook" />Notatnik preferencji</a>
           <a href="#/zalozenia" className={`nav-item ${page === "zalozenia" ? "active" : ""}`}><Icon name="target" />Cele i preferencje</a>
           <a href="#/ustawienia" className={`nav-item ${page === "ustawienia" ? "active" : ""}`}><Icon name="settings" />Ustawienia</a>
           <details className="nav-extra" key={page === "czat" || page === "produkty" ? "extra" : "main"} open={page === "czat" || page === "produkty" ? true : undefined}>
@@ -119,10 +162,10 @@ export default function App() {
           )}
         </nav>
         <main className="main" id="main-content" tabIndex={-1}>
-          <div className="topbar no-print"><span>Twoja przestrzeń <span className="topbar-divider">/</span> <b>{NAV.find(n => n.key === page)?.label ?? ({ nowy: "Nowy plan", zalozenia: "Cele i preferencje", ustawienia: "Ustawienia", pomoc: "Pomoc", czat: "Asystent", produkty: "Produkty" } as Record<string, string>)[page] ?? "Plan tygodnia"}</b></span>
-            <div className="row"><a href="#/ustawienia" className="connection-label"><span className={`live-dot ${status?.llm.key_present && status?.llm.enabled ? "" : "neutral"}`} />{status ? status.llm.key_present && status.llm.enabled ? "AI dostępne" : "Tryb bez AI" : "Łączenie…"}</a><button className="btn icon-button" aria-label={theme === "light" ? "Włącz ciemny motyw" : "Włącz jasny motyw"} onClick={() => setTheme(t => t === "light" ? "dark" : "light")}><Icon name={theme === "light" ? "moon" : "sun"} /></button></div>
+          <div className="topbar no-print"><span>Twoja przestrzeń <span className="topbar-divider">/</span> <b>{NAV.find(n => n.key === page)?.label ?? ({ nowy: "Nowy plan", notatnik: "Notatnik preferencji", zalozenia: "Cele i preferencje", ustawienia: "Ustawienia", pomoc: "Pomoc", czat: "Asystent", produkty: "Produkty" } as Record<string, string>)[page] ?? "Plan tygodnia"}</b></span>
+            <div className="row"><a href="#/ustawienia" className="connection-label"><span className={`live-dot ${status?.llm.key_present && status?.llm.enabled ? "" : "neutral"}`} />{status ? status.llm.key_present && status.llm.enabled ? "AI dostępne" : "Tryb bez AI" : "Łączenie…"}</a><button className="btn icon-button" aria-label={theme === "light" ? "Włącz ciemny motyw" : "Włącz jasny motyw"} onClick={toggleTheme}><Icon name={theme === "light" ? "moon" : "sun"} /></button></div>
           </div>
-          {content}
+          <ErrorBoundary resetKey={route.join("/")}>{content}</ErrorBoundary>
           <footer className="page-footer no-print">porcja. <span>Dobrze mieć plan.</span><a href="#/pomoc">Pomoc</a></footer>
         </main>
       </div>

@@ -44,8 +44,11 @@ export default function ShoppingPage({ planId }: { planId?: string }) {
       lines.push("", g.label.toUpperCase());
       for (const it of g.items) {
         if (done.includes(it.produkt)) continue;
-        const remaining = Math.round((it.gramy - (bought[it.produkt] ?? 0)) * 10) / 10;
-        lines.push(`- ${it.nazwa} — ${remaining} g do kupienia`);
+        // bez „- ” i „[ ]” — notatki w telefonie same robią z wierszy listę do odhaczania
+        const part = bought[it.produkt] ?? 0;
+        const remaining = Math.round((it.gramy - part) * 10) / 10;
+        const variants = it.warianty_rozne && it.warianty ? ` (w tym: ${it.warianty.map(v => `${v.nazwa.toLowerCase()} ${Math.ceil(v.gramy / 10) * 10} g`).join(", ")})` : "";
+        lines.push(part > 0 ? `${it.nazwa} — jeszcze ${remaining} g` : `${it.nazwa} — ${it.ilosc}${variants}`);
       }
     }
     try {
@@ -101,7 +104,7 @@ export default function ShoppingPage({ planId }: { planId?: string }) {
         </MoreActions>
       </div>
       <div className="card flat row no-print">
-        <div className="grow"><b>{doneCount === total && total > 0 ? "Wszystko kupione" : `Pozostało ${total - doneCount} z ${total} produktów`}</b>
+        <div className="grow"><b>{doneCount === total && total > 0 ? "Wszystko kupione" : `Pozostało ${total - doneCount} z ${total} ${plural(total, "produktu", "produktów", "produktów")}`}</b>
           <div className="muted small">Eksport obejmuje całą listę. Odhaczenie zapamiętuje ilość — po zmianie diety większy zakup pojawi się ponownie.</div></div>
         <label className="check"><input type="checkbox" checked={hideDone} onChange={(e) => setHideDone(e.target.checked)} /> Ukryj kupione</label>
         <div className="shopping-progress" role="progressbar" aria-label="Kupione produkty" aria-valuemin={0} aria-valuemax={total || 1} aria-valuenow={doneCount}><span style={{ width: `${total ? doneCount / total * 100 : 0}%` }} /></div>
@@ -127,6 +130,12 @@ export default function ShoppingPage({ planId }: { planId?: string }) {
                       aria-label={`${it.nazwa}${it.na_wynos ? " — do zamówienia" : " — kupione"}`} />
                     <div>
                       <div className="shop-name">{it.nazwa}</div>
+                      {(it.warianty?.length ?? 0) > 1 && (
+                        <div className={`small ${it.warianty_rozne ? "warn-text" : "muted"}`}
+                          title={it.warianty_rozne ? "Warianty różnią się kalorycznością — kup je w tych proporcjach, inaczej plan się zmieni." : undefined}>
+                          w tym: {it.warianty!.map(v => `${v.nazwa.toLowerCase()} ${Math.ceil(v.gramy / 10) * 10} g`).join(", ")}
+                        </div>
+                      )}
                       {(bought[it.produkt] ?? 0) > 0 && !done.includes(it.produkt) && <div className="muted small">Kupiono {bought[it.produkt]} g · dokup {Math.round((it.gramy - bought[it.produkt]) * 10) / 10} g</div>}
                     </div>
                     <div className="right nowrap">

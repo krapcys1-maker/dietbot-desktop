@@ -33,6 +33,47 @@ def restore(snapshot: dict, current: Repository) -> Repository:
                       dish_ratings=current.dish_ratings)
 
 
+# Pola bez wpływu na gramatury i zasady planu: ich zmiana (np. odrzucenie dania w bibliotece, poprawka opisu) nie
+# może blokować zamian w zapisanych dietach (audyt 09.10.2026, S2).
+DISPLAY_ONLY = {"dishes": ("status", "source", "description", "steps", "name", "prep_minutes"),
+                "products": ("name", "aliases", "source", "notes", "verified")}
+
+
+# z wartości odżywczych silnik i weryfikator celów używają tylko tych pól — np. dopisana zawartość soli (podsumowanie
+# soli od 0.5.0) nie unieważnia zapisanych planów
+CALCULATED_NUTRIENTS = ("kcal", "protein", "fat", "carbs")
+
+
+def _calculation_view(section: str, data: dict) -> dict:
+    skip = DISPLAY_ONLY.get(section)
+    if not skip:
+        return data
+    out = {}
+    for k, item in data.items():
+        view = {f: v for f, v in item.items() if f not in skip}
+        if section == "products" and isinstance(view.get("per_100g"), dict):
+            view["per_100g"] = {f: view["per_100g"].get(f) for f in CALCULATED_NUTRIENTS}
+        out[k] = view
+    return out
+
+
+def _normalized(snapshot: dict) -> dict | None:
+    """Kopia zapisana starszą wersją nie ma nowych pól z wartościami domyślnymi (np. płeć, limity porcji) — przed
+    porównaniem przepuszczamy ją przez obecne modele, żeby zmiana schematu nie oznaczała każdego planu jako zmienionego."""
+    try:
+        return {"assumptions": Assumptions.model_validate(snapshot["assumptions"]).model_dump(mode="json"),
+                "products": {k: Product.model_validate(p).model_dump(mode="json")
+                             for k, p in (snapshot.get("products") or {}).items()},
+                "dishes": {k: DishTemplate.model_validate(d).model_dump(mode="json")
+                           for k, d in (snapshot.get("dishes") or {}).items()}}
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
 def matches_current(snapshot: dict, repo: Repository, plan: WeekPlan) -> bool:
+    saved = _normalized(snapshot)
+    if saved is None:
+        return False
     now = capture(repo, plan)
-    return all(snapshot.get(k) == now[k] for k in ("assumptions", "products", "dishes"))
+    return all(_calculation_view(k, saved[k]) == _calculation_view(k, now[k])
+               for k in ("assumptions", "products", "dishes"))

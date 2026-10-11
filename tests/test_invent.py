@@ -127,11 +127,29 @@ def test_invent_without_llm_fails_politely(tmp_path):
 
 
 def test_chat_routes_invention_request(env):
+    """Płatne wymyślanie dań z czatu startuje dopiero po „Tak, uruchom” (audyt 09.10.2026, W4)."""
     service, fake = env
     reply = ChatAssistant(service).handle("wymyśl mi trzy dania z krewetkami")
-    assert reply["data"]["kind"] == "wymyslanie"
-    job = service.jobs.wait(reply["data"]["job_id"], timeout=120)
+    assert reply["data"]["kind"] == "potwierdz_akcje" and "płatne" in reply["text"]
+    assert "generacja_dan_obiad" not in " ".join(fake.tasks)  # nic jeszcze nie wymyślono
+    started = ChatAssistant(service).confirm(reply["data"]["proposal_id"])
+    assert started["data"]["kind"] == "wymyslanie"
+    job = service.jobs.wait(started["data"]["job_id"], timeout=120)
     assert job.status is JobStatus.DONE
+
+
+def test_chat_does_not_force_invention_on_negation_or_question(env):
+    service, fake = env
+
+    def answer(task, system, user, schema, **kw):
+        return LLMResult(value=schema.model_validate({"typ": "odpowiedz", "tekst": "Białko liczy program."}), attempts=1,
+                         cost_usd=0.0, prompt_tokens=0, completion_tokens=0, seconds=0.0)
+
+    fake.complete_json = answer
+    for text in ("Nie wymyślaj nowych dań, powiedz tylko, jak liczycie białko", "Jak wymyślacie nowe dania?",
+                 "Czy macie jakieś nowe dania?"):
+        reply = ChatAssistant(service).handle(text)
+        assert reply["data"] is None and reply["text"] == "Białko liczy program.", text
 
 
 def test_compose_prompt_prefers_new_dishes(repo):

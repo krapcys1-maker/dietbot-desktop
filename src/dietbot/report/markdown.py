@@ -9,10 +9,11 @@ from ..checker.verify import VerificationReport
 from ..domain.assumptions import DAY_LABELS_PL, Assumptions
 from ..domain.dish import MEAL_LABELS_PL, DishTemplate
 from ..domain.plan import WeekPlan
-from ..domain.product import Category, Product, StoreProduct
+from ..domain.product import Product, StoreProduct
 from ..measures import household
 from ..shopping import SHOPPING_NOTE, SHOPPING_NUTRITION_NOTE, build_shopping_list
 from ..textfmt import fmt_num, plural_pl
+from .batch import batch_recipe
 from .summary import day_summaries, week_summaries
 
 METRICS = [("kcal", "Energia", "kcal"), ("protein", "Białko", "g"), ("fat", "Tłuszcz", "g"), ("carbs", "Węglowodany", "g")]
@@ -25,6 +26,10 @@ def fmt_amount(product: Product, grams: float) -> str:
     g = fmt_num(grams, 0 if grams >= 3 else 1)
     hint = household(product, grams)
     return f"{g} g (≈ {hint})" if hint else f"{g} g"
+
+
+def _everyone(persons) -> str:
+    return "obie osoby" if len(persons) == 2 else "wszyscy domownicy" if len(persons) > 2 else "domownik"
 
 
 def _status_icon(ok: bool) -> str:
@@ -75,6 +80,38 @@ def render_plan(plan: WeekPlan, a: Assumptions, products: Mapping[str, Product],
                 tags.append(f"na zapas: {', '.join(days)}")
             tag_txt = f" _({'; '.join(tags)})_" if tags else ""
             lines += [f"### {MEAL_LABELS_PL[meal.meal]} — {name}{tag_txt}", ""]
+            batch = batch_recipe(plan, meal, dish, products, persons)
+            if batch:
+                if meal.batch_group in batch_done:
+                    lines += [f"**Dziś tylko odgrzewasz przygotowane porcje. Nie gotujesz drugi raz.** "
+                              f"Pełne składniki i przepis na całość ({batch['portions_text']}) "
+                              f"są przy dniu: {batch['days'][0].lower()}."
+                              + (" Pieczywo podaj osobno." if batch["has_side"] else ""), ""]
+                    continue
+                batch_done.add(meal.batch_group)
+                lines += [f"**{batch['title']}**", "", batch["instructions"], "",
+                          "| Składnik | Łącznie na wszystkie dni i osoby |", "|---|---:|"]
+                for item in batch["items"]:
+                    product = products.get(item["product_id"])
+                    label = product.name if product else item["product_id"]
+                    if item["side"]:
+                        label += " — dodatek do podania osobno"
+                    amount = fmt_amount(product, item["grams"]) if product else f"{fmt_num(item['grams'])} g"
+                    lines.append(f"| {label} | {amount} |")
+                if batch["water"]:
+                    lines.append(f"| Woda do gotowania | {batch['water']} |")
+                lines += ["", "**Przygotowanie całej ilości — wykonujesz raz:**", ""]
+                lines += [f"{i}. {s}" for i, s in enumerate(batch["steps"], 1)]
+                lines += ["", "_Podział porcji: poniższe ilości surowych składników są już zawarte w całości powyżej. "
+                          "To nie jest lista do ponownego gotowania. Mięso i większe kawałki rozdziel według porcji; "
+                          "jedna proporcja masy całej zupy nie daje dokładnego podziału każdego składnika._", ""]
+                for batch_meal in sorted((m for m in plan.meals if m.batch_group == meal.batch_group), key=lambda m: int(m.day)):
+                    for portion in batch_meal.portions:
+                        parts = ", ".join(f"{products[it.product_id].name.lower()} {fmt_amount(products[it.product_id], it.grams)}"
+                                          for it in portion.items if it.product_id in products and not products[it.product_id].negligible)
+                        lines.append(f"- {DAY_LABELS_PL[batch_meal.day]} — {person_names.get(portion.person_id, portion.person_id)}: {parts}.")
+                lines.append("")
+                continue
             if dish and dish.description:
                 lines += [dish.description, ""]
             header = "| Składnik | " + " | ".join(p.name for p in persons) + " |"
@@ -92,20 +129,19 @@ def render_plan(plan: WeekPlan, a: Assumptions, products: Mapping[str, Product],
                     cells.append(fmt_amount(product, g) if (g and product) else "—")
                 lines.append(f"| {label} | " + " | ".join(cells) + " |")
             lines.append("")
-            if meal.batch_group and meal.batch_pot_g and meal.batch_group not in batch_done:
-                batch_done.add(meal.batch_group)
-                # do garnka nie trafia pieczywo podawane obok
-                pot = ", ".join(f"{products[p].name.lower()} {fmt_amount(products[p], g)}"
-                                for p, g in meal.batch_pot_g.items()
-                                if p in products and products[p].category is not Category.BREAD)
-                lines += [f"**Gotujesz raz, na wszystkie porcje:** {pot}.", ""]
-            if dish and dish.steps and (not meal.batch_group or meal.batch_group in batch_done):
-                if not meal.batch_group or meal == next(m for m in plan.meals if m.batch_group == meal.batch_group):
-                    lines.append("_Przygotowanie:_")
-                    lines += [f"{i}. {s}" for i, s in enumerate(dish.steps, start=1)]
-                    lines.append("")
-                else:
-                    lines += ["_Odgrzewasz porcję ugotowaną wcześniej._", ""]
+            if dish and dish.groups and not meal.batch_group:
+                for group in dish.groups:
+                    amounts = [(pid, sum(g.get(pid, 0) for g in grams_by.values())) for pid in group.products]
+                    ingredients = ", ".join(f"{products[pid].name.lower()} {fmt_num(g)} g"
+                                            for pid, g in amounts if pid in products and g > 0)
+                    lines += [f"**{group.name.capitalize()} — razem dla wszystkich osób:** {ingredients}.", ""]
+                if any("jajko_kurze" in group.products for group in dish.groups):
+                    lines += ["_Jajko do masy roztrzep i odważ podaną łączną ilość. "
+                              "Gotową masę podziel według porcji z tabeli; nie odmierzaj ułamka jajka osobno na każdy talerz._", ""]
+            if dish and dish.steps:
+                lines.append("_Przygotowanie:_")
+                lines += [f"{i}. {s}" for i, s in enumerate(dish.steps, start=1)]
+                lines.append("")
 
         day_snacks = [s for s in plan.snacks if s.day == day]
         if day_snacks:
@@ -117,7 +153,7 @@ def render_plan(plan: WeekPlan, a: Assumptions, products: Mapping[str, Product],
                                   for i in s.items)
                 lines.append(f"- **{person_names.get(s.person_id, s.person_id)}:** {items}. {s.reason or ''}")
             lines.append("")
-        lines += [f"_Stałe pozycje (obie osoby): {fixed}._", "", f"**Suma dnia — {DAY_LABELS_PL[day].lower()}**", ""]
+        lines += [f"_Stałe pozycje ({_everyone(persons)}): {fixed}._", "", f"**Suma dnia — {DAY_LABELS_PL[day].lower()}**", ""]
         mine = [summaries.get((int(day), p.id)) for p in persons]
         if all(s is not None for s in mine):
             lines += ["| Co | " + " | ".join(p.name for p in persons) + " |", "|---|" + "---:|" * len(persons)]
@@ -142,6 +178,15 @@ def render_plan(plan: WeekPlan, a: Assumptions, products: Mapping[str, Product],
             lines.append("| **Razem dzień** | " + " | ".join(
                 f"**{_macro_text(s.total)}** {_status_icon(s.ok)}" for s in mine) + " |")
             lines.append("| _Widełki_ | " + " | ".join(_bands_text(p) for p in persons) + " |")
+            extra = []
+            for p in persons:
+                t = totals.get((int(day), p.id))
+                if t is not None and t.kcal:
+                    extra.append(f"{p.name}: sól {fmt_num(t.salt)} g, kwasy nasycone "
+                                 f"{fmt_num(t.saturated_fat * 9 / t.kcal * 100)}% energii")
+            if extra:
+                lines += ["", "_" + "; ".join(extra) + " (zalecenia: sól poniżej 5 g, kwasy nasycone poniżej 10% "
+                          "energii)._"]
         else:  # plan liczony dla innych osób niż w założeniach — same sumy z weryfikatora
             lines += ["| Osoba | " + " | ".join(m[1] for m in METRICS) + " |", "|---|" + "---:|" * len(METRICS)]
             for person in persons:
@@ -223,13 +268,15 @@ def week_facts(plan: WeekPlan, a: Assumptions, dishes: Mapping[str, DishTemplate
         lines.append(f"- Gotowanie na zapas: {name} — {where(meals)}")
     lines.append(f"- Przekąski bilansujące: {len(plan.snacks)}")
     if egg and egg.measure("szt") and eggs > 0:  # to samo zaokrąglenie co w widoku aplikacji
-        lines.append(f"- Jajka w tygodniu (obie osoby): ok. {math.ceil(eggs / egg.measure('szt').grams - 0.05)} szt.")
+        lines.append(f"- Jajka w tygodniu ({_everyone(a.persons)}): ok. {math.ceil(eggs / egg.measure('szt').grams - 0.05)} szt.")
     lines.append("")
     return lines
 
 
 def render_shopping_list(plan: WeekPlan, a: Assumptions, products: Mapping[str, Product],
-                         store_products: Sequence[StoreProduct] = ()) -> str:
+                         store_products: Sequence[StoreProduct] = (), bullets: bool = True) -> str:
+    """`bullets=False` — same pozycje bez znaczników listy (np. do wklejenia w notatki telefonu, które same dodają
+    pola do odhaczania; „- [ ]” przeszkadzało tam domownikom)."""
     rows = build_shopping_list(plan, a, products, store_products)
     lines = ["# Lista zakupów", "",
              f"_Na {len(plan.days)} {plural_pl(len(plan.days), 'dzień', 'dni', 'dni')} dla "
@@ -243,6 +290,7 @@ def render_shopping_list(plan: WeekPlan, a: Assumptions, products: Mapping[str, 
                 lines.append("")
             lines += [f"## {row.group_label}", ""]
             current = row.group
-        lines.append(f"- [ ] {row.name} — {row.amount_text}")
+        variants = f" (w tym: {row.variants_text})" if row.variants_differ else ""
+        lines.append(f"{'- ' if bullets else ''}{row.name} — {row.amount_text}{variants}")
     lines.append("")
     return "\n".join(lines) + "\n"

@@ -69,6 +69,8 @@ def test_generate_and_view(service, generated):
         assert all(s == "ok" for d in view["days"] for t in d["totals"].values() for s in t["states"].values())
     batch = [m for d in view["days"] for m in d["meals"] if m["batch_group"]]
     assert batch and batch[0]["pot"] and not batch[0]["reheat"] and batch[1]["reheat"]
+    assert batch[0]["batch_recipe"]["portions_count"] == 4
+    assert batch[0]["batch_recipe"]["items"] == batch[1]["batch_recipe"]["items"]
     assert batch[0]["slot_key"] == "1-2_obiad"
     assert any(f["label"] == "Posiłki z puli 20%" for f in view["facts"])
     assert [w["person_id"] for w in view["week_summary"]] == ["kobieta", "mezczyzna"]
@@ -175,7 +177,7 @@ def test_add_product_from_label(service):
 
 
 def test_api_endpoints(service, generated):
-    client = TestClient(create_app(service))
+    client = TestClient(create_app(service), base_url="http://127.0.0.1")
     assert client.get("/api/status").status_code == 200
     plans = client.get("/api/plany").json()
     assert plans and any(p["active"] for p in plans)
@@ -184,8 +186,8 @@ def test_api_endpoints(service, generated):
     r = client.get(f"/api/plany/{generated['plan_id']}/zamienniki", params={"slot": "0_sniadanie"})
     assert r.status_code == 200 and r.json()["options"]
     r = client.post(f"/api/plany/{generated['plan_id']}/zamien", json={"slot_key": "0_sniadanie", "dish_id": "nie_ma"})
-    assert r.status_code == 400 and "Nie ma takiego dania" in r.json()["detail"]
-    assert client.get("/api/plany/nie-ma-takiego").status_code == 400
+    assert r.status_code == 404 and "Nie ma takiego dania" in r.json()["detail"]
+    assert client.get("/api/plany/nie-ma-takiego").status_code == 404
     assert client.get("/api/dania", params={"q": "kurczak"}).json()
     assert client.get("/api/produkty", params={"q": "skyr"}).json()
     assert client.get("/api/zalozenia").json()["data"]["osoby"]
@@ -199,7 +201,7 @@ def test_api_endpoints(service, generated):
 
 
 def test_api_validation_errors_are_polish(service):
-    client = TestClient(create_app(service))
+    client = TestClient(create_app(service), base_url="http://127.0.0.1")
     r = client.post("/api/plany/generuj", json={"use_llm": False, "wishes": "x" * 1500})
     assert r.status_code == 400 and r.json()["detail"] == "życzenia: za długi tekst (maks. 1000 znaków)"
     r = client.post("/api/plany/generuj", json={"use_llm": "może", "week_start": "wczoraj"})
@@ -232,7 +234,7 @@ def test_save_entire_week_and_shopping_as_text(service, generated, tmp_path, mon
         return path
 
     monkeypatch.setattr(api_module, "save_text_as", fake_save)
-    client = TestClient(create_app(service))
+    client = TestClient(create_app(service), base_url="http://127.0.0.1")
     for kind in ("plan", "shopping"):
         response = client.post(f"/api/plany/{plan_id}/zapisz-plik", json={"kind": kind})
         assert response.status_code == 200 and response.json()["saved"] is True
@@ -243,7 +245,7 @@ def test_api_key_is_saved_locally_and_never_returned(service, monkeypatch):
     settings = LLMSettings.load(service.paths)
     monkeypatch.delenv(settings.api_key_env, raising=False)
     previous_use_llm = service.use_llm
-    client = TestClient(create_app(service))
+    client = TestClient(create_app(service), base_url="http://127.0.0.1")
     key = "sk-" + "a1b2c3d4" * 4
     try:
         too_short = client.put("/api/ustawienia/deepseek", json={"key": "sk-short"})

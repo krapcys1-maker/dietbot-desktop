@@ -1,0 +1,14 @@
+# Korekty błędnych wartości w bazie produktów (audyt 09.10.2026). Działają przy wczytywaniu danych, także w starszych
+# instalacjach — produkt jest poprawiany tylko wtedy, gdy nadal ma dokładnie stare wartości z pola „bylo”.
+- produkt: szynka_parmenska
+  powod: wartości chudej polędwicy łososiowej (BLS W443000) zamienione na szynkę dojrzewającą (BLS W441000 Parmaschinken)
+  bylo: {kcal: 123, tluszcz: 2.08}
+  zmiana:
+    zrodlo: {baza: BLS, kod: W441000, wersja: 4.0 (2025), nazwa_oryginalna: Parmaschinken | Parma ham, pobrano: '2026-10-11'}
+    na_100g: {kcal: 307, bialko: 26.72, tluszcz: 21.8, weglowodany: 0.13, blonnik: 0, cukry: 0.13, kwasy_nasycone: 8.07,
+      sol: 5.3, kwasy_organiczne: 1.11}
+- produkt: sol
+  powod: sól kuchenna ma zawartość soli (do podsumowania soli dnia); dalej pomijalna w kcal i makro
+  bylo: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  zmiana:
+    na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0, sol: 99.5}

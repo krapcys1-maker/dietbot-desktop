@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 
-from ..domain.assumptions import Assumptions, Weekday
+from ..domain.assumptions import Assumptions, Weekday, fixed_grams
 from ..domain.dish import DishTemplate
 from ..domain.nutrition import BAND_TOLERANCE
 from ..domain.plan import PlannedMeal, PlannedSnack
@@ -42,7 +42,7 @@ def day_totals(
     snacks: Sequence[PlannedSnack],
     include_snacks: bool = True,
 ) -> dict[str, float]:
-    total = items_totals(catalog, {i.product_id: i.grams for i in a.day.fixed_items})
+    total = items_totals(catalog, fixed_grams(a))
     for meal in meals:
         if meal.day != day:
             continue

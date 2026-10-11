@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+import datetime as dt
 import hashlib
 import io
+import json
 import os
-import pickle
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -13,7 +14,7 @@ from typing import Any
 from ruamel.yaml import YAML
 
 # wersja formatu pamięci podręcznej sparsowanych plików — zmiana unieważnia stare wpisy
-_CACHE_VERSION = 1
+_CACHE_VERSION = 2
 
 
 def _yaml() -> YAML:
@@ -56,36 +57,59 @@ def to_plain(data: Any) -> Any:
     return data
 
 
+def _encode(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {k: _encode(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_encode(v) for v in value]
+    if isinstance(value, dt.datetime):
+        return {"__datetime__": value.isoformat()}
+    if isinstance(value, dt.date):
+        return {"__date__": value.isoformat()}
+    return value
+
+
+def _decode(value: Any) -> Any:
+    if isinstance(value, dict):
+        if len(value) == 1 and "__date__" in value:
+            return dt.date.fromisoformat(value["__date__"])
+        if len(value) == 1 and "__datetime__" in value:
+            return dt.datetime.fromisoformat(value["__datetime__"])
+        return {k: _decode(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_decode(v) for v in value]
+    return value
+
+
 def load_plain(path: Path, cache_dir: Path | None = None) -> Any:
     """`to_plain(load_yaml(path))` z pamięcią podręczną na dysku.
 
     Parser zachowujący komentarze potrzebuje ok. 3,5 s na bibliotekę dań (kilkanaście tysięcy linii), a wynik zmienia
-    się tylko po edycji pliku. Klucz wpisu: ścieżka, rozmiar i czas modyfikacji pliku. Bez `cache_dir` albo przy
-    problemie z dyskiem — zwykłe wczytanie (pamięć podręczna nigdy nie jest warunkiem działania).
+    się tylko po edycji pliku. Klucz wpisu: skrót SHA-256 treści pliku (nie czas modyfikacji — ten bywa nieświeży po
+    przywróceniu kopii albo na dyskach sieciowych). Zapis w JSON, nie pickle: podrzucony plik pamięci podręcznej nie
+    może wykonać kodu (audyt N4). Bez `cache_dir` albo przy problemie z dyskiem — zwykłe wczytanie.
     """
     if cache_dir is None:
         return to_plain(load_yaml(path))
-    cache_file = stamp = None
+    cache_file = digest = None
     try:
-        st = path.stat()
-        stamp = (st.st_mtime_ns, st.st_size)
-        cache_file = cache_dir / (hashlib.sha1(str(path.resolve()).encode("utf-8")).hexdigest() + ".pkl")
+        raw = path.read_bytes()
+        digest = hashlib.sha256(raw).hexdigest()
+        cache_file = cache_dir / (hashlib.sha1(str(path.resolve()).encode("utf-8")).hexdigest() + ".json")
         if cache_file.exists():
-            with cache_file.open("rb") as f:
-                saved = pickle.load(f)
-            if saved.get("version") == _CACHE_VERSION and saved.get("stamp") == stamp:
-                return saved["data"]
-    except (OSError, pickle.PickleError, EOFError, AttributeError, KeyError, TypeError):
+            saved = json.loads(cache_file.read_text(encoding="utf-8"))
+            if saved.get("version") == _CACHE_VERSION and saved.get("sha256") == digest:
+                return _decode(saved["data"])
+    except (OSError, ValueError, TypeError, KeyError, AttributeError, RecursionError):
         pass
     data = to_plain(load_yaml(path))
     if cache_file is not None:
         try:
             cache_dir.mkdir(parents=True, exist_ok=True)
             fd, tmp = tempfile.mkstemp(prefix=cache_file.name, suffix=".tmp", dir=cache_dir)
-            with os.fdopen(fd, "wb") as f:
-                pickle.dump({"version": _CACHE_VERSION, "stamp": stamp, "data": data}, f,
-                            protocol=pickle.HIGHEST_PROTOCOL)
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
+                json.dump({"version": _CACHE_VERSION, "sha256": digest, "data": _encode(data)}, f, ensure_ascii=False)
             os.replace(tmp, cache_file)
-        except OSError:
+        except (OSError, TypeError, ValueError):
             pass
     return data

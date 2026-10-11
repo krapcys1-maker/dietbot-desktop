@@ -29,6 +29,11 @@ export const METRIC_NAMES: Record<string, string> = { kcal: "Energia", protein: 
 export const TAG_NAMES: Record<string, string> = {
   wegan: "wegańskie",
   slodkie: "słodkie", pula_20: "pula 20%", na_zapas: "na zapas", zupa: "zupa", wege: "wege", na_cieplo: "na ciepło", szybkie: "szybkie",
+  na_zimno: "na zimno", przekaska: "przekąska", fit: "fit",
+};
+export const STATE_NAMES: Record<string, string> = {
+  surowy: "surowy", suchy: "suchy", gotowany: "gotowany", gotowy_do_jedzenia: "gotowy do jedzenia", odsaczony: "odsączony",
+  mrozony: "mrożony", pieczony: "pieczony", smazony: "smażony", wedzony: "wędzony", konserwowy: "konserwowy",
 };
 export const STATUS_NAMES: Record<string, string> = { szkic: "szkic", zatwierdzone: "zatwierdzone", odrzucone: "odrzucone" };
 
@@ -51,6 +56,27 @@ export function dayDate(weekStart: string | null, index: number): string | null 
 }
 
 // ---------------------------------------------------------------- router na hashu (#/tydzien/abc)
+// Strażnik niezapisanych zmian: przejście do innej zakładki pyta o zgodę, a po odmowie wraca pod poprzedni adres.
+// Słuchacz rejestruje się przy wczytaniu modułu, więc działa przed odświeżeniem widoku przez React.
+let leaveGuard: string | null = null;
+let lastHash = typeof window !== "undefined" ? window.location.hash : "";
+let reverting = false;
+if (typeof window !== "undefined") {
+  window.addEventListener("hashchange", () => {
+    if (reverting) { reverting = false; return; }
+    if (leaveGuard && !window.confirm(leaveGuard)) {
+      reverting = true;
+      window.location.hash = lastHash;
+      return;
+    }
+    lastHash = window.location.hash;
+  });
+}
+
+export function setLeaveGuard(message: string | null) {
+  leaveGuard = message;
+}
+
 function subscribe(cb: () => void) {
   window.addEventListener("hashchange", cb);
   return () => window.removeEventListener("hashchange", cb);

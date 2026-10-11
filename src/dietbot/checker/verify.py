@@ -13,9 +13,17 @@ from enum import StrEnum
 from pydantic import BaseModel, Field
 
 from ..domain.assumptions import DAY_LABELS_PL, Assumptions, Weekday
-from ..domain.diet import compatible
-from ..domain.dish import GROUP_MEMBER_STEP_G, MEAL_LABELS_PL, DishIngredient, DishTemplate, MealType, Role
-from ..domain.nutrition import BAND_TOLERANCE, EnergyMethod
+from ..domain.diet import DIET_GENITIVE_PL, compatible
+from ..domain.dish import (
+    GROUP_MEMBER_STEP_G,
+    MEAL_LABELS_PL,
+    DishIngredient,
+    DishTemplate,
+    MealType,
+    Portioning,
+    Role,
+)
+from ..domain.nutrition import BAND_TOLERANCE, MEAL_MASS_TOLERANCE, EnergyMethod
 from ..domain.plan import PlannedMeal, WeekPlan
 from ..domain.product import Product
 from ..textfmt import fmt_num
@@ -51,6 +59,8 @@ class DayTotals(BaseModel):
     fat: float
     carbs: float
     fiber: float
+    salt: float = 0.0  # g soli (z produktów i soli kuchennej w przepisach) — do pokazania, nie do celów
+    saturated_fat: float = 0.0
 
 
 class VerificationReport(BaseModel):
@@ -65,6 +75,11 @@ class VerificationReport(BaseModel):
         return {i.code for i in self.issues}
 
 
+def _pname(products: Mapping[str, Product], product_id: str) -> str:
+    p = products.get(product_id)
+    return p.name.lower() if p else product_id
+
+
 def _energy_per_100g(p: Product, method: EnergyMethod) -> float:
     n = p.per_100g
     if method is EnergyMethod.LABEL:
@@ -73,12 +88,15 @@ def _energy_per_100g(p: Product, method: EnergyMethod) -> float:
 
 
 def nutrition_of(items: Mapping[str, float], products: Mapping[str, Product], method: EnergyMethod) -> dict[str, float]:
-    out = {"kcal": 0.0, "protein": 0.0, "fat": 0.0, "carbs": 0.0, "fiber": 0.0}
+    """Sumy dla gramatur. Sól liczymy także z produktów pomijalnych w kcal i makro (sól kuchenna w przepisach)."""
+    out = {"kcal": 0.0, "protein": 0.0, "fat": 0.0, "carbs": 0.0, "fiber": 0.0, "salt": 0.0, "saturated_fat": 0.0}
     for pid, grams in items.items():
         p = products[pid]
+        f = grams / 100.0
+        out["salt"] += (p.per_100g.salt or 0.0) * f
         if p.negligible:
             continue
-        f = grams / 100.0
+        out["saturated_fat"] += (p.per_100g.saturated_fat or 0.0) * f
         out["kcal"] += _energy_per_100g(p, method) * f
         out["protein"] += p.per_100g.protein * f
         out["fat"] += p.per_100g.fat * f
@@ -92,12 +110,12 @@ def _step_g(ing: DishIngredient, product: Product, in_group: bool = False) -> fl
     składniki grup proporcji ważymy co GROUP_MEMBER_STEP_G."""
     if in_group:
         return ing.step_g or GROUP_MEMBER_STEP_G
-    if ing.step_g:
-        return ing.step_g
     if ing.unit:
         m = product.measure(ing.unit)
         if m is not None:
             return m.grams
+    if ing.step_g:
+        return ing.step_g
     return product.step_g
 
 
@@ -129,13 +147,13 @@ def verify_plan(
             if it.grams < 0:
                 err("ujemna_gramatura", f"{where}: ujemna gramatura {it.product_id}", **kw)
             if it.grams > 0 and not compatible(products[it.product_id], a.diet):
-                err("rodzaj_diety", f"{where}: {products[it.product_id].name} nie pasuje do diety {a.diet}", **kw)
+                err("rodzaj_diety", f"{where}: {products[it.product_id].name} nie pasuje do diety {DIET_GENITIVE_PL.get(a.diet, a.diet)}", **kw)
             out[it.product_id] = out.get(it.product_id, 0.0) + it.grams
         return out
 
     for fixed in a.day.fixed_items:
         if fixed.product_id in products and not compatible(products[fixed.product_id], a.diet):
-            err("rodzaj_diety", f"Stała pozycja {products[fixed.product_id].name} nie pasuje do diety {a.diet}")
+            err("rodzaj_diety", f"Stała pozycja {products[fixed.product_id].name} nie pasuje do diety {DIET_GENITIVE_PL.get(a.diet, a.diet)}")
 
     # --- struktura: każdy dzień ma wszystkie posiłki, każdy posiłek porcje dla każdej osoby
     by_slot: dict[tuple[int, MealType], list[PlannedMeal]] = defaultdict(list)
@@ -219,10 +237,60 @@ def verify_plan(
             person = a.person(portion.person_id)
             grams = sum(it.grams for it in portion.items)
             cap = person.meal_mass_cap(m.meal)
-            if grams > cap * 1.02:
+            if grams > cap * (1 + MEAL_MASS_TOLERANCE):
                 warn("duza_porcja",
                      f"{DAY_LABELS_PL[m.day]}, {MEAL_LABELS_PL[m.meal].lower()}, {person.name}: porcja {fmt_num(grams, 0)} g "
                      f"— powyżej limitu {fmt_num(cap, 0)} g", day=m.day, meal=m.meal, person_id=person.id)
+
+    # --- twarde zależności przepisu i jednostki; niezależnie od rozwiązania silnika
+    for m in plan.meals:
+        dish = dishes.get(m.dish_id)
+        if dish is None:
+            continue
+        for reason in dish.culinary_errors:
+            err("przepis_niekompletny", f"{dish.name}: {reason}", day=m.day, meal=m.meal)
+        for portion in m.portions:
+            grams = {it.product_id: it.grams for it in portion.items}
+            for ratio in dish.ratios:
+                numerator = sum(grams.get(p, 0) for p in ratio.numerator)
+                denominator = sum(grams.get(p, 0) for p in ratio.denominator)
+                if ((denominator <= 0 and numerator > 0)
+                        or (ratio.min is not None and numerator < ratio.min * denominator - .15)
+                        or (ratio.max is not None and numerator > ratio.max * denominator + .15)):
+                    err("proporcje_przepisu", f"{dish.name}: {ratio.description or 'proporcja składników'} "
+                        f"— {fmt_num(numerator)} g względem {fmt_num(denominator)} g nie zachowuje przepisu.",
+                        day=m.day, meal=m.meal, person_id=portion.person_id)
+            # porcja zgodna z przepisem dla KAŻDEGO dania (wcześniej tylko przepisy z proporcjami): składniki spoza
+            # przepisu, brak obowiązkowego składnika, połówki sztuk (audyt 09.10.2026, S8)
+            in_recipe = {i.product_id for i in dish.ingredients}
+            person = a.person(portion.person_id) if portion.person_id in person_ids else None
+            for pid_, g in grams.items():
+                if pid_ not in in_recipe and g > 0:
+                    err("skladnik_spoza_przepisu", f"{dish.name}: {_pname(products, pid_)} nie należy do przepisu.",
+                        day=m.day, meal=m.meal, person_id=portion.person_id)
+            for ing in dish.ingredients:
+                if ing.product_id not in products or ing.role is Role.SPICE or products[ing.product_id].negligible:
+                    continue
+                g = grams.get(ing.product_id, 0)
+                excluded_here = person is not None and ing.product_id in person.excluded_products
+                if not ing.optional and ing.typical_g > 0 and g <= 0 and not excluded_here:
+                    err("brak_skladnika_przepisu", f"{dish.name}: brak wymaganego składnika {products[ing.product_id].name}.",
+                        day=m.day, meal=m.meal, person_id=portion.person_id)
+                step = _step_g(ing, products[ing.product_id], ing.product_id in dish.grouped_products())
+                # Shared mixtures are divided AFTER weighing the whole batch.
+                if (g > 0 and ing.portioning is Portioning.PER_PERSON and (ing.scales or ing.unit)
+                        and abs(g - round(g / step) * step) > .15):
+                    err("jednostka_przepisu", f"{dish.name}: {products[ing.product_id].name} wymaga kroku {fmt_num(step)} g, "
+                        f"otrzymano {fmt_num(g)} g.", day=m.day, meal=m.meal, person_id=portion.person_id)
+        # „po równo”: każdy dostaje tyle samo (np. jedno jajko sadzone na osobę)
+        for ing in dish.ingredients:
+            if (ing.portioning is not Portioning.EQUAL or ing.product_id not in products or ing.role is Role.SPICE
+                    or products[ing.product_id].negligible):
+                continue  # przyprawy mają stałą ilość dobraną do osoby (jak w silniku), nie zmienną „po równo”
+            amounts = [next((it.grams for it in p_.items if it.product_id == ing.product_id), 0.0) for p_ in m.portions]
+            if amounts and max(amounts) - min(amounts) > .15:
+                err("porcje_po_rowno", f"{dish.name}: {products[ing.product_id].name} ma być po równo, a porcje to "
+                    + ", ".join(f"{fmt_num(x)} g" for x in amounts), day=m.day, meal=m.meal)
 
     # --- grupy składników (ciasto, panierka, sos): proporcje jak w przepisie
     for m in plan.meals:
@@ -281,6 +349,25 @@ def verify_plan(
                 err("danie_na_zapas", f"{label}: porcje osoby {pid} różnią się między dniami gotowania na zapas",
                     person_id=pid)
 
+    # garnek dania na zapas = suma porcji wszystkich osób ze wszystkich dni gotowania
+    for group in sorted({m.batch_group for m in plan.meals if m.batch_group}):
+        meals = [m for m in plan.meals if m.batch_group == group]
+        pot = meals[0].batch_pot_g
+        if not pot:
+            continue
+        summed: dict[str, float] = defaultdict(float)
+        terms: dict[str, int] = defaultdict(int)
+        for m in meals:
+            for portion in m.portions:
+                for it in portion.items:
+                    summed[it.product_id] += it.grams
+                    terms[it.product_id] += 1
+        name = dishes[meals[0].dish_id].name if meals[0].dish_id in dishes else meals[0].dish_id
+        for pid_ in set(pot) | set(summed):
+            if abs(pot.get(pid_, 0.0) - summed.get(pid_, 0.0)) > 0.1 * max(terms.get(pid_, 1), 1) + .05:
+                err("garnek_na_zapas", f"{name}: w garnku {_pname(products, pid_)} {fmt_num(pot.get(pid_, 0.0))} g, "
+                    f"a porcje razem to {fmt_num(summed.get(pid_, 0.0))} g")
+
     if a.week.no_repeats:
         groups: dict[str, set[str]] = defaultdict(set)
         for m in plan.meals:
@@ -298,10 +385,16 @@ def verify_plan(
         for portion in m.portions:
             excluded = banned | (set(a.person(portion.person_id).excluded_products) if portion.person_id in person_ids
                                  else set())
+            person = a.person(portion.person_id) if portion.person_id in person_ids else None
             for it in portion.items:
                 if it.product_id in excluded and it.grams > 0:
-                    err("zakazany_produkt", f"{label}: zakazany produkt '{it.product_id}'", day=m.day, meal=m.meal,
-                        person_id=portion.person_id)
+                    err("zakazany_produkt", f"{label}: zakazany produkt „{_pname(products, it.product_id)}”",
+                        day=m.day, meal=m.meal, person_id=portion.person_id)
+                cap = person.portion_cap(products[it.product_id], m.meal)                     if person is not None and it.product_id in products else None
+                if cap is not None and it.grams > cap + GROUP_ROUNDING_G:
+                    err("limit_porcji", f"{label}, {person.name}: {products[it.product_id].name.lower()} "
+                                        f"{fmt_num(it.grams)} g — więcej niż limit {fmt_num(cap)} g z preferencji",
+                        day=m.day, meal=m.meal, person_id=portion.person_id)
         if dish is None:
             continue
         for tag in a.prohibitions.dish_tags_by_meal.get(m.meal, []):
@@ -327,6 +420,23 @@ def verify_plan(
                             f"{label}: źródło węglowodanów '{ing.product_id}' (kategoria {cat}) spoza dozwolonych",
                             day=m.day, meal=m.meal)
 
+    for person in a.persons:
+        if person.below_safe_kcal:
+            # plan może trzymać się założeń, ale same założenia są poniżej ostrożnego minimum — mówimy to wprost
+            issues.append(Issue(code="cele_ponizej_minimum", severity=Severity.WARNING, person_id=person.id,
+                                message=f"{person.name}: cel {fmt_num(person.targets.kcal.min)}–"
+                                        f"{fmt_num(person.targets.kcal.max)} kcal jest poniżej ostrożnego minimum ok. "
+                                        f"{fmt_num(person.safe_min_kcal)} kcal — plan jest zgodny z założeniami, ale "
+                                        "tak niskie cele ustal ze specjalistą."))
+
+    for item in a.day.fixed_items:
+        if item.product_id in banned:
+            err("zakazany_produkt", f"stała pozycja dnia: zakazany produkt „{_pname(products, item.product_id)}”")
+        for pid in person_ids:
+            if item.product_id in a.person(pid).excluded_products:
+                err("zakazany_produkt", f"stała pozycja dnia: „{_pname(products, item.product_id)}” wykluczona przez "
+                                        f"osobę {a.person(pid).name}", person_id=pid)
+
     # --- przekąski
     per_day = Counter((int(s.day), s.person_id) for s in plan.snacks)
     for (day, pid), count in per_day.items():
@@ -334,6 +444,18 @@ def verify_plan(
             err("przekaski_limit", f"{DAY_LABELS_PL[Weekday(day)]}: {count} przekąski dla {pid}, maksimum "
                                    f"{a.day.snacks.max_per_person_per_day}", day=Weekday(day), person_id=pid)
     for s in plan.snacks:
+        person = a.person(s.person_id) if s.person_id in person_ids else None
+        excluded = banned | (set(person.excluded_products) if person is not None else set())
+        for it in s.items:
+            if it.product_id in excluded and it.grams > 0:
+                # zakazy obowiązują także w przekąskach (np. migdały przy alergii) — audyt 09.10.2026, W2
+                err("zakazany_produkt", f"{DAY_LABELS_PL[s.day]}, przekąska: zakazany produkt "
+                                        f"„{_pname(products, it.product_id)}”", day=s.day, person_id=s.person_id)
+            cap = person.portion_cap(products[it.product_id], MealType.SNACK)                 if person is not None and it.product_id in products else None
+            if cap is not None and it.grams > cap + GROUP_ROUNDING_G:
+                err("limit_porcji", f"{DAY_LABELS_PL[s.day]}, przekąska, {person.name}: "
+                                    f"{products[it.product_id].name.lower()} {fmt_num(it.grams)} g — więcej niż limit "
+                                    f"{fmt_num(cap)} g z preferencji", day=s.day, person_id=s.person_id)
         if s.dish_id not in a.day.snacks.allowed:
             err("przekaska_niedozwolona", f"{DAY_LABELS_PL[s.day]}: przekąska '{s.dish_id}' spoza dozwolonej listy",
                 day=s.day, person_id=s.person_id)

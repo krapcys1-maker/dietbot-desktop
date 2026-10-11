@@ -80,7 +80,7 @@ export default function DishesPage({ dishId }: { dishId?: string }) {
                 </div>
                 <div className="row" style={{ marginTop: 4, gap: 5 }}>
                   {d.invented && <span className="badge ok">wymyślone</span>}
-                  <TagBadges tags={d.tags} />
+                  <TagBadges tags={d.tags} diets={d.diets} />
                 </div>
               </div>
               <div className="stack" style={{ gap: 4, justifyItems: "end" }}>
@@ -132,7 +132,7 @@ function DishDetailCard({ id, onChanged }: { id: string; onChanged: () => void }
         </div>
         <span className={`badge ${d.status === "zatwierdzone" ? "ok" : d.status === "odrzucone" ? "error" : "warn"}`}>{STATUS_NAMES[d.status]}</span>
       </div>
-      <TagBadges tags={d.tags} isTreat={d.is_treat} isSweet={d.is_sweet} />
+      <TagBadges tags={d.tags} isTreat={d.is_treat} isSweet={d.is_sweet} diets={d.diets} />
       <DishRating id={d.id} name={d.name} />
       {d.description && <p className="meal-desc">{d.description}</p>}
       {d.excluded.length > 0 && (
@@ -161,8 +161,12 @@ function DishDetailCard({ id, onChanged }: { id: string; onChanged: () => void }
             ))}
           </tbody>
         </table></div>
-        <div className="muted small">Gramatury w planie dobiera silnik do celów każdej osoby.</div>
+        <div className="muted small">Gramatury dopasowujemy do celów, zachowując zadeklarowane proporcje przepisu.</div>
       </div>
+      {d.culinary_notes?.length > 0 && <details className="group-box">
+        <summary>Zasady przygotowania i porcjowania</summary>
+        <ul>{d.culinary_notes.map((note, i) => <li key={i}>{note}</li>)}</ul>
+      </details>}
       {d.groups.length > 0 && (
         <div>
           <h3 style={{ marginBottom: 4 }}>Stałe proporcje</h3>

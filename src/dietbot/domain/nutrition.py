@@ -13,6 +13,8 @@ _MASS_TOLERANCE_G = 3.0
 # Tolerancja porównań sum dnia z widełkami na liczbach zmiennoprzecinkowych — jedna dla silnika i weryfikatora,
 # żeby silnik nigdy nie uznał za poprawny dnia, który weryfikator odrzuci (nie jest to „luz” w zasadach)
 BAND_TOLERANCE: dict[str, float] = {"kcal": 0.01, "protein": 0.001, "fat": 0.001, "carbs": 0.001}
+# ile ponad limit masy talerza nie zgłaszamy (zaokrąglenia kroków) — wspólne dla silnika i weryfikatora
+MEAL_MASS_TOLERANCE = 0.02
 
 
 class EnergyMethod(StrEnum):

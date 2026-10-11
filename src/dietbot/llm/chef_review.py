@@ -20,11 +20,12 @@ from pydantic import BaseModel, Field
 from ..domain.dish import MEAL_LABELS_PL, DishTemplate
 from ..domain.product import Product
 from ..food.matcher import ProductMatcher
+from .scope import in_context
 
 BATCH = 8
 
 CHEF_SYSTEM = """Jesteś doświadczonym szefem kuchni i redaktorem polskiej książki kucharskiej. Oceniasz przepisy, zanim trafią
-do aplikacji z jadłospisami dla dwóch osób (gramatury porcji dobiera osobny program — oceniaj proporcje i sens, nie kalorie).
+do aplikacji z jadłospisami dla domowników (gramatury porcji dobiera osobny program — oceniaj proporcje i sens, nie kalorie).
 Dla każdego dania sprawdź:
 1. Czy to realne, smaczne danie, które zwykły człowiek ugotuje w domu z tych składników (albo kupi, jeśli to jedzenie na wynos).
 2. Czy proporcje mają sens kulinarny — zwłaszcza w masach (grupy): ciasto, panierka, masa mielona, farsz, sos, surówka.
@@ -140,12 +141,16 @@ def review_dishes(llm, dishes: list[DishTemplate], products: Mapping[str, Produc
                                         max_tokens=5000)
 
     with ThreadPoolExecutor(max_workers=max(1, workers)) as ex:
-        futures = [ex.submit(call, b) for b in batches]
+        futures = {ex.submit(in_context(call), b): b for b in batches}
         for fut in as_completed(futures):
             try:
                 batch, res = fut.result()
-            except Exception as exc:  # brak oceny nie blokuje dań, które przeszły kontrolę kodu
-                log(f"kontrola kucharza niedostępna dla części dań ({exc}) — zostają bez oceny")
+            except Exception as exc:  # noqa: BLE001
+                # bez oceny kucharza danie nie trafia do biblioteki (wcześniej przechodziło jako „dobre” — audyt S12)
+                log(f"kontrola kucharza niedostępna dla części dań ({exc}) — te dania nie trafią do biblioteki")
+                for dish in futures[fut]:
+                    out.rejected.append({"nazwa": dish.name, "id": dish.id,
+                                         "powody": ["kucharz nie ocenił dania (błąd połączenia z modelem)"]})
                 continue
             out.cost_usd += res.cost_usd
             by_id = {r.id.strip(): r for r in res.value.oceny}
@@ -167,5 +172,5 @@ def review_dishes(llm, dishes: list[DishTemplate], products: Mapping[str, Produc
     out.kept.sort(key=lambda d: order.get(d.id, len(order)))
     missing = [d for d in dishes if d.id in reviewed and d.id not in {k.id for k in out.kept}
                and d.id not in {r["id"] for r in out.rejected}]
-    out.kept.extend(missing)  # partie z błędem połączenia — dania zostają
+    out.kept.extend(missing)  # dania, których model nie wymienił w udanej ocenie partii
     return out

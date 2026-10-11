@@ -36,6 +36,51 @@ def _similarity(pools: Pools, a_id: str, b_id: str) -> float:
     return score
 
 
+def replace_disallowed(comp: Composition, pools: Pools, dishes: Mapping[str, DishTemplate], a: Assumptions,
+                       keep: set[str] | None = None) -> list[str]:
+    """Wymienia w miejscu tylko dania, które przestały pasować do swojego posiłku (np. po nowej zasadzie z notatnika:
+    zakaz produktu, limit porcji, ocena 👎) — na najbardziej podobne dozwolone danie tego samego rodzaju. Reszty układu
+    (także ręcznych zamian domowników) nie rusza. Zwraca notatki po polsku."""
+    notes: list[str] = []
+    keep = keep or set()
+    days = sorted({d for s in comp.slots for d in s.days})
+    batch_idx = {"-".join(str(int(d)) for d in ds) + f"_{m.value}": idx
+                 for ds, m, idx in slot_layout(a, days) if idx is not None}
+    used = {s.dish_id for s in comp.slots}
+
+    def name(d: str) -> str:
+        return dishes[d].name if d in dishes else d
+
+    def label(s: SlotPlan) -> str:
+        return f"{', '.join(DAY_LABELS_PL[d] for d in s.days).lower()}, {MEAL_LABELS_PL[s.meal].lower()}"
+
+    for slot in list(comp.slots):
+        if slot.dish_id in keep:
+            continue
+        if slot.meal is MealType.SNACK:
+            if slot.dish_id not in pools.treat_snacks:
+                comp.slots.remove(slot)
+                notes.append(f"{label(slot)}: bez przekąski {name(slot.dish_id)} (nie pasuje do obecnych zasad)")
+            continue
+        idx = batch_idx.get(slot.key)
+        pool = pools.batch.get(idx, []) if idx is not None else pools.by_meal.get(slot.meal, [])
+        if slot.dish_id in pool:
+            continue
+        old = dishes.get(slot.dish_id)
+        candidates = [d for d in pool if d not in used and d in dishes and (old is None or (
+            dishes[d].is_treat == old.is_treat
+            and (slot.meal is not MealType.SUPPER or dishes[d].is_sweet == old.is_sweet)))]
+        why = "; ".join(pools.excluded.get(slot.dish_id, [])) or "danie nie pasuje do obecnych zasad"
+        if not candidates:
+            notes.append(f"{label(slot)}: {name(slot.dish_id)} nie pasuje ({why}), a nie ma czym go zastąpić")
+            continue
+        best = max(candidates, key=lambda d: (_similarity(pools, slot.dish_id, d), d))
+        notes.append(f"{label(slot)}: {name(slot.dish_id)} → {name(best)} ({why})")
+        used.add(best)
+        slot.dish_id, slot.alternates = best, []
+    return notes
+
+
 def autofix_composition(comp: Composition, pools: Pools, dishes: Mapping[str, DishTemplate], a: Assumptions,
                         days: list[Weekday], cuisine_counts: Mapping[str, int] | None = None,
                         must_use: set[str] | None = None, pins: Mapping[str, list[Weekday]] | None = None) -> list[str]:

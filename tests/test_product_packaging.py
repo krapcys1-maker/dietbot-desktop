@@ -31,3 +31,13 @@ def test_visual_assets_are_local_and_licensed():
     index = (ROOT / "web/index.html").read_text(encoding="utf-8")
     assert "Porcja" in index and 'href="/porcja.svg"' in index
     assert "https://" not in index
+
+
+def test_package_ships_starter_data_without_raw_source_tables():
+    spec = (ROOT / "packaging/DietBot.spec").read_text(encoding="utf-8")
+    # cały folder dane zawierałby też dane\raw (surowe BLS/CIQUAL, ok. 34 MB) — do paczki tylko dane startowe
+    assert r'r"\dane", r"defaults\dane"' not in spec
+    assert 'for sub in ("dania", "produkty", "sklepy", "korekty")' in spec
+    assert 'os.environ.get("PORCJA_DANE")' in spec  # dane z czystego eksportu gita, nie z katalogu roboczego
+    tracked = {p.name for p in (ROOT / "dane").iterdir() if p.is_dir()} - {"raw"}
+    assert tracked == {"dania", "produkty", "sklepy", "korekty"}  # nowy folder danych trzeba dopisać do paczki

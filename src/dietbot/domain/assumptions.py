@@ -10,6 +10,7 @@ from pydantic import Field, field_validator, model_validator
 from .common import DomainModel, check_slug
 from .dish import MealType
 from .nutrition import EnergyMethod
+from .product import Category, Product
 
 # średnia gęstość energii domowych dań z biblioteki to ok. 1,1–1,4 kcal/g (obiady i kolacje ok. 1,1) — powyżej tej wartości
 # dzień nie zmieści się w limitach masy talerza bez dużych odchyleń (testy wariantów celów, 13.09.2026)
@@ -59,6 +60,12 @@ def _n(value: float) -> str:
     return str(int(value)) if float(value).is_integer() else f"{value:.1f}".replace(".", ",")
 
 
+# Ostrożne minimum energii dla dorosłych bez nadzoru specjalisty (typowe progi diet niskokalorycznych: ok. 1200 kcal
+# u kobiet i 1500 kcal u mężczyzn). To granica ostrzeżenia w aplikacji, nie norma kliniczna.
+SAFE_MIN_KCAL: dict[str, float] = {"kobieta": 1200.0, "mezczyzna": 1500.0}
+# kcal z makro (4/9/4) a cel kcal — większa rozbieżność oznacza sprzeczne cele
+TARGETS_MACRO_MISMATCH = 0.15
+
 # domyślne limity masy posiłku dla 2000 kcal (osoby z większym zapotrzebowaniem: × pierwiastek ze stosunku energii)
 DEFAULT_MEAL_MASS_G: dict[MealType, float] = {MealType.BREAKFAST: 550.0, MealType.LUNCH: 750.0, MealType.SUPPER: 650.0}
 
@@ -93,6 +100,26 @@ class DailyTargets(DomainModel):
         return getattr(self, metric)
 
 
+class PortionCap(DomainModel):
+    """Największa porcja produktu (albo całej kategorii, np. ryżu) w jednym posiłku osoby — z preferencji domowników."""
+
+    product_id: str | None = Field(default=None, alias="produkt")
+    category: Category | None = Field(default=None, alias="kategoria")
+    meals: list[MealType] = Field(default_factory=list, alias="posilki")  # puste = każdy posiłek
+    max_g: float = Field(alias="maks_g", gt=0, le=2000)
+
+    @model_validator(mode="after")
+    def _target(self) -> PortionCap:
+        if (self.product_id is None) == (self.category is None):
+            raise ValueError("limit porcji dotyczy produktu albo kategorii (dokładnie jednego z nich)")
+        return self
+
+    def applies(self, product: Product, meal: MealType | None) -> bool:
+        if meal is not None and self.meals and meal not in self.meals:
+            return False
+        return product.id == self.product_id if self.product_id else product.category is self.category
+
+
 class Person(DomainModel):
     id: str
     name: str = Field(alias="nazwa")
@@ -103,6 +130,24 @@ class Person(DomainModel):
     excluded_products: list[str] = Field(default_factory=list, alias="wyklucza_produkty")
     # największa rozsądna masa talerza (wszystkie składniki razem) — chroni przed np. 2 kg zupy na obiad
     max_meal_mass_g: dict[MealType, float] = Field(default_factory=dict, alias="maks_masa_posilku_g")
+    # np. „ryż suchy najwyżej 65 g na posiłek” — twardy limit silnika, ważniejszy niż typowa porcja z przepisu
+    portion_caps: list[PortionCap] = Field(default_factory=list, alias="limity_porcji")
+    # tylko do progów bezpieczeństwa (np. minimum kcal); brak = jak w id osoby albo ostrożny próg dla kobiet
+    sex: Literal["kobieta", "mezczyzna"] | None = Field(default=None, alias="plec")
+
+    @property
+    def safe_min_kcal(self) -> float:
+        sex = self.sex or (self.id if self.id in SAFE_MIN_KCAL else None)
+        return SAFE_MIN_KCAL.get(sex or "kobieta", SAFE_MIN_KCAL["kobieta"])
+
+    @property
+    def below_safe_kcal(self) -> bool:
+        return self.targets.kcal.min < self.safe_min_kcal
+
+    def portion_cap(self, product: Product, meal: MealType | None = None) -> float | None:
+        """Najostrzejszy limit porcji produktu w posiłku (None = brak limitu). `meal` None = limity każdego posiłku."""
+        caps = [c.max_g for c in self.portion_caps if c.applies(product, meal)]
+        return min(caps) if caps else None
 
     @field_validator("max_meal_mass_g")
     @classmethod
@@ -204,6 +249,14 @@ class EnergySettings(DomainModel):
         return value
 
 
+def fixed_grams(a: Assumptions) -> dict[str, float]:
+    """Stałe pozycje dnia jako produkt → gramy; ten sam produkt wpisany dwa razy jest sumowany (jak w silniku)."""
+    out: dict[str, float] = {}
+    for item in a.day.fixed_items:
+        out[item.product_id] = out.get(item.product_id, 0.0) + item.grams
+    return out
+
+
 class Assumptions(DomainModel):
     diet: Literal["tradycyjna", "wege", "wegan"] = Field(default="tradycyjna", alias="rodzaj_diety")
     version: int = Field(default=1, alias="wersja")
@@ -249,6 +302,18 @@ class Assumptions(DomainModel):
                     f"{t.kcal.center / caps:.2f} kcal na gram jedzenia — więcej niż mają zwykłe domowe dania "
                     "(ok. 1,1–1,2); silnik może przekraczać limity masy talerza. Zwiększ limity masy posiłków "
                     "albo liczbę przekąsek."
+                )
+            if p.below_safe_kcal:
+                warnings.append(
+                    f"{p.name}: dolna granica energii {t.kcal.min:.0f} kcal jest poniżej ostrożnego minimum "
+                    f"ok. {p.safe_min_kcal:.0f} kcal dziennie dla dorosłej osoby. Tak niskie cele ustal ze specjalistą "
+                    "(lekarzem lub dietetykiem); plan będzie oznaczony uwagą."
+                )
+            macro_kcal = 4 * t.protein.center + 9 * t.fat.center + 4 * t.carbs.center
+            if t.kcal.center and abs(macro_kcal - t.kcal.center) / t.kcal.center > TARGETS_MACRO_MISMATCH:
+                warnings.append(
+                    f"{p.name}: makro z celów daje ok. {macro_kcal:.0f} kcal (4/9/4), a cel energii to "
+                    f"{t.kcal.center:.0f} kcal — cele są ze sobą sprzeczne, silnik nie spełni wszystkich naraz."
                 )
             if (p.protein_anchor.min - p.protein_anchor_tolerance) * meals > t.protein.max:
                 warnings.append(

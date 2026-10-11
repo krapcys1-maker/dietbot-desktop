@@ -6,7 +6,7 @@ import json
 import sqlite3
 import uuid
 from collections.abc import Iterator
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -56,6 +56,27 @@ CREATE TABLE IF NOT EXISTS dish_ratings (
     rating INTEGER NOT NULL CHECK(rating IN (-1, 1)),
     updated_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS pref_notes (
+    id TEXT PRIMARY KEY,
+    created_at TEXT NOT NULL,
+    channel TEXT NOT NULL DEFAULT 'aplikacja',
+    plan_id TEXT,
+    text TEXT NOT NULL,
+    analysis_json TEXT
+);
+CREATE TABLE IF NOT EXISTS pref_rules (
+    id TEXT PRIMARY KEY,
+    created_at TEXT NOT NULL,
+    data_json TEXT NOT NULL,
+    deleted INTEGER NOT NULL DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS program_notes (
+    id TEXT PRIMARY KEY,
+    created_at TEXT NOT NULL,
+    note_id TEXT,
+    text TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'nowa'
+);
 CREATE TABLE IF NOT EXISTS chat (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     created_at TEXT NOT NULL,
@@ -66,6 +87,10 @@ CREATE TABLE IF NOT EXISTS chat (
     data_json TEXT
 );
 """
+
+
+# wersja schematu bazy (PRAGMA user_version): 2 = notatnik preferencji (pref_notes, pref_rules, program_notes)
+SCHEMA_VERSION = 2
 
 
 def new_id() -> str:
@@ -107,20 +132,23 @@ class PlanStore:
         self.path = path
         path.parent.mkdir(parents=True, exist_ok=True)
         if path.exists():
-            with sqlite3.connect(path) as old:
+            with closing(sqlite3.connect(path)) as old:  # „with connect()” tylko zatwierdza, nie zamyka (audyt N7)
                 exists = old.execute("SELECT 1 FROM sqlite_master WHERE name='plan_snapshots'").fetchone()
                 if not exists:
                     backup = path.with_name(path.name + ".before-snapshots.bak")
                     if not backup.exists():
-                        with sqlite3.connect(backup) as target:
+                        with closing(sqlite3.connect(backup)) as target:
                             old.backup(target)
         with self._conn() as c:
             c.executescript(SCHEMA)
+            if int(c.execute("PRAGMA user_version").fetchone()[0]) < SCHEMA_VERSION:
+                c.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
 
     @contextmanager
     def _conn(self) -> Iterator[sqlite3.Connection]:
         conn = sqlite3.connect(self.path, timeout=30)
         conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA foreign_keys = ON")  # np. zapisana dieta tylko dla istniejącego planu
         try:
             with conn:
                 yield conn
@@ -193,6 +221,11 @@ class PlanStore:
         with self._conn() as c:
             rows = c.execute("SELECT * FROM plans WHERE deleted = 0 ORDER BY created_at DESC LIMIT ?", (limit,)).fetchall()
         return [self._record(r) for r in rows]
+
+    def children(self, plan_id: str) -> set[str]:
+        """Identyfikatory wersji utworzonych z tego planu (zamiana, przeliczenie, naprawa)."""
+        with self._conn() as c:
+            return {r[0] for r in c.execute("SELECT id FROM plans WHERE parent_id = ? AND deleted = 0", (plan_id,))}
 
     def family(self, family_id: str) -> list[PlanRecord]:
         with self._conn() as c:
@@ -267,6 +300,62 @@ class PlanStore:
         pid = self.get_setting("active_plan")
         rec = self.get(pid) if pid else None
         return rec or self.latest(ok_only=True) or self.latest()
+
+    # ------------------------------------------------------------------ notatnik preferencji
+    def add_pref_note(self, text: str, *, plan_id: str | None = None, channel: str = "aplikacja",
+                      analysis: dict | None = None) -> str:
+        note_id = new_id()
+        with self._conn() as c:
+            c.execute("INSERT INTO pref_notes (id, created_at, channel, plan_id, text, analysis_json) VALUES (?, ?, ?, ?, ?, ?)",
+                      (note_id, datetime.now(UTC).isoformat(), channel, plan_id, text,
+                       json.dumps(analysis, ensure_ascii=False) if analysis is not None else None))
+        return note_id
+
+    def set_pref_note_analysis(self, note_id: str, analysis: dict) -> None:
+        with self._conn() as c:
+            c.execute("UPDATE pref_notes SET analysis_json = ? WHERE id = ?", (json.dumps(analysis, ensure_ascii=False), note_id))
+
+    def pref_notes(self, limit: int = 100) -> list[dict]:
+        with self._conn() as c:
+            rows = c.execute("SELECT * FROM pref_notes ORDER BY created_at DESC LIMIT ?", (limit,)).fetchall()
+        return [{"id": r["id"], "created_at": r["created_at"], "channel": r["channel"], "plan_id": r["plan_id"],
+                 "text": r["text"], "analysis": json.loads(r["analysis_json"]) if r["analysis_json"] else None}
+                for r in rows]
+
+    def pref_rules(self) -> list[dict]:
+        """Zasady w kolejności dodania (dane JSON zasady z polskimi kluczami)."""
+        with self._conn() as c:
+            rows = c.execute("SELECT data_json FROM pref_rules WHERE deleted = 0 ORDER BY created_at, rowid").fetchall()
+        return [json.loads(r[0]) for r in rows]
+
+    def save_pref_rule(self, rule_id: str, data: dict) -> None:
+        with self._conn() as c:
+            c.execute("INSERT INTO pref_rules (id, created_at, data_json) VALUES (?, ?, ?) ON CONFLICT(id) "
+                      "DO UPDATE SET data_json = excluded.data_json",
+                      (rule_id, datetime.now(UTC).isoformat(), json.dumps(data, ensure_ascii=False)))
+
+    def delete_pref_rule(self, rule_id: str) -> bool:
+        with self._conn() as c:
+            return c.execute("UPDATE pref_rules SET deleted = 1 WHERE id = ? AND deleted = 0", (rule_id,)).rowcount > 0
+
+    def add_program_note(self, text: str, note_id: str | None = None) -> str:
+        pid = new_id()
+        with self._conn() as c:
+            c.execute("INSERT INTO program_notes (id, created_at, note_id, text) VALUES (?, ?, ?, ?)",
+                      (pid, datetime.now(UTC).isoformat(), note_id, text))
+        return pid
+
+    def program_notes(self) -> list[dict]:
+        with self._conn() as c:
+            rows = c.execute("SELECT * FROM program_notes ORDER BY created_at DESC").fetchall()
+        return [{"id": r["id"], "created_at": r["created_at"], "note_id": r["note_id"], "text": r["text"],
+                 "status": r["status"]} for r in rows]
+
+    def set_program_note_status(self, note_id: str, status: str) -> bool:
+        with self._conn() as c:
+            if status == "usunieta":
+                return c.execute("DELETE FROM program_notes WHERE id = ?", (note_id,)).rowcount > 0
+            return c.execute("UPDATE program_notes SET status = ? WHERE id = ?", (status, note_id)).rowcount > 0
 
     # ------------------------------------------------------------------ czat
     def add_message(self, role: str, text: str, *, plan_id: str | None = None, channel: str = "aplikacja",

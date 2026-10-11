@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { followJob } from "../api";
+import { api, followJob } from "../api";
 import type { BandState, Job } from "../types";
 import { TAG_NAMES } from "../util";
 
@@ -11,16 +11,19 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const push = useCallback((text: string, kind: "info" | "error" = "info") => {
     const id = Date.now() + Math.random();
-    setToasts((t) => [...t, { id, text, kind }]);
-    setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), kind === "error" ? 7000 : 3500);
+    setToasts((t) => [...t.slice(-4), { id, text, kind }]);
+    // błędy zostają, aż je zamkniesz (wcześniej znikały po 7 s, zanim dało się je przeczytać — audyt S13)
+    if (kind !== "error") setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 3500);
   }, []);
+  const close = (id: number) => setToasts((t) => t.filter((x) => x.id !== id));
   return (
     <ToastCtx.Provider value={push}>
       {children}
       <div className="toast-wrap" aria-live="polite" aria-atomic="false">
         {toasts.map((t) => (
-          <div key={t.id} className={`toast ${t.kind === "error" ? "error" : ""}`}>
-            {t.text}
+          <div key={t.id} className={`toast ${t.kind === "error" ? "error" : ""}`} role={t.kind === "error" ? "alert" : undefined}>
+            <span className="grow">{t.text}</span>
+            {t.kind === "error" && <button className="toast-close" aria-label="Zamknij komunikat" onClick={() => close(t.id)}>✕</button>}
           </div>
         ))}
       </div>
@@ -60,10 +63,13 @@ export function ErrorBox({ error, onRetry }: { error: string; onRetry?: () => vo
   );
 }
 
-export function TagBadges({ tags, isTreat, isSweet }: { tags: string[]; isTreat?: boolean; isSweet?: boolean }) {
-  const shown = tags.filter((t) => TAG_NAMES[t] && !(t === "wege" && tags.includes("wegan")));
+export function TagBadges({ tags, isTreat, isSweet, diets }: { tags: string[]; isTreat?: boolean; isSweet?: boolean; diets?: string[] }) {
+  // „wege”/„wegan” pokazujemy tylko z obliczonej zgodności składników — sam tag w danych bywał mylący (np. danie z parmezanem)
+  const shown = tags.filter((t) => TAG_NAMES[t] && t !== "wege" && t !== "wegan");
   return (
     <span className="row" style={{ gap: 5 }}>
+      {diets?.includes("wegan") ? <span className="badge ok">wegańskie</span>
+        : diets?.includes("wege") ? <span className="badge ok">wegetariańskie</span> : null}
       {(isTreat || tags.includes("pula_20")) && <span className="badge treat">pula 20%</span>}
       {(isSweet || tags.includes("slodkie")) && <span className="badge sweet">słodkie</span>}
       {tags.includes("na_zapas") && <span className="badge batch">na zapas</span>}
@@ -84,20 +90,42 @@ export function StateBadge({ state }: { state: BandState | null }) {
   return <span className="badge warn">{state === "za_malo" ? "za mało" : "za dużo"}</span>;
 }
 
-export function Modal({ title, onClose, children, footer, wide }: {
-  title: ReactNode; onClose: () => void; children: ReactNode; footer?: ReactNode; wide?: boolean;
+const FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/** Okno dialogowe: fokus wchodzi do okna i nie wychodzi z niego klawiszem Tab, po zamknięciu wraca na przycisk,
+ *  który je otworzył. `confirmClose` — pytanie przed zamknięciem (np. niezapisany formularz). */
+export function Modal({ title, onClose, children, footer, wide, confirmClose }: {
+  title: ReactNode; onClose: () => void; children: ReactNode; footer?: ReactNode; wide?: boolean; confirmClose?: () => boolean;
 }) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const requestClose = useCallback(() => {
+    if (!confirmClose || confirmClose()) onClose();
+  }, [onClose, confirmClose]);
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    const opener = document.activeElement as HTMLElement | null;
+    const first = dialogRef.current?.querySelector<HTMLElement>(".dialog-body " + FOCUSABLE) ?? dialogRef.current?.querySelector<HTMLElement>(FOCUSABLE);
+    first?.focus();
+    return () => opener?.focus?.();
+  }, []);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { e.preventDefault(); requestClose(); return; }
+      if (e.key !== "Tab" || !dialogRef.current) return;
+      const items = Array.from(dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE));
+      if (!items.length) return;
+      const [firstItem, lastItem] = [items[0], items[items.length - 1]];
+      if (e.shiftKey && document.activeElement === firstItem) { e.preventDefault(); lastItem.focus(); }
+      else if (!e.shiftKey && document.activeElement === lastItem) { e.preventDefault(); firstItem.focus(); }
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, [requestClose]);
   return (
-    <div className="overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="dialog" style={wide ? { width: "min(980px, 100%)" } : undefined} role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+    <div className="overlay" onMouseDown={(e) => e.target === e.currentTarget && requestClose()}>
+      <div ref={dialogRef} className="dialog" style={wide ? { width: "min(980px, 100%)" } : undefined} role="dialog" aria-modal="true" aria-labelledby="dialog-title">
         <div className="dialog-head">
           <h2 id="dialog-title">{title}</h2>
-          <button className="btn ghost" onClick={onClose} aria-label="Zamknij">
+          <button className="btn ghost" onClick={requestClose} aria-label="Zamknij">
             ✕
           </button>
         </div>
@@ -149,12 +177,19 @@ export function JobProgress({ jobId, onDone }: { jobId: string; onDone?: (job: J
   }, [lines]);
 
   const running = !error && (!job || job.status === "w_toku" || job.status === "w_kolejce");
+  const [stopping, setStopping] = useState(false);
+  const stop = () => {
+    setStopping(true);
+    api.cancelJob(jobId).catch(() => setStopping(false));
+  };
   return (
     <div className="stack">
       <div className="row">
-        {running ? <Spinner label={job?.status === "w_kolejce" ? "Czeka w kolejce…" : "Liczę…"} /> : null}
+        {running ? <Spinner label={stopping ? "Przerywam…" : job?.status === "w_kolejce" ? "Czeka w kolejce…" : "Liczę…"} /> : null}
+        {running && <button className="btn small ghost" disabled={stopping} onClick={stop}>Przerwij</button>}
         {job?.status === "gotowe" && <span className="badge ok">Gotowe</span>}
         {job?.status === "blad" && <span className="badge error">Błąd</span>}
+        {job?.status === "przerwane" && <span className="badge warn">Przerwano</span>}
       </div>
       <div className="joblog" ref={boxRef}>
         {lines.length === 0 && <div>Start…</div>}
@@ -164,7 +199,7 @@ export function JobProgress({ jobId, onDone }: { jobId: string; onDone?: (job: J
           </div>
         ))}
       </div>
-      {job?.error && <div className="alert error">{job.error}</div>}
+      {job?.error && <div className={`alert ${job.status === "przerwane" ? "warn" : "error"}`}>{job.error}</div>}
       {error && <div className={`alert ${error.startsWith("To zadanie było") ? "info" : "error"}`}>{error}</div>}
     </div>
   );

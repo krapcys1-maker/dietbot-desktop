@@ -22,7 +22,7 @@ def service(repo, tmp_path):
 def test_save_library_persistence_and_history(service):
     rec = service.store.save(PlanRecord(plan=WeekPlan(days=[Weekday.MONDAY], meals=[]),
                                        title="Przykładowy tydzień", source="algorytm", ok=False))
-    client = TestClient(create_app(service))
+    client = TestClient(create_app(service), base_url="http://127.0.0.1")
     original = service.store.get(rec.id).plan.model_dump_json()
     assert client.put(f"/api/diety/{rec.id}", json={"title": "  Moja dieta  "}).status_code == 200
     assert client.put(f"/api/diety/{rec.id}", json={"title": "Nowa nazwa"}).status_code == 200
@@ -37,12 +37,12 @@ def test_save_library_persistence_and_history(service):
     assert not service.store.saved_diets()
     assert len(client.get("/api/diety").json()) == 2
     assert service.store.get(rec.id).plan.model_dump_json() == original
-    assert client.put("/api/diety/missing", json={"title": "Nie ma"}).status_code == 400
+    assert client.put("/api/diety/missing", json={"title": "Nie ma"}).status_code == 404
     assert client.put(f"/api/diety/{rec.id}", json={"title": "  "}).status_code == 400
 
 
 def test_ratings_filter_all_pools_and_snacks_and_persist(service):
-    client = TestClient(create_app(service))
+    client = TestClient(create_app(service), base_url="http://127.0.0.1")
     pools = service.pools()
     meal_id = pools.by_meal[MealType.BREAKFAST][0]
     batch_id = next(iter(pools.batch.values()))[0]
@@ -69,7 +69,7 @@ def test_ratings_filter_all_pools_and_snacks_and_persist(service):
     assert client.put(f"/api/oceny/{meal_id}", json={"rating": 0}).status_code == 200
     assert meal_id not in client.get("/api/oceny").json()
     assert client.put(f"/api/oceny/{meal_id}", json={"rating": 2}).status_code == 400
-    assert client.put("/api/oceny/missing", json={"rating": 1}).status_code == 400
+    assert client.put("/api/oceny/missing", json={"rating": 1}).status_code == 404
 
 
 def test_likes_increase_selection_without_forcing(repo):

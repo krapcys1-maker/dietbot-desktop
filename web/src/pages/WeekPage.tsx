@@ -7,7 +7,7 @@ import MoreActions from "../components/MoreActions";
 import Icon from "../components/Icon";
 import { ErrorBox, JobProgress, Loading, Modal, Spinner, StateBadge, TagBadges, useToast } from "../components/ui";
 import type { Day, DayBreakdown, Job, Meal, Metric, Person, PlanView, SwapOptions } from "../types";
-import { DAY_SHORT, dateTime, dayDate, go, loadLocal, num, saveLocal, todayIndex, useAsync, usd } from "../util";
+import { DAY_SHORT, dateTime, dayDate, go, loadLocal, num, plural, saveLocal, todayIndex, usd, useAsync } from "../util";
 
 const DAYS_ACC: Record<string, string> = {
   poniedziałek: "poniedziałek", wtorek: "wtorek", środa: "środę", czwartek: "czwartek", piątek: "piątek", sobota: "sobotę", niedziela: "niedzielę",
@@ -20,6 +20,28 @@ const METRICS: { key: Metric; label: string; unit: string }[] = [
   { key: "carbs", label: "Węglowodany", unit: "g" },
 ];
 
+const SALT_LIMIT_G = 5; // WHO: mniej niż 5 g soli dziennie
+const SAT_FAT_LIMIT_PCT = 10;
+
+/** Błonnik, sól i kwasy nasycone dnia — do oceny jakości diety, nie do celów silnika (audyt 09.10.2026, S9). */
+function QualityLine({ values }: { values: { fiber?: number; salt?: number; saturated_fat_pct?: number } }) {
+  const salt = values.salt ?? 0;
+  const sat = values.saturated_fat_pct ?? 0;
+  return (
+    <div className="muted small">
+      Błonnik {num(values.fiber ?? 0)} g ·{" "}
+      <span className={salt > SALT_LIMIT_G ? "warn-text" : undefined}
+        title="Sól z produktów i soli kuchennej w przepisach. WHO zaleca mniej niż 5 g dziennie.">
+        sól {num(salt, 1)} g{salt > SALT_LIMIT_G ? " (WHO: < 5 g)" : ""}
+      </span>{" "}·{" "}
+      <span className={sat > SAT_FAT_LIMIT_PCT ? "warn-text" : undefined}
+        title="Kwasy tłuszczowe nasycone jako procent energii dnia. Zalecenie: mniej niż 10%.">
+        kwasy nasycone {num(sat, 1)}% energii{sat > SAT_FAT_LIMIT_PCT ? " (zalecane < 10%)" : ""}
+      </span>
+    </div>
+  );
+}
+
 export default function WeekPage({ planId }: { planId?: string }) {
   const toast = useToast();
   const { data: plan, error, loading, reload } = useAsync<PlanView | null>(
@@ -30,6 +52,7 @@ export default function WeekPage({ planId }: { planId?: string }) {
   const [swapMeal, setSwapMeal] = useState<Meal | null>(null);
   const [job, setJob] = useState<{ id: string; title: string } | null>(null);
   const [jobRunning, setJobRunning] = useState(false);
+  const [starting, setStarting] = useState(false);
   const [showLog, setShowLog] = useState(false);
 
   useEffect(() => {
@@ -61,12 +84,16 @@ export default function WeekPage({ planId }: { planId?: string }) {
   const today = todayIndex(plan.week_start);
 
   const startJob = async (kind: "recompute" | "repair") => {
+    if (jobRunning || starting) return; // podwójne kliknięcie albo Enter tworzyły dwie wersje (audyt S1)
+    setStarting(true);
     try {
       const j = await api.recompute(plan.id, kind === "repair");
       setJobRunning(true);
       setJob({ id: j.id, title: kind === "repair" ? "Przeliczenie z naprawą" : "Przeliczenie planu" });
     } catch (e) {
       toast((e as Error).message, "error");
+    } finally {
+      setStarting(false);
     }
   };
 
@@ -106,7 +133,7 @@ export default function WeekPage({ planId }: { planId?: string }) {
             {plan.active && <span className="badge">aktualny</span>}
             {plan.saved_diet && <span className="badge ok">💾 {plan.saved_diet.title}</span>}
           </div>
-          <div className="sub">{plan.days.length} dni · {plan.persons.map((p) => p.name).join(" i ")} · wersja {plan.version}</div>
+          <div className="sub">{plan.days.length} {plural(plan.days.length, "dzień", "dni", "dni")} · {plan.persons.map((p) => p.name).join(" i ")} · wersja {plan.version}</div>
         </div>
       </div>
       <div className="plan-toolbar no-print">
@@ -136,16 +163,16 @@ export default function WeekPage({ planId }: { planId?: string }) {
 
       {plan.assumptions_changed && (
         <div className="alert warn row no-print">
-          <span className="grow">Cele lub baza zmieniły się od zapisu. Ta dieta zachowuje zapisane dane, liczby i zakupy.
+          <span className="grow">Cele, preferencje z notatnika, przepisy lub zasady proporcji zmieniły się od zapisu. Ta dieta zachowuje zapisane dane, liczby i zakupy.
             Przelicz, aby utworzyć nową wersję według aktualnych ustawień.</span>
-          <button className="btn small" onClick={() => startJob("recompute")}>Przelicz te same dania</button>
-          <button className="btn small" onClick={() => startJob("repair")}>Przelicz i napraw</button>
+          <button className="btn small" disabled={jobRunning || starting} onClick={() => startJob("recompute")}>Przelicz te same dania</button>
+          <button className="btn small" disabled={jobRunning || starting} onClick={() => startJob("repair")}>Przelicz i napraw</button>
         </div>
       )}
       {!plan.ok && !plan.assumptions_changed && (
         <div className="alert warn row no-print">
           <span className="grow">Plan ma uwagi weryfikatora (szczegóły na dole). Możesz zamienić danie albo spróbować automatycznej naprawy.</span>
-          <button className="btn small" onClick={() => startJob("repair")}>Napraw automatycznie</button>
+          <button className="btn small" disabled={jobRunning || starting} onClick={() => startJob("repair")}>Napraw automatycznie</button>
         </div>
       )}
 
@@ -246,7 +273,11 @@ export default function WeekPage({ planId }: { planId?: string }) {
         />
       )}
       {job && (
-        <Modal title={job.title} onClose={() => { if (!jobRunning) setJob(null); }}>
+        <Modal title={job.title} onClose={() => {
+          if (!jobRunning) { setJob(null); return; }
+          // ✕ w trakcie liczenia: pytamy o przerwanie (wcześniej przycisk nic nie robił — audyt S13)
+          if (window.confirm("Przerwać przeliczanie? Nowa wersja planu nie powstanie.")) api.cancelJob(job.id).catch(() => undefined);
+        }}>
           <JobProgress jobId={job.id} onDone={onJobDone} />
           {jobRunning && <div className="muted small">Okno zamknie się po zakończeniu — nowa wersja planu otworzy się sama.</div>}
         </Modal>
@@ -268,6 +299,7 @@ function DayView({ day, plan, onSwap }: { day: Day; plan: PlanView; onSwap: (m: 
               <span>{m.label}</span><b>{num(total.values[m.key])}<small> {m.unit}</small></b>
               <small>cel {num(p.targets[m.key].min)}–{num(p.targets[m.key].max)}</small>
             </div>)}</div>
+            <QualityLine values={total.values} />
           </section>;
         })}
       </div>
@@ -453,7 +485,7 @@ function PersonTotals({ person, totals }: { person: Person; totals?: Day["totals
           </div>
         );
       })}
-      <div className="muted small">Błonnik: {num(totals.values.fiber)} g</div>
+      <QualityLine values={totals.values} />
     </div>
   );
 }
@@ -480,7 +512,7 @@ function MealCard({ meal, persons, onSwap }: { meal: Meal; persons: Person[]; on
           <div className="meal-label">{meal.meal_label}</div>
           <div className="meal-name">{meal.dish_name}</div>
           <div className="row" style={{ marginTop: 6 }}>
-            <TagBadges tags={meal.tags} isTreat={meal.is_treat} isSweet={meal.is_sweet} />
+            <TagBadges tags={meal.tags} isTreat={meal.is_treat} isSweet={meal.is_sweet} diets={meal.diets} />
             {meal.cuisine && <span className="badge">kuchnia {meal.cuisine}</span>}
             {meal.prep_minutes && <span className="badge"><Icon name="clock" />{meal.prep_minutes} min</span>}
             {meal.batch_group && <span className="badge batch">{meal.reheat ? "odgrzewasz" : "gotujesz"}: {meal.batch_days.join(", ").toLowerCase()}</span>}
@@ -495,8 +527,19 @@ function MealCard({ meal, persons, onSwap }: { meal: Meal; persons: Person[]; on
           {(por.mass_over || (por.anchor_state && por.anchor_state !== "ok")) && <small className="bad-text">Sprawdź szczegóły porcji</small>}</div>;
       })}</div>
       <DishRating id={meal.dish_id} name={meal.dish_name} />
+      {meal.batch_recipe && !meal.reheat && <div className="pot stack">
+        <h3>{meal.batch_recipe.title}</h3>
+        <p>{meal.batch_recipe.instructions}</p>
+        <table className="table"><thead><tr><th>Składnik</th><th>Łącznie na wszystkie dni i osoby</th></tr></thead>
+          <tbody>{meal.batch_recipe.items.map(i => <tr key={i.product_id}><td>{i.name}{i.side && <div className="muted small">Dodatek do podania osobno</div>}</td><td>{i.amount}</td></tr>)}
+          {meal.batch_recipe.water && <tr><td>Woda do gotowania</td><td>{meal.batch_recipe.water}</td></tr>}</tbody></table>
+        {meal.steps.length > 0 && <><b>Przygotowanie całej ilości — wykonujesz raz</b><ol className="steps">{meal.steps.map((s,i)=><li key={i}>{s}</li>)}</ol></>}
+      </div>}
+      {meal.reheat && <div className="alert info">Dziś tylko odgrzewasz przygotowane porcje. Nie gotujesz drugi raz.
+        Pełne składniki i przepis na całość znajdziesz przy dniu: {meal.batch_days[0]?.toLowerCase()}.{meal.batch_recipe?.has_side ? " Pieczywo podaj osobno." : ""}</div>}
       <details className="disclosure meal-ingredients">
-        <summary>Składniki i gramatury <span className="summary-hint">{rows.length} składników · porcje dla {persons.length} osób</span></summary>
+        <summary>{meal.batch_group ? "Podział gotowej partii — porcje na dzisiaj" : "Składniki i gramatury"} <span className="summary-hint">{rows.length} {plural(rows.length, "składnik", "składniki", "składników")} · porcje dla {persons.length} {plural(persons.length, "osoby", "osób", "osób")}</span></summary>
+      {meal.batch_group && <p className="muted">Te ilości surowych składników są już zawarte w tabeli na całość. To nie jest druga lista do gotowania. Mięso i większe kawałki rozdziel według porcji.</p>}
       <div style={{ overflowX: "auto" }}>
         <table className="portions">
           <thead>
@@ -555,20 +598,20 @@ function MealCard({ meal, persons, onSwap }: { meal: Meal; persons: Person[]; on
           </tfoot>
         </table>
       </div>
-      {!meal.reheat && (meal.groups ?? []).map((g) => (
+      {!meal.batch_group && (meal.groups ?? []).map((g) => (
         <div key={g.name} className="group-box">
           <b>{g.name.charAt(0).toUpperCase() + g.name.slice(1)}</b> — przygotuj razem ({num(g.total_g)} g, proporcje z przepisu):{" "}
           {g.items.map((i) => `${i.name.toLowerCase()} ${i.amount}${i.household ? ` (≈ ${i.household})` : ""}`).join(", ")}
         </div>
       ))}
-      {meal.pot && meal.pot.length > 0 && (
+      {!meal.batch_recipe && meal.pot && meal.pot.length > 0 && (
         <div className="pot">
           <b>Gotujesz raz, na wszystkie porcje:</b>{" "}
           {meal.pot.map((p) => `${p.name.toLowerCase()} ${p.amount}${p.household ? ` (≈ ${p.household})` : ""}`).join(", ")}
         </div>
       )}
       </details>
-      {meal.reheat ? (
+      {meal.batch_recipe ? null : meal.reheat ? (
         <div className="muted">Odgrzewasz porcję ugotowaną wcześniej.</div>
       ) : (
         meal.steps.length > 0 && (
@@ -632,7 +675,7 @@ function SwapDialog({ plan, meal, onClose, onStarted }: { plan: PlanView; meal: 
         <button key={o.id} className={`option ${selected === o.id ? "selected" : ""}`} aria-pressed={selected === o.id} onClick={() => setSelected(o.id)}>
           <div className="row">
             <b className="grow">{o.name}</b>
-            <TagBadges tags={o.tags} />
+            <TagBadges tags={o.tags} diets={o.diets} />
           </div>
           {o.description && <div className="muted small">{o.description}</div>}
           <div className="row small muted">

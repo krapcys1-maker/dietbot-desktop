@@ -25,7 +25,7 @@ MEAL_ICONS = {"sniadanie": "🍳", "obiad": "🍲", "kolacja": "🥗", "przekask
 DAY_SHORT = ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Nd"]
 
 HELP = (
-    "<b>DietBot</b> — wasz jadłospis na tydzień.\n\n"
+    "<b>Porcja</b> — wasz jadłospis na tydzień.\n\n"
     "/dzis — posiłki na dziś z gramaturami\n"
     "/jutro — posiłki na jutro\n"
     "/tydzien — dania na cały tydzień\n"
@@ -50,20 +50,59 @@ def md_to_html(text: str) -> str:
     return re.sub(r"(?<![\w/])_(.+?)_(?![\w/])", r"<i>\1</i>", escaped)
 
 
+TAG = re.compile(r"<(/?)(b|i|u|s|code|pre)>")
+
+
+def _cut_point(line: str, limit: int) -> int:
+    """Miejsce cięcia ≤ limit, które nie wypada w środku znacznika HTML ani encji (&amp;) — Telegram odrzuca takie
+    wiadomości (audyt N2). Najlepiej na spacji."""
+    cut = limit
+    head = line[:cut]
+    if head.rfind("<") > head.rfind(">"):
+        cut = head.rfind("<")
+    head = line[:cut]
+    amp = head.rfind("&")
+    if amp > head.rfind(";") and cut - amp <= 10:
+        cut = amp
+    space = line.rfind(" ", 0, cut)
+    if space > cut * 0.6:
+        cut = space + 1
+    return max(cut, 1)
+
+
+def _balance(parts: list[str]) -> list[str]:
+    """Każda część ma domknięte znaczniki: otwarte na końcu części zamykamy i otwieramy na początku następnej."""
+    out: list[str] = []
+    carried: list[str] = []
+    for part in parts:
+        text = "".join(f"<{t}>" for t in carried) + part
+        stack: list[str] = []
+        for closing, tag in TAG.findall(text):
+            if closing and stack and stack[-1] == tag:
+                stack.pop()
+            elif not closing:
+                stack.append(tag)
+        out.append(text + "".join(f"</{t}>" for t in reversed(stack)))
+        carried = stack
+    return out
+
+
 def chunks(text: str, limit: int = LIMIT) -> list[str]:
+    limit_raw = limit - 40  # zapas na domknięcie i ponowne otwarcie znaczników
     parts: list[str] = []
     current = ""
     for line in text.split("\n"):
-        while len(line) > limit:  # pojedyncza bardzo długa linia
-            parts.append(line[:limit])
-            line = line[limit:]
-        if len(current) + len(line) + 1 > limit and current:
+        while len(line) > limit_raw:  # pojedyncza bardzo długa linia — cięcie poza znacznikiem i encją
+            cut = _cut_point(line, limit_raw)
+            parts.append(line[:cut])
+            line = line[cut:]
+        if len(current) + len(line) + 1 > limit_raw and current:
             parts.append(current.rstrip("\n"))
             current = ""
         current += line + "\n"
     if current.strip():
         parts.append(current.rstrip("\n"))
-    return parts or [""]
+    return _balance(parts) or [""]
 
 
 def _n(value: float) -> int:
@@ -187,6 +226,11 @@ def build_bot(service: DietService, token: str, allowed: set[int], session=None,
     class Access(BaseMiddleware):
         async def __call__(self, handler, event, data):
             user = getattr(event, "from_user", None)
+            message = event if isinstance(event, Message) else getattr(event, "message", None)
+            chat = getattr(message, "chat", None)
+            if chat is not None and getattr(chat, "type", "private") != "private":
+                # w grupie plan, makro i czat widziałaby cała grupa — bot działa tylko w rozmowie prywatnej (N1)
+                return None
             if user is not None and user.id in allowed:
                 return await handler(event, data)
             if isinstance(event, Message) and (event.text or "").startswith("/start") and user is not None:
@@ -309,11 +353,15 @@ def build_bot(service: DietService, token: str, allowed: set[int], session=None,
             await callback.answer("Odrzucono")
             return
         reply = await asyncio.to_thread(ChatAssistant(service, channel="telegram").confirm, pid)
-        saved = (reply.get("data") or {}).get("kind") == "zalozenia_zapisane"
-        await callback.answer("Zapisano" if saved else "Nie zapisano")
+        data = reply.get("data") or {}
+        done = data.get("kind") == "zalozenia_zapisane" or bool(data.get("job_id"))
+        await callback.answer("Zapisano" if data.get("kind") == "zalozenia_zapisane" else "Uruchomiono" if done
+                              else "Nie zapisano")
         if callback.message is not None:
             for part in chunks(md_to_html(reply["text"])):
                 await callback.message.answer(part)
+            if data.get("job_id"):
+                await follow(callback.message, data["job_id"])
 
     dp = Dispatcher()
     dp.include_router(router)

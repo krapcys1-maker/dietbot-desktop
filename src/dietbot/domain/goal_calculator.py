@@ -4,7 +4,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from .assumptions import Band, DailyTargets
+from .assumptions import SAFE_MIN_KCAL, Band, DailyTargets
 
 ACTIVITY = {"low": 1.2, "light": 1.375, "moderate": 1.55, "high": 1.725}
 SOURCES = [
@@ -48,9 +48,11 @@ def calculate_goals(profile: GoalInput) -> dict:
     maintenance = resting * ACTIVITY[profile.activity]
     deficit = min(500, maintenance * (0.10 if profile.pace == "gentle" else 0.15)) if profile.goal == "lose" else 0
     kcal = round((maintenance - deficit) / 10) * 10
-    # Conservative product boundary, not a universal clinical minimum. Never silently clamp.
-    if kcal * 0.95 < 1500 or kcal > 4000:
-        raise ValueError("Wynik jest poza ostrożnym zakresem aplikacji (dolna granica celu 1500 kcal, środek do 4000 kcal). Nie zmieniamy go automatycznie. Wpisz cele ustalone indywidualnie.")
+    # Conservative product boundary, not a universal clinical minimum. Never silently clamp. Jeden próg 1500 kcal
+    # odrzucał większość typowych kobiet (audyt 09.10.2026, W1) — próg zależy od płci, jak ostrzeżenie przy celach.
+    floor = SAFE_MIN_KCAL["mezczyzna" if profile.sex == "male" else "kobieta"]
+    if kcal * 0.95 < floor or kcal > 4000:
+        raise ValueError(f"Wynik jest poza ostrożnym zakresem aplikacji (dolna granica celu {floor:.0f} kcal, środek do 4000 kcal). Nie zmieniamy go automatycznie. Wpisz cele ustalone indywidualnie ze specjalistą.")
     values = {"kcal": kcal, "protein": round(kcal * 0.20 / 4), "fat": round(kcal * 0.30 / 9), "carbs": round(kcal * 0.50 / 4)}
     bands = {key: Band(min=round(value * (0.95 if key == "kcal" else 0.90)),
                        max=round(value * (1.05 if key == "kcal" else 1.10)), target=value)
@@ -60,6 +62,7 @@ def calculate_goals(profile: GoalInput) -> dict:
     return {
         "resting_kcal": round(resting), "maintenance_kcal": round(maintenance),
         "deficit_kcal": round(maintenance - kcal), "targets": targets.model_dump(by_alias=True),
+        "sex": "mezczyzna" if profile.sex == "male" else "kobieta",
         "protein_anchor": {"min": round(anchor * 0.70), "max": round(anchor * 1.20)},
         "loss_kg": round(profile.weight_kg - profile.target_weight_kg, 1) if profile.goal == "lose" else 0,
         "method": "Mifflin–St Jeor × przybliżony współczynnik aktywności. Propozycja B/T/W: 20% / 30% / 50% energii.",

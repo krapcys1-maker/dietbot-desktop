@@ -3,7 +3,7 @@ import { api } from "../api";
 import GoalCalculator from "../components/GoalCalculator";
 import { ErrorBox, JobProgress, Loading, Modal, Spinner, useToast } from "../components/ui";
 import type { AssumptionsData, AssumptionsResponse, BandData, PlanSummary } from "../types";
-import { DAY_NAMES, go, useAsync } from "../util";
+import { DAY_SHORT, go, setLeaveGuard, useAsync } from "../util";
 
 const MACROS: { key: "kcal" | "bialko" | "tluszcz" | "weglowodany"; label: string; unit: string }[] = [
   { key: "kcal", label: "Energia", unit: "kcal" },
@@ -44,6 +44,10 @@ export default function AssumptionsPage() {
   }, [resp]);
 
   const dirty = useMemo(() => !!resp && !!data && JSON.stringify(resp.data) !== JSON.stringify(data), [resp, data]);
+  useEffect(() => {
+    setLeaveGuard(dirty ? "Masz niezapisane zmiany w celach i preferencjach. Wyjść bez zapisywania?" : null);
+    return () => setLeaveGuard(null);
+  }, [dirty]);
   const productName = useMemo(() => Object.fromEntries((resp?.products ?? []).map((p) => [p.id, p.name])), [resp]);
 
   if (loading && !resp) return <div className="page"><Loading /></div>;
@@ -81,13 +85,18 @@ export default function AssumptionsPage() {
   const save = async () => {
     setSaving(true);
     try {
-      const r = await api.saveAssumptions(data);
+      let r = await api.saveAssumptions(data, resp.version);
+      if (!r.ok && r.needs_confirmation && window.confirm(r.needs_confirmation)) {
+        r = await api.saveAssumptions(data, resp.version, true);
+      }
       setErrors(r.errors);
       setWarnings(r.warnings);
       if (r.ok) {
         toast("Zapisano założenia.");
         setSaved(true);
         reload();
+      } else if (r.needs_confirmation) {
+        toast("Nie zapisano — cele energii zostały bez zmian.");
       } else {
         toast("Nie zapisano — popraw błędy.", "error");
       }
@@ -106,6 +115,7 @@ export default function AssumptionsPage() {
         <div>
           <span className="eyebrow">PO TWOJEMU</span><h1>Cele i preferencje</h1>
           <div className="sub">Twój sposób jedzenia, cele i ulubione smaki. Zmiany zaczną działać po zapisaniu — dotychczasowe diety pozostaną bez zmian.</div>
+          <div className="muted small">Ustawienia startowe to przykład jednego domu (m.in. wąskie widełki, zakaz rukoli i płatków owsianych, bez kasz) — dopasuj je do siebie.</div>
         </div>
         <div className="row">
           <button className="btn" onClick={() => { setData(clone(resp.data)); setErrors([]); }} disabled={!dirty}>Cofnij zmiany</button>
@@ -133,7 +143,7 @@ export default function AssumptionsPage() {
         </label>
         {data.rodzaj_diety && data.rodzaj_diety !== "tradycyjna" && <>
           <p className="muted">Sprawdzamy składniki, przekąski i stałe pozycje. Produkty złożone o nieznanym składzie są pomijane. Wybieraj pieczywo i makaron bez jaj/mleka; nazwa „wege” na daniu nie wystarcza. To filtr składników, nie audyt wszystkich witamin i minerałów diety.</p>
-          {data.rodzaj_diety === "wegan" && <p className="alert info small">Przy diecie wegańskiej trzeba zadbać m.in. o wiarygodne źródło witaminy B12. DietBot nie bilansuje witamin ani minerałów. <a href="https://www.nhs.uk/live-well/eat-well/how-to-eat-a-balanced-diet/the-vegan-diet/" target="_blank" rel="noreferrer">Informacje NHS o diecie wegańskiej</a>.</p>}
+          {data.rodzaj_diety === "wegan" && <p className="alert info small">Przy diecie wegańskiej trzeba zadbać m.in. o wiarygodne źródło witaminy B12. Porcja nie bilansuje witamin ani minerałów. <a href="https://www.nhs.uk/live-well/eat-well/how-to-eat-a-balanced-diet/the-vegan-diet/" target="_blank" rel="noreferrer">Informacje NHS o diecie wegańskiej</a>.</p>}
           {(data.dzien.stale_pozycje ?? []).filter(f => !resp.products.find(p => p.id === f.produkt)?.diets.includes(data.rodzaj_diety!)).map(f => <div className="alert warn row" key={f.produkt}>
             <span className="grow">Stała pozycja „{productName[f.produkt]}” nie pasuje do wybranej diety. Zmień ją w sekcji Dzień albo usuń.</span>
             <button className="btn small" onClick={() => update(d => { d.dzien.stale_pozycje = d.dzien.stale_pozycje?.filter(x => x.produkt !== f.produkt); })}>Usuń tę stałą pozycję</button>
@@ -152,9 +162,21 @@ export default function AssumptionsPage() {
               <input type="text" value={person.nazwa} onChange={(e) => update((d) => { d.osoby[pi].nazwa = e.target.value; })} />
             </label>
           </div>
+          <label className="field" style={{ maxWidth: 360 }}>
+            <span>Płeć — tylko do progów bezpieczeństwa (np. minimum kalorii)</span>
+            <select value={person.plec ?? ""} onChange={(e) => update((d) => {
+              const v = e.target.value as "" | "kobieta" | "mezczyzna";
+              if (v) d.osoby[pi].plec = v; else delete d.osoby[pi].plec;
+            })}>
+              <option value="">nie podano (ostrożny próg 1200 kcal)</option>
+              <option value="kobieta">kobieta (minimum ok. 1200 kcal)</option>
+              <option value="mezczyzna">mężczyzna (minimum ok. 1500 kcal)</option>
+            </select>
+          </label>
           <GoalCalculator key={data.dzien.posilki.length} meals={data.dzien.posilki.length} onApply={r => update(d => {
             d.osoby[pi].cele_dzienne = r.targets;
             d.osoby[pi].kotwica_bialka_na_posilek = r.protein_anchor;
+            if (r.sex) d.osoby[pi].plec = r.sex;
           })} />
           <div className="table-scroll"><table className="band-table">
             <thead>
@@ -311,7 +333,7 @@ export default function AssumptionsPage() {
                       if (e.target.checked) set.add(dk); else set.delete(dk);
                       d.tydzien.na_zapas![i].dni = DAY_KEYS.filter((x) => set.has(x));
                     })} />
-                  {DAY_NAMES[di].slice(0, 3)}
+                  {DAY_SHORT[di]}
                 </label>
               ))}
               <button className="btn small ghost" onClick={() => update((d) => { d.tydzien.na_zapas!.splice(i, 1); })}>Usuń</button>

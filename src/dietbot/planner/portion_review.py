@@ -13,20 +13,21 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from ..domain.assumptions import DAY_LABELS_PL, Assumptions, Weekday
 from ..domain.dish import MEAL_LABELS_PL, DishTemplate, MealType
 from ..domain.plan import PlannedMeal, WeekPlan
 from ..domain.product import Product
 from ..textfmt import fmt_num
+from ..textnumbers import without_numbers
 
 TIGHT_MAX = 1.2  # „za dużo”: składnik najwyżej 120% typowej porcji (przed skalowaniem na osobę)…
 TIGHT_MIN = 0.85  # „za mało”: składnik co najmniej 85% typowej porcji…
 FROM_PLATE_MAX = 0.8  # …i najwyżej 80% tego, co było na talerzu (w gramach dla osoby 2000 kcal)
 FROM_PLATE_MIN = 1.25  # …i co najmniej 125% tego, co było na talerzu
 
-PORTION_SYSTEM = """Jesteś szefem kuchni. Program policzył gramatury tygodniowego jadłospisu dla dwóch osób — porcje różnią się,
+PORTION_SYSTEM = """Jesteś szefem kuchni. Program policzył gramatury tygodniowego jadłospisu dla domowników — porcje różnią się,
 bo osoby mają inne cele kalorii. Kalorie i białko są już sprawdzone; oceniasz WYŁĄCZNIE, czy talerz ma sens kulinarny:
 - czy proporcje składników w daniu są normalne (sos do makaronu, surówka do mięsa, ser na kanapce, dodatki do mięsa),
 - czy któregoś składnika nie ma absurdalnie dużo albo mało jak na to danie (np. 300 g ogórka w mizerii do kotleta,
@@ -46,6 +47,12 @@ class PortionIssue(BaseModel):
     kierunek: Literal["za_duzo", "za_malo"]
     problem: str
     waga: Literal["drobna", "powazna"]
+
+    @field_validator("problem")
+    @classmethod
+    def _plain(cls, v: str) -> str:
+        # opis trafia do ostrzeżeń planu — liczby („ma 650 kcal”) podaje tylko program (audyt S12)
+        return without_numbers(v) or "porcja wygląda nietypowo"
 
 
 class PortionReview(BaseModel):

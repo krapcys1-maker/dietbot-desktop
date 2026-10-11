@@ -42,6 +42,17 @@ def test_calculator_rejects_unsafe_input(change):
 def test_low_energy_not_silently_clamped():
     data = profile().model_dump()
     data.update(age=65, height_cm=150, weight_kg=60, target_weight_kg=57, sex="female", activity="low")
+    with pytest.raises(ValueError, match="1200"):
+        calculate_goals(GoalInput.model_validate(data))
+
+
+def test_calculator_floor_depends_on_sex():
+    """Wspólny próg 1500 kcal odrzucał większość typowych kobiet (audyt 09.10.2026, W1)."""
+    data = profile().model_dump()
+    data.update(age=50, height_cm=160, weight_kg=58, sex="female", activity="low", goal="maintain", target_weight_kg=None)
+    result = calculate_goals(GoalInput.model_validate(data))
+    assert 1200 <= result["targets"]["kcal"]["min"] < 1500 and result["sex"] == "kobieta"
+    data.update(sex="male", height_cm=160, weight_kg=50, age=75)
     with pytest.raises(ValueError, match="1500"):
         calculate_goals(GoalInput.model_validate(data))
 
@@ -66,6 +77,37 @@ def test_new_recipes_classification(repo):
     assert len(added) == 34
     assert sum(dish_compatible(d, repo.products, "wegan") for d in added) == 26
     assert all(dish_compatible(d, repo.products, "wege") and d.steps and d.prep_minutes for d in added)
+
+
+def test_plant_drink_replaces_coffee_milk_in_vegan_diet(repo):
+    a = repo.assumptions.model_copy(deep=True)
+    a.diet = "wegan"
+    errors = check_consistency(repo.products, repo.dishes, a).errors
+    # komunikat po polsku i z podpowiedzią zamiennika, który naprawdę jest w bazie
+    assert any("dietą wegańską" in e and "napój sojowy" in e for e in errors)
+    for drink in ("napoj_sojowy", "napoj_owsiany"):
+        assert compatible(repo.products[drink], "wegan") and repo.products[drink].source.code
+    a.day.fixed_items = [fx.model_copy(update={"product_id": "napoj_sojowy"}) if fx.product_id == "mleko_1_5" else fx
+                         for fx in a.day.fixed_items]
+    assert not check_consistency(repo.products, repo.dishes, a).errors
+
+
+def test_plant_recipes_033_widen_vegan_pools(repo):
+    from dietbot.engine import EngineSettings
+    from dietbot.planner.pools import build_pools
+
+    added = [d for d in repo.dishes.values() if d.id.startswith("roslinne_033_")]
+    assert len(added) == 14
+    for d in added:
+        assert dish_compatible(d, repo.products, "wegan"), d.id
+        assert d.steps and d.prep_minutes and not d.culinary_errors, d.id
+    a = repo.assumptions.model_copy(deep=True)
+    a.diet = "wegan"
+    pools = build_pools(repo.approved_dishes(), repo.products, a, EngineSettings())
+    assert not {d.id for d in added} & set(pools.excluded)
+    assert {m.value: len(ids) >= 12 for m, ids in pools.by_meal.items()} == {"sniadanie": True, "obiad": True,
+                                                                             "kolacja": True}
+    assert len(pools.batch[0]) >= 4  # wegańskie zupy na zapas: wtorek + środa
 
 
 def test_snapshot_keeps_fixed_items_targets_tables_and_exports(repo, tmp_path):
@@ -122,17 +164,17 @@ def test_active_plan_outside_latest_hundred_still_in_list(repo, tmp_path):
 
 def test_origin_rejects_other_local_ports(repo, tmp_path):
     s = DietService(repo.paths, use_llm=False, db_path=tmp_path / "origin.sqlite3")
-    client = TestClient(create_app(s))
-    for origin in ("https://example.org", "http://testserver:9999", "http://127.0.0.1:9999", "null"):
+    client = TestClient(create_app(s), base_url="http://127.0.0.1")
+    for origin in ("https://example.org", "http://testserver", "http://127.0.0.1:9999", "null"):
         assert client.post("/api/cele/oblicz", json=profile().model_dump(), headers={"Origin": origin}).status_code == 403
-    assert client.post("/api/cele/oblicz", json=profile().model_dump(), headers={"Origin": "http://testserver"}).status_code == 200
+    assert client.post("/api/cele/oblicz", json=profile().model_dump(), headers={"Origin": "http://127.0.0.1"}).status_code == 200
     s.jobs.shutdown()
 
 
 def test_calculator_api_has_no_settings_side_effects(repo, tmp_path):
     s = DietService(repo.paths, use_llm=False, db_path=tmp_path / "api.sqlite3")
     before = s.repo.assumptions.model_dump_json()
-    client = TestClient(create_app(s))
+    client = TestClient(create_app(s), base_url="http://127.0.0.1")
     assert client.post("/api/cele/oblicz", json=profile().model_dump()).status_code == 200
     assert s.repo.assumptions.model_dump_json() == before
     assert not s.store.list()

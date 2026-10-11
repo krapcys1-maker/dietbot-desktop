@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field, ValidationError
 from rapidfuzz import fuzz
 
 from ..domain.assumptions import Assumptions
+from ..domain.culinary import protect_recipe
 from ..domain.dish import (
     DishIngredient,
     DishStatus,
@@ -29,7 +30,7 @@ from ..engine.settings import EngineSettings
 from ..food.matcher import MatchStatus, ProductMatcher
 from ..planner.pools import build_pools
 from ..textnorm import normalize
-from .client import LLMClient
+from .client import BudgetExceeded, LLMClient
 
 
 class GenIngredient(BaseModel):
@@ -60,7 +61,7 @@ class GenBatch(BaseModel):
 
 
 GEN_SYSTEM = """Jesteś doświadczonym kucharzem i dietetykiem. Tworzysz przepisy do polskiej aplikacji z jadłospisami
-dla dwóch osób mieszkających w Rumunii (zakupy w zwykłych sklepach, np. Lidl). Gramatury dokładne policzy program —
+dla domowników mieszkających w Rumunii (zakupy w zwykłych sklepach, np. Lidl). Gramatury dokładne policzy program —
 Ty podajesz TYPOWE porcje składników dla jednej osoby jedzącej 2000 kcal dziennie, jak w dobrej książce kucharskiej.
 
 Role składników:
@@ -79,7 +80,10 @@ MASY I PROPORCJE: składnikom jednej masy (ciasto, panierka, masa mielona, farsz
 pole "grupa" i to samo porcjowanie. Program może zrobić więcej albo mniej masy, ale zachowa proporcje z Twoich gramatur,
 więc typowe gramatury składników masy muszą oddawać prawdziwy przepis, np. ciasto naleśnikowe: mąka 60 g, mleko 150 g,
 jajko 30 g, olej 5 g; panierka do kotleta 150 g: jajko 15 g, bułka tarta 20 g, mąka 8 g (mięso w tej samej grupie).
-Przyprawy nie należą do grup. Danie bez wyraźnej masy (np. kanapki, sałatka z kawałków) nie potrzebuje grup.
+Przyprawy nie należą do grup. Ciasto, placki i panierka MUSZĄ mieć grupę obejmującą wszystkie składniki masy;
+w panierce także mięso. Brak proporcji powoduje odrzucenie przepisu. Nie dobieraj niezależnie mąki, jajek i mleka
+pod makro. Kanapki nie potrzebują grupy masy, ale pieczywo i główne nadzienie muszą mieć rozsądną proporcję:
+program zachowa ją (±25%). Zamknięty tost: 2 kromki (50 g) i co najmniej 20 g sera, jeśli jest serowy.
 Nazwy grup po polsku z polskimi znakami (np. "ciasto naleśnikowe", "surówka"). Każdy produkt tylko RAZ na liście
 składników — gdy mąka jest w cieście i do podsypania, podaj ją raz, łącznie.
 Śniadania i obiady są WYTRAWNE (bez cukru, dżemu, słodkich dodatków); na słodko wyłącznie kolacje z tagiem slodkie.
@@ -371,6 +375,8 @@ def validate_generated(gen: GenDish, products: Mapping[str, Product], matcher: P
         )
     except ValidationError as exc:
         return None, [f"struktura: {e['msg']}" for e in exc.errors()]
+    dish = protect_recipe(dish, products)
+    reasons.extend(dish.culinary_errors)
     if MealType.SNACK in dish.meal_types:
         reasons.append("generator nie tworzy przekąsek")
     if dish.is_batch and (MealType.LUNCH not in dish.meal_types or DishTag.SOUP.value not in dish.tags):
@@ -605,6 +611,8 @@ def run_generation_plan(repo, client: LLMClient, plan=DEFAULT_PLAN, workers: int
     """
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
+    from .scope import in_context
+
     orders = [as_order(x) for x in plan]
     settings = EngineSettings()
     matcher = ProductMatcher(repo.products)
@@ -659,10 +667,12 @@ def run_generation_plan(repo, client: LLMClient, plan=DEFAULT_PLAN, workers: int
 
     def parallel(jobs, handle) -> None:
         with ThreadPoolExecutor(max_workers=max(1, workers)) as ex:
-            futures = {ex.submit(fn): key for key, fn in jobs}
+            futures = {ex.submit(in_context(fn)): key for key, fn in jobs}
             for fut in as_completed(futures):
                 try:
                     res = fut.result()
+                except BudgetExceeded:
+                    raise  # limit kosztu to nie „nieudana partia” — wynik nie może udawać, że dania odpadły w kontroli
                 except Exception as exc:  # pojedyncza partia nie może zatrzymać całości
                     log(f"partia nieudana: {exc}")
                     continue

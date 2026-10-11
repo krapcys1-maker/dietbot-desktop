@@ -15,7 +15,7 @@ from ..engine import BlockStatus, EngineRequest, EngineResult, EngineSettings, s
 from ..llm.client import LLMClient, LLMError
 from ..storage.repository import Repository
 from ..textfmt import fmt_num
-from .autofix import autofix_composition, rebalance_days
+from .autofix import autofix_composition, rebalance_days, replace_disallowed
 from .compose import (
     COMPOSE_SYSTEM,
     Composition,
@@ -49,6 +49,9 @@ from .wishes import WishExclusions, extract_exclusions, resolve_requested_dishes
 
 MAX_COMPOSE_ROUNDS = 3
 MAX_REPAIR_ROUNDS = 3
+# wykluczenia z życzeń muszą zostawić każdemu posiłkowi sensowny wybór dań
+MIN_POOL_AFTER_WISHES = 8
+MIN_POOL_SHARE_AFTER_WISHES = 0.15
 
 
 class LiveLog(list[str]):
@@ -123,6 +126,16 @@ class WeekPlanner:
         a, r = self.repo.assumptions, self.repo
         return solve_week(req, a, r.products, self.dishes_for(comp), self.settings, cache=self.cache)
 
+    def _exclusions_empty_pools(self, extra_banned: set[str]) -> bool:
+        """Czy wykluczenia z życzeń zostawiają któremuś posiłkowi mniej niż kilka dań (albo ułamek zwykłej puli)."""
+        full = self.pools()
+        cut = self.pools(extra_banned=extra_banned)
+        for meal, ids in full.by_meal.items():
+            left = len(cut.by_meal.get(meal, []))
+            if left < min(MIN_POOL_AFTER_WISHES, len(ids)) or left < len(ids) * MIN_POOL_SHARE_AFTER_WISHES:
+                return True
+        return False
+
     def pools(self, avoid: set[str] | None = None, extra_banned: set[str] | None = None) -> Pools:
         return build_pools(self.repo.approved_dishes(), self.repo.products, self.repo.assumptions, self.settings,
                            avoid=avoid or set(), extra_banned=extra_banned, ratings=self.repo.dish_ratings)
@@ -158,7 +171,8 @@ class WeekPlanner:
         if self.llm is not None:
             shown = prompt_pools(pools, dishes, seed, focus=must_use | wish_focus(wishes, pools, dishes),
                                  cuisines={c for c, n in (cuisine_counts or {}).items() if n > 0})
-            prompt = build_compose_prompt(shown, a, days, wishes, avoid, must_use, cuisine_counts, pins)
+            prompt = build_compose_prompt(shown, a, days, wishes, avoid, must_use, cuisine_counts, pins,
+                                          self.repo.preference_hints)
             log.append("Lista dań dla modelu: " + ", ".join(f"{MEAL_LABELS_PL[m].lower()} {len(ids)} z {len(pools.by_meal[m])}"
                                                            for m, ids in shown.by_meal.items()))
             messages_note = ""
@@ -243,6 +257,13 @@ class WeekPlanner:
             extra_banned, cuisine_counts = set(excl.product_ids), dict(excl.cuisine_counts)
             if excl.notes:
                 log.append("Z życzeń na ten tydzień: " + "; ".join(excl.notes))
+            if extra_banned and self._exclusions_empty_pools(extra_banned):
+                # model mógł wykluczyć prawie wszystko (np. całe kategorie) — puste pule dawały kilka płatnych rund
+                # i błąd zamiast planu (audyt 09.10.2026, S12)
+                log.append("Wykluczenia z życzeń usunęłyby prawie wszystkie dania któregoś posiłku — pomijam je "
+                           "w tym planie (napisz życzenie dokładniej, np. konkretny produkt)")
+                extra_banned = set()
+                excl.product_ids = set()
             if excl.dishes and not excl.requested:
                 try:
                     excl.requested, c = resolve_requested_dishes(self.llm, excl.dishes, self.pools(set(), extra_banned),
@@ -305,7 +326,16 @@ class WeekPlanner:
         `extra_banned` — produkty wykluczone życzeniami tego planu; bez gotowych `pools` naprawa buduje pule bez nich."""
         t0 = t0 if t0 is not None else time.perf_counter()
         log = log if log is not None else LiveLog()
+        if extra_banned:
+            self.repo = self.repo.for_planning(extra_banned)  # przekąski bilansujące bez produktów z życzeń
         a = self.repo.assumptions
+        if repair:
+            # dania, które przestały pasować (np. nowa zasada z notatnika: zakaz produktu, limit porcji, ocena 👎) —
+            # silnik policzyłby je bez odchyleń, a weryfikator i tak by je odrzucił
+            pools = pools or self.pools(extra_banned=extra_banned)
+            replaced = replace_disallowed(comp, pools, self.repo.approved_dishes(), a, keep)
+            for note in replaced:
+                log.append(f"Zamiana na dozwolone danie — {note}")
         dishes = self.dishes_for(comp)
         log.append("Silnik liczy gramatury…")
         result = self._solve(comp)
@@ -334,6 +364,18 @@ class WeekPlanner:
             log.append(f"    sprawdzono {len(options)} zamian, w pełni działających: {len(working)}")
             swaps: dict[str, str] = {}
             block_of = {o.slot_key: tuple(o.block_days) for o in options}
+            current = {s.key: s.dish_id for s in comp.slots}
+
+            def swap_text(key: str, dish_id: str, current: dict[str, str] = current) -> str:
+                # dziennik czyta użytkownik („Jak powstał ten plan”) — nazwy dań i dni zamiast identyfikatorów
+                try:
+                    where = slot_label(key)
+                except (ValueError, KeyError):
+                    where = key
+                old = self.repo.dishes.get(current.get(key, ""))
+                new = self.repo.dishes.get(dish_id)
+                return (f"{where}: {old.name if old else current.get(key, '?')} → "
+                        f"{new.name if new else dish_id}")
             llm_blocks: set[tuple[int, ...]] = set()
             if self.llm is not None and working:
                 try:
@@ -347,16 +389,16 @@ class WeekPlanner:
                         if (sw.slot, sw.danie) in valid and block not in llm_blocks and sw.danie not in swaps.values():
                             swaps[sw.slot] = sw.danie
                             llm_blocks.add(block)
-                            log.append(f"    zamiana {sw.slot} → {sw.danie}: {sw.uzasadnienie}")
+                            log.append(f"    zamiana {swap_text(sw.slot, sw.danie)}: {sw.uzasadnienie}")
                         else:
-                            log.append(f"    pominięto propozycję modelu {sw.slot} → {sw.danie}")
+                            log.append(f"    pominięto propozycję modelu {swap_text(sw.slot, sw.danie)}")
                 except LLMError as exc:
                     log.append(f"    model językowy niedostępny przy naprawie ({exc})")
             for key, cand in select_swaps(result, options).items():
                 if block_of.get(key) in llm_blocks or cand in swaps.values():
                     continue
                 swaps[key] = cand
-                log.append(f"    zamiana {key} → {cand} (według silnika)")
+                log.append(f"    zamiana {swap_text(key, cand)} (według silnika)")
             if not swaps:
                 log.append("    żadna zamiana nie poprawia planu")
                 break
