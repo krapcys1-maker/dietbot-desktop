@@ -10,8 +10,9 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 
 from ..checker.verify import VerificationReport, nutrition_of
-from ..domain.assumptions import DAY_LABELS_PL, Assumptions, Weekday
+from ..domain.assumptions import DAY_LABELS_PL, Assumptions, Weekday, fixed_grams
 from ..domain.dish import MEAL_LABELS_PL, DishTemplate
+from ..domain.nutrition import BAND_TOLERANCE
 from ..domain.plan import WeekPlan
 from ..domain.product import Product
 
@@ -60,10 +61,13 @@ class WeekSummary:
         return sum(1 for d in self.days if d.ok)
 
 
-def band_state(value: float, lo: float, hi: float) -> str:
-    if value < lo - 0.01:
+def band_state(value: float, lo: float, hi: float, metric: str = "kcal") -> str:
+    """Ta sama tolerancja co w weryfikatorze — wcześniej 144,995 g białka było „ok” w aplikacji, a błędem w
+    weryfikatorze (audyt N15)."""
+    tol = BAND_TOLERANCE.get(metric, 0.01)
+    if value < lo - tol:
         return "za_malo"
-    if value > hi + 0.01:
+    if value > hi + tol:
         return "za_duzo"
     return "ok"
 
@@ -83,7 +87,7 @@ def day_summaries(plan: WeekPlan, report: VerificationReport, a: Assumptions, pr
         return {m: n[m] for m in METRICS}
 
     out: dict[tuple[int, str], DaySummary] = {}
-    fixed = values({fx.product_id: fx.grams for fx in a.day.fixed_items}) if a.day.fixed_items else None
+    fixed = values(fixed_grams(a)) if a.day.fixed_items else None
     for day in plan.days:
         day_meals = sorted((m for m in plan.meals if m.day == day),
                            key=lambda m: a.day.meals.index(m.meal) if m.meal in a.day.meals else 9)
@@ -111,7 +115,7 @@ def day_summaries(plan: WeekPlan, report: VerificationReport, a: Assumptions, pr
             if fixed is not None:
                 rows.append(BreakdownRow("stale", f"Stałe pozycje: {fixed_items_label(a, products)}", dict(fixed)))
             total = {m: float(getattr(t, m)) for m in METRICS}
-            states = {m: band_state(total[m], person.targets.band(m).min, person.targets.band(m).max) for m in METRICS}
+            states = {m: band_state(total[m], person.targets.band(m).min, person.targets.band(m).max, m) for m in METRICS}
             rows_sum = {m: sum(r.values[m] for r in rows) for m in METRICS}
             out[(int(day), person.id)] = DaySummary(day=day, person_id=person.id, rows=rows, total=total, states=states,
                                                     rows_sum=rows_sum)
@@ -133,9 +137,9 @@ def week_summaries(plan: WeekPlan, report: VerificationReport, a: Assumptions, p
         bands = {m: person.targets.band(m) for m in METRICS}
         out.append(WeekSummary(
             person_id=person.id, days=mine, total=total, average=average,
-            average_states={m: band_state(average[m], bands[m].min, bands[m].max) for m in METRICS},
+            average_states={m: band_state(average[m], bands[m].min, bands[m].max, m) for m in METRICS},
             week_band={m: (bands[m].min * n, bands[m].max * n) for m in METRICS},
-            total_states={m: band_state(total[m], bands[m].min * n, bands[m].max * n) for m in METRICS},
+            total_states={m: band_state(total[m], bands[m].min * n, bands[m].max * n, m) for m in METRICS},
         ))
     return out
 

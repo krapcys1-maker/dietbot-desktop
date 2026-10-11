@@ -256,8 +256,8 @@ ograniczeń (model ścisły z założeniami) i powód każdej przekąski po pols
 - Testy „czy potrafi wykryć błąd”: każdy psuje dokładnie jedną rzecz w poprawnym planie.
 
 ## 9. Biblioteka dań
-- 658 dań, 648 zatwierdzonych (w pulach: śniadania 182, obiady 232, kolacje 193; 38 zup na zapas, 12 przekąsek
-  z puli 20%, 38 posiłków z puli 20%, 31 słodkich kolacji; 237 dań z grupami proporcji; 255 produktów)
+- 706 dań, 696 zatwierdzonych (stan 11.10.2026; w pulach diety tradycyjnej z domyślnymi założeniami: śniadania 198,
+  obiady 244, kolacje 214; 42 zupy na zapas, 12 przekąsek z puli 20%; 260 produktów, 93 produkty z półek)
   w 13 kuchniach: polska, włoska, azjatycka, międzynarodowa,
   wege, hiszpańska, indyjska, meksykańska, grecka, amerykańska, turecka, francuska, bliskowschodnia.
 - **Chude śniadania i kolacje** (13.09.2026): biblioteka miała w śniadaniach i kolacjach medianę 41–42% energii
@@ -364,7 +364,7 @@ ograniczeń (model ścisły z założeniami) i powód każdej przekąski po pols
 | Telegram | aiogram 3.31 |
 | Magazyn | YAML (produkty, dania, sklepy, założenia) + SQLite (plany, czat) |
 | Paczka | PyInstaller 6 |
-| Testy / jakość | pytest (220 testów), ruff, tsc |
+| Testy / jakość | pytest (ok. 300 testów, CI w GitHub Actions), ruff, tsc |
 
 ## 14. Struktura katalogów
 ```

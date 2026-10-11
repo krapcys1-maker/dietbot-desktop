@@ -26,9 +26,11 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: pyproject.toml
-      - name: Zależności
-        run: python -m pip install -e ".[dev,app]"
+          cache-dependency-path: requirements-lock.txt
+      - name: Zależności (dokładne wersje z requirements-lock.txt)
+        run: python -m pip install -r requirements-lock.txt
+      - name: Projekt
+        run: python -m pip install -e . --no-deps
       - name: Ruff
         run: python -m ruff check src tests
       - name: Spójność danych (produkty, dania, założenia)

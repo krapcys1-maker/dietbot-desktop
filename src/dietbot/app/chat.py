@@ -19,10 +19,13 @@ from ..domain.assumptions import DAY_KEYS_PL, DAY_LABELS_PL, Weekday, parse_day
 from ..domain.dish import MEAL_LABELS_PL, MealType
 from ..food.matcher import MatchStatus, ProductMatcher
 from ..llm.client import LLMError
+from ..llm.scope import current as current_scope
+from ..llm.scope import task_scope
 from ..measures import household
 from ..storage.yamlio import load_yaml, to_plain
-from ..textfmt import fmt_num
+from ..textfmt import fmt_num, plural_pl
 from ..textnorm import normalize
+from ..textnumbers import has_numbers, without_numbers
 from .jobs import UserError
 from .service import DietService, composition_from_plan
 from .store import PlanRecord
@@ -66,8 +69,7 @@ class ChatAction(BaseModel):
     @field_validator("tekst")
     @classmethod
     def _no_numbers(cls, v: str) -> str:
-        words = set(re.findall(r"[a-ząćęłńóśźż]+", v.lower()))
-        if any(ch.isdigit() for ch in v) or words & CHAT_NUMBER_WORDS:
+        if has_numbers(v, CHAT_NUMBER_WORDS):
             raise ValueError("tekst nie może zawierać cyfr ani liczebników — wszystkie liczby podaje program "
                              "(użyj pola fakty albo zmiany)")
         return v
@@ -77,10 +79,19 @@ class DishPick(BaseModel):
     danie: str | None = Field(description="id dania z listy albo null, gdy nic nie pasuje")
     uzasadnienie: str
 
+    @field_validator("uzasadnienie")
+    @classmethod
+    def _plain(cls, v: str) -> str:
+        return without_numbers(v, CHAT_NUMBER_WORDS)  # zdania z liczbami wypadają — liczby podaje program
+
 
 INVENT_REQUEST = re.compile(r"\b(wymysl\w*|stworz\w* (przepis|dani\w*)|dodaj\w* (przepis|dani\w*)|nowe dani\w*)\b")
+# „nie wymyślaj…”, „jak wymyślacie…?”, „czy macie nowe dania?” — to nie są prośby o płatne wymyślanie (audyt W4)
+NOT_A_REQUEST = re.compile(r"\b(nie|bez|zadn\w*|jak|czy|dlaczego|po co|kiedy|ile)\b")
+PAID_ACTION_NOTE = ("To uruchomi płatne wywołania modelu językowego na Twoim koncie DeepSeek "
+                    "(zwykle kilka centów; wymyślanie dań kosztuje więcej).")
 
-SYSTEM = """Jesteś asystentem w polskiej aplikacji do planowania tygodniowego jadłospisu dla dwóch osób.
+SYSTEM = """Jesteś asystentem w polskiej aplikacji do planowania tygodniowego jadłospisu dla domowników (osoby podaje kontekst).
 Liczby (kalorie, makroskładniki, gramatury) liczy deterministyczny program — Ty ich NIGDY nie podajesz ani nie liczysz.
 Twoje zadanie: zrozumieć wiadomość i wybrać jedną akcję:
 - "pokaz" — pytanie o wartości, sumy, gramatury, gdzie jest produkt: wypełnij "fakty", a program dopisze liczby.
@@ -148,6 +159,13 @@ class ChatAssistant:
 
     # ------------------------------------------------------------------ wejście
     def handle(self, text: str, plan_id: str | None = None) -> dict:
+        """Jedna wiadomość = jedno polecenie z własnym limitem kosztu AI (jak zadanie w tle)."""
+        if current_scope() is not None:
+            return self._handle(text, plan_id)
+        with task_scope():
+            return self._handle(text, plan_id)
+
+    def _handle(self, text: str, plan_id: str | None = None) -> dict:
         text = text.strip()
         rec = (self.s.store.get(plan_id) if plan_id else None) or self.s.store.active()
         if rec is not None:
@@ -163,21 +181,15 @@ class ChatAssistant:
         except LLMError as exc:
             return self._reply(f"Nie udało się porozmawiać z modelem językowym: {exc}", rec)
         action = res.value
-        if action.typ == "odpowiedz" and INVENT_REQUEST.search(normalize(text)):
-            # model czasem opowiada przepis zamiast go wymyślić do biblioteki — prośba „wymyśl/stwórz/dodaj danie” wygrywa
-            action = action.model_copy(update={"typ": "wymysl_dania", "zyczenia": text, "ile_dan": action.ile_dan or 2,
-                                               "tekst": "Wymyślam to danie z produktów z bazy — silnik i kucharz je sprawdzą."})
+        norm = normalize(text)
+        if action.typ == "odpowiedz" and INVENT_REQUEST.search(norm) and not NOT_A_REQUEST.search(norm):
+            # model czasem opowiada przepis zamiast go wymyślić do biblioteki — nie zgadujemy: pytamy o zgodę
+            action = action.model_copy(update={"typ": "wymysl_dania", "zyczenia": text, "ile_dan": action.ile_dan or 2})
         try:
             if action.typ == "pokaz":
                 return self._show(action, rec)
-            if action.typ == "generuj":
-                job = self.s.generate(wishes=action.zyczenia or text, channel=self.channel, invent=action.wymysl_nowe)
-                note = " Najpierw wymyślę nowe dania, potem ułożę tydzień — to potrwa kilka minut." if action.wymysl_nowe else ""
-                return self._reply((action.tekst or "Układam nowy plan tygodnia.") + note, rec,
-                                   {"job_id": job.id, "kind": "generowanie"})
-            if action.typ == "wymysl_dania":
-                job = self.s.invent(action.zyczenia or text, action.ile_dan or 6, channel=self.channel)
-                return self._reply(action.tekst or "Wymyślam nowe dania.", rec, {"job_id": job.id, "kind": "wymyslanie"})
+            if action.typ in ("generuj", "wymysl_dania"):
+                return self._propose_action(action, text, rec)
             if action.typ == "zamien":
                 return self._swap(action, rec, text)
             if action.typ == "zmien_zalozenia":
@@ -203,7 +215,8 @@ class ChatAssistant:
         today = date.today()
         lines = [f"Dziś: {DAY_LABELS_PL[Weekday(today.weekday())].lower()}, {today:%d.%m.%Y}.",
                  "Osoby: " + ", ".join(f"{p.name} (id: {p.id})" for p in a.persons) +
-                 ". Użytkownik to mężczyzna, żona to kobieta."]
+                 (". Użytkownik to mężczyzna, żona to kobieta." if {p.id for p in a.persons} == {"kobieta", "mezczyzna"}
+                  else ".")]
         if rec is None:
             lines.append("Nie ma jeszcze żadnego planu tygodnia.")
         else:
@@ -384,6 +397,37 @@ class ChatAssistant:
         return self._reply(text, rec, {"job_id": job.id, "kind": "zamiana", "dish_id": pick.danie})
 
     # ------------------------------------------------------------------ zmiany założeń (z potwierdzeniem)
+    def _propose_action(self, action: ChatAction, text: str, rec: PlanRecord | None) -> dict:
+        """Płatne i trwałe akcje (nowy plan, wymyślanie dań do biblioteki) czekają na „Tak, uruchom” — jak zmiany
+        założeń. Model mógł źle zrozumieć wiadomość, a wymyślone dania trafiają do biblioteki."""
+        s = self.s
+        wishes = (action.zyczenia or text).strip()[:1000]
+        if action.typ == "generuj":
+            what = "Ułożę nowy plan tygodnia" + (f" z życzeniami: „{wishes}”" if wishes else "")
+            if action.wymysl_nowe:
+                what += ", najpierw wymyślając nowe dania (kilka minut)"
+            params = {"akcja": "generuj", "zyczenia": wishes, "wymysl_nowe": action.wymysl_nowe}
+        else:
+            count = action.ile_dan or 6
+            what = (f"Wymyślę {count} {plural_pl(count, 'danie', 'dania', 'dań')} do biblioteki: „{wishes}”. "
+                    "Nowe dania będą oznaczone jako nowe — możesz je odrzucić")
+            params = {"akcja": "wymysl_dania", "zyczenia": wishes, "ile_dan": count}
+        pid = uuid.uuid4().hex[:10]
+        s.pending_changes[pid] = params
+        while len(s.pending_changes) > MAX_PENDING_PROPOSALS:
+            s.pending_changes.pop(next(iter(s.pending_changes)))
+        intro = (action.tekst.strip() + "\n\n") if action.tekst else ""
+        return self._reply(f"{intro}{what}.\n\n{PAID_ACTION_NOTE} Uruchomić?", rec,
+                           {"proposal_id": pid, "kind": "potwierdz_akcje"})
+
+    def _run_action(self, prop: dict, rec: PlanRecord | None) -> dict:
+        s = self.s
+        if prop["akcja"] == "generuj":
+            job = s.generate(wishes=prop.get("zyczenia") or None, channel=self.channel, invent=bool(prop.get("wymysl_nowe")))
+            return self._reply("Układam nowy plan tygodnia.", rec, {"job_id": job.id, "kind": "generowanie"})
+        job = s.invent(prop.get("zyczenia") or "", int(prop.get("ile_dan") or 6), channel=self.channel)
+        return self._reply("Wymyślam nowe dania — silnik i kucharz je sprawdzą.", rec, {"job_id": job.id, "kind": "wymyslanie"})
+
     def _remember(self, text: str, rec: PlanRecord | None) -> dict:
         """Uwaga trafia do notatnika preferencji; odpowiedź składa program z wyniku analizy (opisy zasad z liczbami)."""
         from .notebook import Notebook
@@ -489,19 +533,28 @@ class ChatAssistant:
 
     def confirm(self, proposal_id: str) -> dict:
         s = self.s
-        prop = s.pending_changes.pop(proposal_id, None)
+        prop = s.pending_changes.get(proposal_id)
         rec = s.active_plan()
         if prop is None:
             return self._reply("Ta propozycja zmian wygasła — napisz jeszcze raz, co zmienić.", rec)
+        if "akcja" in prop:
+            try:
+                reply = self._run_action(prop, rec)
+            except UserError as exc:
+                return self._reply(f"Nie uruchomiono: {exc}", rec)
+            s.pending_changes.pop(proposal_id, None)
+            return reply
         try:
             # zmiany nakładamy na aktualne założenia (mogły się zmienić od propozycji — np. w zakładce Założenia),
             # zamiast nadpisywać plik zrzutem sprzed chwili
             new, diff, _ = self._apply_changes([AssumptionChange.model_validate(c) for c in prop["zmiany"]])
         except UserError as exc:
             return self._reply(f"Nie zapisano zmian: {exc}", rec)
-        result = s.save_assumptions(new)
+        # użytkownik potwierdził propozycję, w której widział uwagi (także o niskich kaloriach)
+        result = s.save_assumptions(new, confirm_low_kcal=True)
         if not result["ok"]:
             return self._reply("Nie zapisano zmian: " + "; ".join(result["errors"]), rec)
+        s.pending_changes.pop(proposal_id, None)  # dopiero po zapisie — odmowa (np. trwa zadanie) jej nie gubi
         text = "Zapisałem nowe założenia:\n" + "\n".join(f"- {d}" for d in diff)
         data = {"kind": "zalozenia_zapisane"}
         if rec is not None:

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hmac
 import logging
 import os
 import sys
@@ -19,7 +20,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from ..domain.goal_calculator import GoalInput, calculate_goals
 from .file_dialogs import save_text_as
-from .jobs import UserError
+from .jobs import NotFound, UserError
 from .service import DietService
 from .validation import polish_error_list
 
@@ -51,6 +52,8 @@ class RecomputeIn(BaseModel):
 
 class AssumptionsIn(BaseModel):
     data: dict
+    version: str | None = None  # wersja pliku z chwili wczytania formularza
+    confirm_low_kcal: bool = False
 
 
 class DishPatchIn(BaseModel):
@@ -123,14 +126,39 @@ def web_dist_dir() -> Path | None:
     return None
 
 
-def create_app(service: DietService) -> FastAPI:
-    app = FastAPI(title="DietBot", docs_url="/api/docs", openapi_url="/api/openapi.json", redoc_url=None)
-    app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost", "testserver"])
+# Strona aplikacji ładuje wyłącznie własne pliki; nie da się jej osadzić w ramce obcej strony.
+CONTENT_SECURITY_POLICY = ("default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
+                           "img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; "
+                           "base-uri 'self'; form-action 'self'; frame-ancestors 'none'")
+
+
+def create_app(service: DietService, session_token: str | None = None, docs: bool | None = None) -> FastAPI:
+    """`session_token` — gdy podany, każde żądanie /api/ musi mieć nagłówek X-Porcja-Token (okno aplikacji dostaje
+    token w adresie). `docs` — dokumentacja API (domyślnie tylko w trybie deweloperskim, nie w wersji instalowanej)."""
+    docs = (not getattr(sys, "frozen", False)) if docs is None else docs
+    app = FastAPI(title="Porcja", docs_url="/api/docs" if docs else None,
+                  openapi_url="/api/openapi.json" if docs else None, redoc_url=None)
+    # bez „testserver”: jednoczłonową nazwę hosta można podsunąć przeglądarce (audyt 09.10.2026, S5)
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost"])
     app.state.service = service
+
+    @app.middleware("http")
+    async def _session_and_headers(request: Request, call_next):
+        if session_token and request.url.path.startswith("/api/"):
+            supplied = request.headers.get("x-porcja-token", "")
+            if not hmac.compare_digest(supplied.encode("utf-8"), session_token.encode("utf-8")):
+                return JSONResponse(status_code=401, content={
+                    "detail": "Brak dostępu do Porcji — otwórz aplikację z jej okna albo skrótu."})
+        response = await call_next(request)
+        response.headers.setdefault("Content-Security-Policy", CONTENT_SECURITY_POLICY)
+        response.headers.setdefault("X-Frame-Options", "DENY")
+        response.headers.setdefault("X-Content-Type-Options", "nosniff")
+        response.headers.setdefault("Referrer-Policy", "no-referrer")
+        return response
 
     @app.exception_handler(UserError)
     async def _user_error(_: Request, exc: UserError) -> JSONResponse:
-        return JSONResponse(status_code=400, content={"detail": str(exc)})
+        return JSONResponse(status_code=404 if isinstance(exc, NotFound) else 400, content={"detail": str(exc)})
 
     @app.exception_handler(RequestValidationError)
     async def _bad_request(_: Request, exc: RequestValidationError) -> JSONResponse:
@@ -171,6 +199,13 @@ def create_app(service: DietService) -> FastAPI:
         return j.to_dict(since=max(0, od))
 
     # ---------------------------------------------------------------- plany
+    @app.post("/api/zadania/{job_id}/przerwij")
+    def cancel_job(job_id: str) -> dict:
+        job = s.jobs.cancel(job_id)
+        if job is None:
+            raise HTTPException(404, "Nie ma takiego zadania")
+        return job.to_dict()
+
     @app.get("/api/diety")
     def library() -> list[dict]:
         return s.library()
@@ -277,7 +312,7 @@ def create_app(service: DietService) -> FastAPI:
 
     @app.put("/api/zalozenia")
     def save_assumptions(body: AssumptionsIn) -> dict:
-        return s.save_assumptions(body.data)
+        return s.save_assumptions(body.data, expected_version=body.version, confirm_low_kcal=body.confirm_low_kcal)
 
     # ---------------------------------------------------------------- dania i produkty
     @app.get("/api/dania")

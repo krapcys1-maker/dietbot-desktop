@@ -36,9 +36,12 @@ from ..domain.preferences import (
 from ..domain.product import CATEGORY_LABELS_PL, Category
 from ..food.matcher import MatchStatus, ProductMatcher
 from ..llm.client import LLMError
+from ..llm.scope import current as current_scope
+from ..llm.scope import task_scope
 from ..textfmt import fmt_num, plural_pl
 from ..textnorm import normalize
-from .jobs import UserError
+from ..textnumbers import has_digits
+from .jobs import NotFound, UserError
 from .store import new_id
 
 if TYPE_CHECKING:
@@ -102,7 +105,7 @@ Domownicy sami zdecydują, czy przyjąć propozycje."""
 
 
 def _no_digits(value: str) -> str:
-    if any(ch.isdigit() for ch in value):
+    if has_digits(value):
         raise ValueError("bez cyfr — liczby podaje program")
     return value
 
@@ -218,7 +221,7 @@ class Notebook:
             self._guard()
             rule = next((r for r in self.rules() if r.id == rule_id), None)
             if rule is None:
-                raise UserError("Nie ma takiej zasady.")
+                raise NotFound("Nie ma takiej zasady.")
             self.s.store.save_pref_rule(rule.id, rule.model_copy(update={"active": active}).to_data())
             self._changed()
         return self.view()
@@ -227,7 +230,7 @@ class Notebook:
         with self.s._lock:
             self._guard()
             if not self.s.store.delete_pref_rule(rule_id):
-                raise UserError("Nie ma takiej zasady.")
+                raise NotFound("Nie ma takiej zasady.")
             self._changed()
         return self.view()
 
@@ -309,7 +312,8 @@ class Notebook:
         a, products = s.repo.assumptions, s.repo.products
         lines = ["Osoby (w tej kolejności są też kolumny tabel w planie): "
                  + ", ".join(f"{p.name} (id: {p.id})" for p in a.persons)
-                 + ". Użytkownik aplikacji to zwykle mężczyzna, żona to kobieta.",
+                 + (". Użytkownik aplikacji to zwykle mężczyzna, żona to kobieta."
+                    if {p.id for p in a.persons} == {"kobieta", "mezczyzna"} else "."),
                  "Kategorie produktów: " + ", ".join(f"{c.value} ({CATEGORY_LABELS_PL[c].lower()})" for c in Category)]
         rules = self.rules()
         if rules:
@@ -409,6 +413,12 @@ class Notebook:
         return best(plan_dishes, 80) or best(sorted(self.s.repo.approved_dishes()), 92)
 
     def add_comment(self, text: str, plan_id: str | None = None, channel: str = "aplikacja") -> dict:
+        if current_scope() is not None:
+            return self._add_comment(text, plan_id, channel)
+        with task_scope():  # jedna uwaga = jedno polecenie z limitem kosztu AI
+            return self._add_comment(text, plan_id, channel)
+
+    def _add_comment(self, text: str, plan_id: str | None = None, channel: str = "aplikacja") -> dict:
         text = (text or "").strip()
         if len(text) < 3:
             raise UserError("Napisz uwagę (np. „za dużo ryżu na obiad, wolę więcej mięsa”).")
@@ -558,6 +568,12 @@ class Notebook:
         return {"lines": lines, "counts": counts}
 
     def analyze_habits(self) -> dict:
+        if current_scope() is not None:
+            return self._analyze_habits()
+        with task_scope():
+            return self._analyze_habits()
+
+    def _analyze_habits(self) -> dict:
         s = self.s
         signals = self.habit_signals()
         c = signals["counts"]
@@ -627,7 +643,7 @@ class Notebook:
         habits = self.habits() or {}
         items = habits.get("program_notes", [])
         if not 0 <= index < len(items):
-            raise UserError("Nie ma takiej uwagi.")
+            raise NotFound("Nie ma takiej uwagi.")
         self.s.store.add_program_note(items.pop(index))
         self.s.store.set_setting(HABITS_KEY, json.dumps(habits, ensure_ascii=False))
         return self.view()
@@ -636,7 +652,7 @@ class Notebook:
         if status not in ("nowa", "zrobione", "usunieta"):
             raise UserError("Nieznany stan uwagi.")
         if not self.s.store.set_program_note_status(note_id, status):
-            raise UserError("Nie ma takiej uwagi.")
+            raise NotFound("Nie ma takiej uwagi.")
         return self.view()
 
     # ------------------------------------------------------------------ widok i eksport

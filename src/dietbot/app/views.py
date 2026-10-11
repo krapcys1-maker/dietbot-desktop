@@ -7,7 +7,9 @@ from collections.abc import Mapping
 
 from ..checker.verify import nutrition_of
 from ..domain.assumptions import DAY_LABELS_PL, Assumptions
+from ..domain.diet import dish_compatible
 from ..domain.dish import MEAL_LABELS_PL, DishTemplate, MealType, cuisine_label
+from ..domain.nutrition import BAND_TOLERANCE
 from ..domain.plan import PlanItem, PlannedMeal, WeekPlan
 from ..domain.product import CATEGORY_LABELS_PL, Category, Product
 from ..measures import household
@@ -26,6 +28,11 @@ SOURCE_LABELS = {"llm": "ułożony przez model językowy", "algorytm": "ułożon
 
 def _r(v: float, nd: int = 1) -> float:
     return round(v, nd)
+
+
+def dish_diets(dish: DishTemplate, products: Mapping[str, Product]) -> list[str]:
+    """Diety liczone ze składników — ta sama funkcja co filtr planu (tag „wege” w danych bywał mylący, audyt S10)."""
+    return [diet for diet in ("wege", "wegan") if dish_compatible(dish, products, diet)]
 
 
 def amount_text(product: Product | None, grams: float) -> str:
@@ -81,10 +88,13 @@ def nutrition_view(items: Mapping[str, float], products: Mapping[str, Product], 
     return {k: _r(v) for k, v in n.items()}
 
 
-def band_state(value: float, lo: float, hi: float) -> str:
-    if value < lo - 0.01:
+def band_state(value: float, lo: float, hi: float, metric: str = "kcal") -> str:
+    """Ta sama tolerancja co w weryfikatorze — wcześniej 144,995 g białka było „ok” w aplikacji, a błędem w
+    weryfikatorze (audyt N15)."""
+    tol = BAND_TOLERANCE.get(metric, 0.01)
+    if value < lo - tol:
         return "za_malo"
-    if value > hi + 0.01:
+    if value > hi + tol:
         return "za_duzo"
     return "ok"
 
@@ -124,7 +134,7 @@ def week_facts(plan: WeekPlan, a: Assumptions, dishes: Mapping[str, DishTemplate
     egg = products.get("jajko_kurze")
     grams = sum(i.grams for m in plan.meals for p in m.portions for i in p.items if i.product_id == "jajko_kurze")
     if egg and egg.measure("szt") and grams > 0:
-        facts.append({"label": "Jajka (obie osoby)", "value": f"ok. {math.ceil(grams / egg.measure('szt').grams - 0.05)} szt.",
+        facts.append({"label": "Jajka (obie osoby)" if len(a.persons) == 2 else "Jajka (wszyscy)", "value": f"ok. {math.ceil(grams / egg.measure('szt').grams - 0.05)} szt.",
                       "detail": "", "ok": True})
     return facts
 
@@ -158,7 +168,7 @@ def plan_view(rec: PlanRecord, repo: Repository) -> dict:
                 if person and dish and not dish.is_treat:
                     lo = person.protein_anchor.min - person.protein_anchor_tolerance
                     hi = person.protein_anchor.max + person.protein_anchor_tolerance
-                    anchor = band_state(nut["protein"], lo, hi)
+                    anchor = band_state(nut["protein"], lo, hi, "protein")
                 mass = sum(i.grams for i in portion.items)
                 cap = person.meal_mass_cap(m.meal) if person else None
                 portions[portion.person_id] = {"items": [item_view(i, products) for i in items], "nutrition": nut,
@@ -183,6 +193,7 @@ def plan_view(rec: PlanRecord, repo: Repository) -> dict:
                 "meal": m.meal.value, "meal_label": MEAL_LABELS_PL[m.meal], "dish_id": m.dish_id,
                 "dish_name": dish.name if dish else m.dish_id, "description": dish.description if dish else None,
                 "cuisine": cuisine_label(dish.cuisine) if dish else None, "tags": dish.tags if dish else [],
+                "diets": dish_diets(dish, products) if dish else [],
                 "is_treat": bool(dish and dish.is_treat), "is_sweet": bool(dish and dish.is_sweet),
                 "prep_minutes": dish.prep_minutes if dish else None,
                 "steps": batch["steps"] if batch else (dish.steps if dish else []),
@@ -208,8 +219,10 @@ def plan_view(rec: PlanRecord, repo: Repository) -> dict:
                 continue
             # 2 miejsca: aplikacja i Telegram pokazują pełne gramy — podwójne zaokrąglanie (152,46 → 152,5 → 153)
             # dawałoby 1 g różnicy względem odpowiedzi czatu liczonej z tych samych sum weryfikatora
-            values = {k: _r(getattr(t, k), 2) for k in (*METRICS, "fiber")}
-            states = {k: band_state(getattr(t, k), person.targets.band(k).min, person.targets.band(k).max)
+            values = {k: _r(getattr(t, k), 2) for k in (*METRICS, "fiber", "salt", "saturated_fat")}
+            # kwasy nasycone jako % energii (zalecenie: poniżej 10%), sól w g (WHO: poniżej 5 g dziennie) — audyt S9
+            values["saturated_fat_pct"] = _r(t.saturated_fat * 9 / t.kcal * 100, 1) if t.kcal else 0.0
+            states = {k: band_state(getattr(t, k), person.targets.band(k).min, person.targets.band(k).max, k)
                       for k in METRICS}
             day_totals[person.id] = {"values": values, "states": states}
         breakdown = {}
@@ -266,6 +279,7 @@ def dish_view(dish: DishTemplate, products: Mapping[str, Product], profile: Dish
         "id": dish.id, "name": dish.name, "description": dish.description,
         "meal_types": [m.value for m in dish.meal_types], "meal_labels": [MEAL_LABELS_PL[m] for m in dish.meal_types],
         "cuisine": cuisine_label(dish.cuisine), "cuisine_key": dish.cuisine, "tags": dish.tags,
+        "diets": dish_diets(dish, products),
         "status": dish.status.value, "prep_minutes": dish.prep_minutes,
         "is_treat": dish.is_treat, "is_sweet": dish.is_sweet, "is_batch": dish.is_batch, "batch_days": dish.batch_days,
         "source": dish.source, "steps": dish.steps, "culinary_notes": dish.culinary_notes,

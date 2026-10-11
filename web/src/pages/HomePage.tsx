@@ -4,7 +4,7 @@ import Icon from "../components/Icon";
 import PlateArt from "../components/PlateArt";
 import { ErrorBox, Loading } from "../components/ui";
 import type { PlanView, Status } from "../types";
-import { useAsync } from "../util";
+import { plural, useAsync } from "../util";
 
 export default function HomePage({ status }: { status: Status | null }) {
   const plan = useAsync<PlanView | null>(() => api.activePlan().catch(e => e.status === 404 ? null : Promise.reject(e)), []);
@@ -27,7 +27,7 @@ export default function HomePage({ status }: { status: Status | null }) {
     {current && <section className="card current-plan">
       <div className="current-plan-icon"><Icon name="calendar" /></div>
       <div className="grow"><span className="eyebrow">TWÓJ AKTUALNY PLAN</span><h2>{current.title}</h2>
-        <p className="muted">{current.days.length} dni · {current.persons.map(p => p.name).join(" i ")} · {current.ok ? "Sprawdzony według zapisanych założeń" : "Ma uwagi — sprawdź je w planie"}</p></div>
+        <p className="muted">{current.days.length} {plural(current.days.length, "dzień", "dni", "dni")} · {current.persons.map(p => p.name).join(" i ")} · {current.ok ? "Sprawdzony według zapisanych założeń" : "Ma uwagi — sprawdź je w planie"}</p></div>
       <ExportButtons planId={current.id} />
     </section>}
     <div className="section-heading"><div><span className="eyebrow">TWOJA KUCHNIA, TWÓJ RYTM</span><h2>{current ? "Wszystko pod ręką" : "Zacznij od trzech prostych kroków"}</h2></div><a href="#/pomoc" className="text-link">Jak to działa <Icon name="arrow" /></a></div>

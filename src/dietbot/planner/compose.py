@@ -3,15 +3,15 @@
 from __future__ import annotations
 
 import random
-import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 
 from pydantic import BaseModel, Field, field_validator
 
-from ..domain.assumptions import DAY_KEYS_PL, DAY_LABELS_PL, Assumptions, Weekday
+from ..domain.assumptions import DAY_KEYS_PL, DAY_LABELS_PL, Assumptions, Weekday, parse_day
 from ..domain.dish import MEAL_LABELS_PL, DishTemplate, MealType, cuisine_label
 from ..textfmt import plural_pl
+from ..textnumbers import without_numbers as strip_number_sentences
 from .balance import BALANCE_OK_PP, day_deviation
 from .pools import Pools
 
@@ -549,22 +549,20 @@ class WeekChoice(BaseModel):
 
 
 def without_numbers(text: str) -> str:
-    """Liczby podaje program: zdania komentarza z liczbami albo liczebnikami („raz”, „kilka”) wypadają. Wcześniej taki
-    komentarz odrzucał całą odpowiedź — model powtarzał to samo zdanie we wszystkich próbach i tydzień układał
-    algorytm zapasowy (test na żywo 14.09.2026: 2 z 4 planów)."""
-    sentences = re.split(r"(?<=[.!?…])\s+", text.strip())
-    kept = [s for s in sentences if not any(ch.isdigit() for ch in s)
-            and not set(re.findall(r"[a-ząćęłńóśźż]+", s.lower())) & NUMBER_WORDS]
-    return " ".join(kept)
+    """Liczby podaje program: zdania komentarza z liczbami albo liczebnikami („raz”, „kilka”, „pół kilo”) wypadają.
+    Wcześniej taki komentarz odrzucał całą odpowiedź — model powtarzał to samo zdanie we wszystkich próbach i tydzień
+    układał algorytm zapasowy (test na żywo 14.09.2026: 2 z 4 planów)."""
+    return strip_number_sentences(text, NUMBER_WORDS)
 
 
 def composition_from_llm(choice: WeekChoice, a: Assumptions, days: list[Weekday]) -> Composition:
     layout = slot_layout(a, days)
     by_day: dict[int, DayChoice] = {}
     for d in choice.dni:
-        key = d.dzien.strip().lower()
-        if key in DAY_KEYS_PL:
-            by_day[int(DAY_KEYS_PL[key])] = d
+        try:  # „Poniedziałek”, „Środa” z polskimi znakami — wcześniej takie dni ginęły (audyt S12)
+            by_day[int(parse_day(d.dzien.strip()))] = d
+        except ValueError:
+            continue
     slots: list[SlotPlan] = []
     for ds, meal, _ in layout:
         dc = by_day.get(int(ds[0]))
@@ -601,7 +599,7 @@ def build_compose_prompt(pools: Pools, a: Assumptions, days: list[Weekday], wish
     persons = "; ".join(f"{p.name}: {p.targets.kcal.min:.0f}–{p.targets.kcal.max:.0f} kcal" for p in a.persons)
     rules = [
         f"Plan na dni: {', '.join(DAY_LABELS_PL[d] for d in days)}. Posiłki: {', '.join(MEAL_LABELS_PL[m].lower() for m in a.day.meals)}.",
-        f"Obie osoby jedzą te same dania (gramatury dobierze program). Cele: {persons}.",
+        f"Wszyscy domownicy ({len(a.persons)}) jedzą te same dania (gramatury dobierze program). Cele: {persons}.",
         f"Pula 20% — WYMAGANE: łącznie od {a.week.treat_meals.min:.0f} do {a.week.treat_meals.max:.0f} w tygodniu (nie mniej), każda w inny dzień. "
         "Liczą się posiłki z tagiem pula_20 i przekąski z puli 20% (lody, chipsy, popcorn, batonik) wpisane w pole przekaska_20 "
         "dnia — przekąska jest dodatkiem do trzech posiłków (program dopasuje gramatury dnia); w pozostałe dni przekaska_20: null.",
@@ -655,6 +653,6 @@ def build_compose_prompt(pools: Pools, a: Assumptions, days: list[Weekday], wish
     return text + "\n\n" + "\n\n".join(batch_blocks + meal_blocks + snack_block)
 
 
-COMPOSE_SYSTEM = """Jesteś doświadczonym dietetykiem i kucharzem. Układasz tygodniowy jadłospis dla dwóch osób,
+COMPOSE_SYSTEM = """Jesteś doświadczonym dietetykiem i kucharzem. Układasz tygodniowy jadłospis dla domowników,
 wybierając dania z przygotowanej listy. Liczby (gramatury, kalorie) liczy osobny program — Ty dbasz o to,
 żeby tydzień był smaczny, różnorodny, praktyczny w przygotowaniu i zgodny z zasadami."""

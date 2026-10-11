@@ -24,6 +24,7 @@ from .settings import SCALE, EngineSettings
 from .types import EngineSlot
 
 METRICS = ("kcal", "protein", "fat", "carbs")
+GOAL_SCALE_FLOOR = {"kcal": 100.0, "protein": 10.0, "fat": 10.0, "carbs": 10.0}
 GROUP_PRECISION = 10_000  # udziały w grupach składników z dokładnością 0,01%
 
 
@@ -171,7 +172,9 @@ class BlockModel:
         return store[key]
 
     # ------------------------------------------------------------------ budowa
-    def build(self, *, require_targets: bool = False) -> BlockModel:
+    def build(self, *, require_targets: bool | str = False) -> BlockModel:
+        """`require_targets`: True/"all" — zero odchyleń od widełek, kotwic i mas talerzy; "bands" — tylko widełki
+        dzienne muszą się zgadzać (kotwice i masy zostają miękkie)."""
         for slot in self.slots:
             self._build_slot(slot)
         for day in self.days:
@@ -180,8 +183,10 @@ class BlockModel:
         if require_targets:
             # Duża kara nie jest twardym ograniczeniem: solver może zatrzymać się na rozwiązaniu
             # poza widełkami. Ta ścieżka nadal optymalizuje realizm, lecz zabrania naruszeń celów.
-            for index in self.slacks.values():
-                self._row({index: 1}, hi=0)
+            only_bands = require_targets == "bands"
+            for name, index in self.slacks.items():
+                if not only_bands or name.startswith("widelki_"):
+                    self._row({index: 1}, hi=0)
         if not self.strict:
             self._build_lighter_supper()
             self.m.minimize(self._lin({i: round(c) for i, c in self._cost.items()}))
@@ -486,7 +491,9 @@ class BlockModel:
                 # must use a regular meal slot, never bypass its cooking rules here.
                 if dish.culinary_errors or dish.groups or dish.ratios:
                     continue
-                if any(i.product_id in person.excluded_products and not i.optional for i in dish.ingredients):
+                # zakazy globalne i wykluczenia osoby — także składniki opcjonalne (model przekąsek ich nie zeruje)
+                banned = set(self.a.prohibitions.products) | set(person.excluded_products)
+                if any(i.product_id in banned for i in dish.ingredients):
                     continue
                 if any(cap_conflict(i, self.catalog.product(i.product_id), self.scales[pid], self.settings, False,
                                     self._cap(pid, self.catalog.product(i.product_id), MealType.SNACK))
@@ -572,7 +579,8 @@ class BlockModel:
                 r2[dm] = r2.get(dm, 0.0) + 1
                 self._row(r1, hi=center * s + dz - const)
                 self._row(r2, lo=center * s - dz - const)
-                w_goal = st.goal_cost_per_percent * 100 / max(center * s, 1)
+                # przy celu bliskim zera waga rosłaby bez ograniczeń — dolna granica skali (audyt S6)
+                w_goal = st.goal_cost_per_percent * 100 / max(center * s, GOAL_SCALE_FLOOR[metric] * s)
                 self._cost_add(dp, w_goal)
                 self._cost_add(dm, w_goal)
 
@@ -588,7 +596,7 @@ class BlockModel:
                 row = Expr()
                 row.merge(self._expr((supper[0].key, pid, "kcal")))
                 row.merge(self._expr((lunch[0].key, pid, "kcal")), -1)
-                sl = self._new_int(0, 50_000, f"lekka|{int(day)}|{pid}")
+                sl = self._new_int(0, 2_000_000, f"lekka|{int(day)}|{pid}")  # do 20 000 kcal różnicy — zawsze kara, nie sprzeczność
                 row.add(sl, -1)
                 self._row(row.coefs, hi=0)
                 self._cost_add(sl, self.settings.lighter_supper_cost_per_kcal / SCALE["kcal"])

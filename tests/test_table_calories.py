@@ -149,7 +149,7 @@ def test_saved_reports_never_override_current_numbers(repo, week_result, tmp_pat
     stored = service.store.get(rec.id).report.model_dump_json()
     service.store.set_setting("active_plan", rec.id)
 
-    client = TestClient(create_app(service))
+    client = TestClient(create_app(service), base_url="http://127.0.0.1")
     response = client.get(f"/api/plany/{rec.id}")
     assert response.status_code == 200
     view = response.json()

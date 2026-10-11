@@ -171,3 +171,13 @@ input[type="text"], input[type="password"], input[type="number"], input[type="da
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition: none !important; scroll-behavior: auto !important; } }
 @media print { .topbar, .page-footer, .skip-link, .hero-art { display: none !important; }.main { overflow: visible; }.page { max-width: none; padding: 0; }.shopping-groups { display: block; }.card { break-inside: avoid; } }
+
+/* Kontrast (audyt 09.10.2026, S13): tekst na jasnych tłach ciemnego motywu, ostrzeżenia i obramowania pól (≥ 3:1). */
+:root { --warn: #8a5600; --field-border: #8f988f; }
+:root[data-theme="dark"] { --field-border: #6e7c6f; }
+:root[data-theme="dark"] .msg.user { color: #19251d; }
+:root[data-theme="dark"] .toast.error { color: #2a0f0d; }
+input[type="text"], input[type="password"], input[type="number"], input[type="date"], input[type="search"], input:not([type]), select, textarea { border-color: var(--field-border); }
+.toast { display: flex; gap: 10px; align-items: flex-start; }
+.toast-close { border: none; background: transparent; color: inherit; cursor: pointer; font-size: 16px; line-height: 1; padding: 0 2px; }
+.error-screen { max-width: 640px; margin: 60px auto; }

@@ -4,6 +4,7 @@ import { ToastProvider } from "./components/ui";
 import { RatingsProvider } from "./components/DishRating";
 import Icon from "./components/Icon";
 import Brand from "./components/Brand";
+import ErrorBoundary from "./components/ErrorBoundary";
 import HomePage from "./pages/HomePage";
 import HelpPage from "./pages/HelpPage";
 import LibraryPage from "./pages/LibraryPage";
@@ -31,6 +32,12 @@ export default function App() {
   const route = useRoute();
   const page = route[0] || "start";
   const [status, setStatus] = useState<Status | null>(null);
+  const [noAccess, setNoAccess] = useState(false);
+  useEffect(() => {
+    const onDenied = () => setNoAccess(true);
+    window.addEventListener("porcja:brak-dostepu", onDenied);
+    return () => window.removeEventListener("porcja:brak-dostepu", onDenied);
+  }, []);
   const [menuOpen, setMenuOpen] = useState(false);
   // bez własnego wyboru motyw idzie za ustawieniem systemu (Windows: tryb ciemny aplikacji)
   const systemTheme = () => (window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light");
@@ -64,6 +71,19 @@ export default function App() {
       clearInterval(t);
     };
   }, [page]);
+
+  if (noAccess) {
+    return (
+      <div className="page error-screen">
+        <div className="card stack">
+          <Brand />
+          <h2>Brak dostępu do Porcji</h2>
+          <p className="muted">Ta strona została otwarta bez klucza sesji. Dla bezpieczeństwa dane są dostępne tylko w oknie
+            aplikacji — otwórz Porcję ze skrótu na pulpicie albo z menu Start.</p>
+        </div>
+      </div>
+    );
+  }
 
   let content;
   switch (page) {
@@ -145,7 +165,7 @@ export default function App() {
           <div className="topbar no-print"><span>Twoja przestrzeń <span className="topbar-divider">/</span> <b>{NAV.find(n => n.key === page)?.label ?? ({ nowy: "Nowy plan", notatnik: "Notatnik preferencji", zalozenia: "Cele i preferencje", ustawienia: "Ustawienia", pomoc: "Pomoc", czat: "Asystent", produkty: "Produkty" } as Record<string, string>)[page] ?? "Plan tygodnia"}</b></span>
             <div className="row"><a href="#/ustawienia" className="connection-label"><span className={`live-dot ${status?.llm.key_present && status?.llm.enabled ? "" : "neutral"}`} />{status ? status.llm.key_present && status.llm.enabled ? "AI dostępne" : "Tryb bez AI" : "Łączenie…"}</a><button className="btn icon-button" aria-label={theme === "light" ? "Włącz ciemny motyw" : "Włącz jasny motyw"} onClick={toggleTheme}><Icon name={theme === "light" ? "moon" : "sun"} /></button></div>
           </div>
-          {content}
+          <ErrorBoundary resetKey={route.join("/")}>{content}</ErrorBoundary>
           <footer className="page-footer no-print">porcja. <span>Dobrze mieć plan.</span><a href="#/pomoc">Pomoc</a></footer>
         </main>
       </div>

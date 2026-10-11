@@ -188,17 +188,25 @@ def _solve_block(slots: Sequence[EngineSlot], assumptions: Assumptions, catalog:
         # Model z karami mógł utknąć poza celami, chociaż poprawne porcje istnieją.
         # Przed diagnozą lub wymianą dań sprawdzamy te same dania z twardymi celami,
         # zachowując funkcję jakości porcji. Nie poszerzamy żadnych limitów użytkownika.
-        bounded = BlockModel(slots, assumptions, catalog, dishes, settings,
-                             allow_snacks=allow_snacks).build(require_targets=True)
-        candidate = bounded.solve()
-        elapsed = sol.wall_ms + candidate.wall_ms
-        deterministic = sol.deterministic_time + candidate.deterministic_time
-        if candidate.feasible:
+        # Najpierw wszystko naraz; gdy to niemożliwe, a dzień ma naruszone widełki — same widełki dzienne (kotwice
+        # i masy talerza mogą wtedy zostać miękkie). Wcześniej jedna nieosiągalna kotwica przekreślała dzień
+        # mieszczący się w widełkach (audyt 09.10.2026, S6).
+        elapsed, deterministic = sol.wall_ms, sol.deterministic_time
+        for mode in ("all", "bands") if violations else ("all",):
+            bounded = BlockModel(slots, assumptions, catalog, dishes, settings,
+                                 allow_snacks=allow_snacks).build(require_targets=mode)
+            candidate = bounded.solve()
+            elapsed += candidate.wall_ms
+            deterministic += candidate.deterministic_time
+            if not candidate.feasible:
+                continue
             new_meals, new_snacks = _extract(bounded, candidate, slots, dishes)
             checked = analyze(bounded, candidate, slots, new_meals, new_snacks, dishes)
-            if not checked[1] and not checked[2] and not checked[4]:
+            accepted = not checked[1] and (mode == "bands" or (not checked[2] and not checked[4]))
+            if accepted:
                 bm, sol, meals, snacks = bounded, candidate, new_meals, new_snacks
                 totals, violations, anchors, binding, masses = checked
+                break
         sol.wall_ms, sol.deterministic_time = elapsed, deterministic
 
     for s in snacks:

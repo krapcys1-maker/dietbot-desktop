@@ -11,6 +11,8 @@ limit_czasu_s: 180
 proby: 3                        # ponowienia przy pustej odpowiedzi lub błędnym JSON
 
 budzet_usd: 5.0                 # twardy limit wydatków (sumowany z rejestru wyniki/llm_koszty.jsonl)
+limit_na_polecenie_usd: 0.5     # jedno polecenie (plan, wymyślanie dań, wiadomość) nie wyda więcej
+ceny_dla_modelu: deepseek-flash # inny model w polu „model” = ostrożny, wyższy cennik, dopóki nie wpiszesz jego cen
 ceny_usd_za_milion_tokenow:     # cennik szczytowy (bez zniżki nocnej) — liczymy ostrożnie
   wejscie: 0.30
   wejscie_z_cache: 0.006

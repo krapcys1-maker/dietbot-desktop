@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "../api";
 import { ErrorBox, Loading, Modal, Spinner, useToast } from "../components/ui";
 import type { AssumptionsResponse, ProductDetail, ProductListItem } from "../types";
-import { go, num, useAsync } from "../util";
+import { go, num, plural, STATE_NAMES, useAsync } from "../util";
 
 const SOURCE_NAMES: Record<string, string> = {
   BLS: "BLS 4.0 (Niemcy)", CIQUAL: "CIQUAL (Francja)", OFF: "Open Food Facts", etykieta: "etykieta", USDA: "USDA", recznie: "wpis ręczny",
@@ -10,10 +10,15 @@ const SOURCE_NAMES: Record<string, string> = {
 
 export default function ProductsPage({ productId }: { productId?: string }) {
   const [q, setQ] = useState("");
+  const [search, setSearch] = useState("");
+  useEffect(() => {
+    const t = setTimeout(() => setSearch(q.trim()), 250);
+    return () => clearTimeout(t);
+  }, [q]);
   const [category, setCategory] = useState("");
   const [adding, setAdding] = useState(false);
   const meta = useAsync<AssumptionsResponse>(() => api.assumptions(), []);
-  const list = useAsync<ProductListItem[]>(() => api.products({ q: q || undefined, kategoria: category || undefined }), [q, category]);
+  const list = useAsync<ProductListItem[]>(() => api.products({ q: search || undefined, kategoria: category || undefined }), [search, category]);
 
   return (
     <div className="page">
@@ -32,7 +37,7 @@ export default function ProductsPage({ productId }: { productId?: string }) {
             <option key={c.id} value={c.id}>{c.name}</option>
           ))}
         </select>
-        {list.data && <span className="muted">{list.data.length} produktów</span>}
+        {list.data && <span className="muted">{list.data.length} {plural(list.data.length, "produkt", "produkty", "produktów")}</span>}
       </div>
       {list.error && <ErrorBox error={list.error} onRetry={list.reload} />}
       <div className="split">
@@ -85,7 +90,7 @@ function ProductCard({ id }: { id: string }) {
     <section className="card stack">
       <div>
         <h2>{p.name}</h2>
-        <div className="muted small">{p.category_label} · stan: {p.state.replaceAll("_", " ")}</div>
+        <div className="muted small">{p.category_label} · stan: {STATE_NAMES[p.state] ?? p.state.replaceAll("_", " ")}</div>
       </div>
       {p.aliases.length > 0 && <div className="small"><b>Inne nazwy:</b> {p.aliases.join(", ")}</div>}
       <table className="table">
@@ -191,6 +196,8 @@ function AddProductDialog({ categories, onClose, onAdded }: { categories: { id: 
     <Modal
       title="Nowy produkt z etykiety"
       onClose={onClose}
+      confirmClose={() => !Object.entries(form).some(([k, v]) => !["category", "state", "store"].includes(k) && String(v ?? "").trim())
+        || window.confirm("Zamknąć bez zapisywania produktu? Wpisane wartości przepadną.")}
       wide
       footer={
         <>

@@ -2754,8 +2754,8 @@
   aliasy: [sól, sól kamienna, szczypta soli, sare]
   kategoria: przyprawy
   stan: gotowy_do_jedzenia
-  zrodlo: {baza: recznie, uwagi: "przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro"}
-  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0}
+  zrodlo: {baza: recznie, uwagi: "przyprawa w ilościach < 3 g — pomijalna w bilansie kcal/makro; liczona w podsumowaniu soli"}
+  na_100g: {kcal: 0, bialko: 0, tluszcz: 0, weglowodany: 0, sol: 99.5}
   pomijalny: true
   krok_g: 1
   miary:
@@ -3228,21 +3228,19 @@
   aliasy: [szynka parmeńska, szynka dojrzewająca, prosciutto]
   kategoria: wedliny
   stan: gotowy_do_jedzenia
-  zrodlo: {baza: BLS, kod: W443000, wersja: 4.0 (2025), nazwa_oryginalna: 'Lachsschinken, Rohpökelware, geräuchert | Pork
-      loin lean rolled, raw cured, smoked', pobrano: '2026-09-13'}
+  zrodlo: {baza: BLS, kod: W441000, wersja: 4.0 (2025), nazwa_oryginalna: Parmaschinken | Parma ham, pobrano: '2026-10-11'}
   krok_g: 5
   max_porcja_g: 80
   na_100g:
-    kcal: 123
-    bialko: 24.43
-    tluszcz: 2.08
-    weglowodany: 0.76
+    kcal: 307
+    bialko: 26.72
+    tluszcz: 21.8
+    weglowodany: 0.13
     blonnik: 0
-    cukry: 0.74
-    kwasy_nasycone: 0.71
-    sol: 3.84
-    kwasy_organiczne: 1.27
-    poliole: 0.02
+    cukry: 0.13
+    kwasy_nasycone: 8.07
+    sol: 5.3
+    kwasy_organiczne: 1.11
 - id: pieczarki_konserwowe
   nazwa: Pieczarki konserwowe (odsączone)
   aliasy: [pieczarki z puszki, pieczarki konserwowe]

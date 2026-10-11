@@ -5,6 +5,7 @@ from __future__ import annotations
 from pydantic import BaseModel, Field
 
 from ..domain.dish import Role
+from ..domain.nutrition import MEAL_MASS_TOLERANCE
 
 # Jednostki całkowite w modelu CP-SAT: 0,01 kcal i 0,001 g. Przy wartościach na 100 g z 2 miejscami po przecinku
 # i krokach w pełnych gramach współczynniki są praktycznie dokładne (brak kumulacji błędu zaokrągleń).
@@ -41,7 +42,7 @@ class EngineSettings(BaseModel):
     snack_cost: int = 30_000  # użycie przekąski bilansującej
     liked_dishes: set[str] = Field(default_factory=set)  # miękka preferencja; nie zmienia celów ani ograniczeń
     meal_mass_cost_per_g: int = 2_500  # 1 g ponad limit masy posiłku (100 g ≈ 2,5 g poza kotwicą białka)
-    meal_mass_tolerance: float = 0.02  # ile ponad limit nie zgłaszamy jako odchylenie (zaokrąglenia kroków)
+    meal_mass_tolerance: float = MEAL_MASS_TOLERANCE  # ile ponad limit nie zgłaszamy jako odchylenie (zaokrąglenia)
     alternate_rank_cost: int = 50_000  # wybór dania zapasowego zamiast pierwszego
     lighter_supper_cost_per_kcal: int = 200  # kolacja cięższa niż obiad
 

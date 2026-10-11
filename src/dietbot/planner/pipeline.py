@@ -49,6 +49,9 @@ from .wishes import WishExclusions, extract_exclusions, resolve_requested_dishes
 
 MAX_COMPOSE_ROUNDS = 3
 MAX_REPAIR_ROUNDS = 3
+# wykluczenia z życzeń muszą zostawić każdemu posiłkowi sensowny wybór dań
+MIN_POOL_AFTER_WISHES = 8
+MIN_POOL_SHARE_AFTER_WISHES = 0.15
 
 
 class LiveLog(list[str]):
@@ -122,6 +125,16 @@ class WeekPlanner:
         req = EngineRequest.model_validate({"slots": comp.to_engine_slots()})
         a, r = self.repo.assumptions, self.repo
         return solve_week(req, a, r.products, self.dishes_for(comp), self.settings, cache=self.cache)
+
+    def _exclusions_empty_pools(self, extra_banned: set[str]) -> bool:
+        """Czy wykluczenia z życzeń zostawiają któremuś posiłkowi mniej niż kilka dań (albo ułamek zwykłej puli)."""
+        full = self.pools()
+        cut = self.pools(extra_banned=extra_banned)
+        for meal, ids in full.by_meal.items():
+            left = len(cut.by_meal.get(meal, []))
+            if left < min(MIN_POOL_AFTER_WISHES, len(ids)) or left < len(ids) * MIN_POOL_SHARE_AFTER_WISHES:
+                return True
+        return False
 
     def pools(self, avoid: set[str] | None = None, extra_banned: set[str] | None = None) -> Pools:
         return build_pools(self.repo.approved_dishes(), self.repo.products, self.repo.assumptions, self.settings,
@@ -244,6 +257,13 @@ class WeekPlanner:
             extra_banned, cuisine_counts = set(excl.product_ids), dict(excl.cuisine_counts)
             if excl.notes:
                 log.append("Z życzeń na ten tydzień: " + "; ".join(excl.notes))
+            if extra_banned and self._exclusions_empty_pools(extra_banned):
+                # model mógł wykluczyć prawie wszystko (np. całe kategorie) — puste pule dawały kilka płatnych rund
+                # i błąd zamiast planu (audyt 09.10.2026, S12)
+                log.append("Wykluczenia z życzeń usunęłyby prawie wszystkie dania któregoś posiłku — pomijam je "
+                           "w tym planie (napisz życzenie dokładniej, np. konkretny produkt)")
+                extra_banned = set()
+                excl.product_ids = set()
             if excl.dishes and not excl.requested:
                 try:
                     excl.requested, c = resolve_requested_dishes(self.llm, excl.dishes, self.pools(set(), extra_banned),
@@ -306,6 +326,8 @@ class WeekPlanner:
         `extra_banned` — produkty wykluczone życzeniami tego planu; bez gotowych `pools` naprawa buduje pule bez nich."""
         t0 = t0 if t0 is not None else time.perf_counter()
         log = log if log is not None else LiveLog()
+        if extra_banned:
+            self.repo = self.repo.for_planning(extra_banned)  # przekąski bilansujące bez produktów z życzeń
         a = self.repo.assumptions
         if repair:
             # dania, które przestały pasować (np. nowa zasada z notatnika: zakaz produktu, limit porcji, ocena 👎) —

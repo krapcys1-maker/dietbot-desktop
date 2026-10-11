@@ -37,6 +37,7 @@ def test_package_ships_starter_data_without_raw_source_tables():
     spec = (ROOT / "packaging/DietBot.spec").read_text(encoding="utf-8")
     # cały folder dane zawierałby też dane\raw (surowe BLS/CIQUAL, ok. 34 MB) — do paczki tylko dane startowe
     assert r'r"\dane", r"defaults\dane"' not in spec
-    assert 'for sub in ("dania", "produkty", "sklepy")' in spec
+    assert 'for sub in ("dania", "produkty", "sklepy", "korekty")' in spec
+    assert 'os.environ.get("PORCJA_DANE")' in spec  # dane z czystego eksportu gita, nie z katalogu roboczego
     tracked = {p.name for p in (ROOT / "dane").iterdir() if p.is_dir()} - {"raw"}
-    assert tracked == {"dania", "produkty", "sklepy"}  # nowy folder danych trzeba dopisać do paczki
+    assert tracked == {"dania", "produkty", "sklepy", "korekty"}  # nowy folder danych trzeba dopisać do paczki

@@ -1,5 +1,45 @@
 # Historia zmian
 
+## 0.5.0 — bezpieczniej i pewniej (11.10.2026)
+
+Poprawki z audytu z 09.10.2026 (`docs/AUDYT_2026-10-09.md`, sekcja 9 opisuje stan każdego punktu).
+
+### Zdrowie i dane
+
+- **Minimum kalorii:** cele poniżej ok. 1200 kcal (kobieta) albo 1500 kcal (mężczyzna) wymagają potwierdzenia, a plan pokazuje uwagę. Kalkulator ma próg zależny od płci — nie odrzuca już większości kobiet.
+- **Zakazy obowiązują też w przekąskach bilansujących**, także zakazy z życzeń („bez orzechów”). Weryfikator sprawdza przekąski i stałe pozycje.
+- **Szynka dojrzewająca** ma właściwe wartości (BLS: 307 kcal i 21,8 g tłuszczu zamiast 123 kcal). Poprawka trafia też do starszych instalacji, jeśli nie zmieniałeś tego produktu.
+- **Sól i kwasy nasycone** w podsumowaniu dnia i w eksporcie, z zaleceniami (sól poniżej 5 g, kwasy nasycone poniżej 10% energii).
+- Weryfikator sprawdza porcje względem przepisu: składniki spoza dania, brak obowiązkowego składnika, połówki sztuk, porcje „po równo” i garnek dania na zapas.
+- Więcej dań w trybie wegetariańskim i wegańskim (sezam, zioła, hummus, tortilla i inne proste produkty roślinne). Plakietka diety wynika ze składników, nie z tagu.
+
+### Koszty AI i bezpieczeństwo
+
+- Czat i Telegram **pytają przed płatną akcją** (nowy plan, wymyślanie dań). „Nie wymyślaj…” i pytania o wymyślanie nie uruchamiają już niczego.
+- **Limit kosztu na jedno polecenie** (domyślnie 0,50 $). Budżet rezerwowany przed wywołaniem — równoległe wywołania go nie przekroczą. Liczone są też nieudane próby.
+- **Bezpiecznik:** gdy model nie odpowiada, aplikacja przez 5 minut pracuje bez AI, zamiast czekać kilkadziesiąt minut. Błędy klucza (401) i środków (402) nie są ponawiane.
+- Dania bez oceny kucharza (awaria połączenia) nie trafiają do biblioteki. Wykluczenia z życzeń, które usunęłyby prawie wszystkie dania, są pomijane z komunikatem.
+- **Token sesji API:** inne programy i konta na komputerze nie odczytają czatu ani nie zmienią celów. Nagłówki chroniące przed osadzeniem w obcej stronie.
+
+### Niezawodność
+
+- Dodanie produktu nie może już zablokować startu (unikalny identyfikator, wycofanie zapisu). Wadliwy wpis w pliku użytkownika jest pomijany z ostrzeżeniem.
+- **Przerwanie zadania:** przycisk „Przerwij” w oknie postępu. Zamknięcie okna w trakcie liczenia pyta o przerwanie i nie zostawia ukrytego procesu. Jedna kopia aplikacji naraz.
+- Dwie zmiany tej samej wersji planu nie gubią się nawzajem; zapis celów nie cofa zmian z czatu. Przyciski są zablokowane na czas zadania.
+- Odrzucenie dania w bibliotece nie blokuje zamian w zapisanych dietach. Zmiana statusu dania i dodanie produktu czekają na koniec zadania.
+- Silnik: przy nieosiągalnej kotwicy białka ponowna próba trzyma przynajmniej dzienne widełki. Kolacja dużo cięższa od obiadu daje karę, a nie „błąd modelu”.
+
+### Wygoda
+
+- Lista zakupów pokazuje warianty połączonej pozycji, gdy różnią się kalorycznością (np. jogurt naturalny i owocowy).
+- Kontrast w ciemnym motywie, błędy zostają do zamknięcia, okna dialogowe obsługiwane klawiaturą, ostrzeżenie przed wyjściem z niezapisanymi celami, ekran błędu zamiast pustego okna, poprawne liczebniki („1 dzień”), motyw bez błysku przy starcie.
+- Telegram działa tylko w rozmowie prywatnej; długie wiadomości nie psują formatowania.
+
+### Projekt
+
+- Dokładne wersje zależności w `requirements-lock.txt` (CI i budowanie). Instalator zawiera dane wyłącznie z zatwierdzonego stanu repozytorium, a skrypt sprawdza zawartość paczki.
+- Pamięć podręczna danych w JSON zamiast pickle; baza SQLite z wersją schematu i kluczami obcymi; `npm audit` bez podatności.
+
 ## 0.4.0 — notatnik preferencji (04.10.2026)
 
 ### Notatnik preferencji

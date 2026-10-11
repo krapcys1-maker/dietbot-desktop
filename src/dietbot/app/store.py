@@ -6,7 +6,7 @@ import json
 import sqlite3
 import uuid
 from collections.abc import Iterator
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from dataclasses import dataclass, field
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -89,6 +89,10 @@ CREATE TABLE IF NOT EXISTS chat (
 """
 
 
+# wersja schematu bazy (PRAGMA user_version): 2 = notatnik preferencji (pref_notes, pref_rules, program_notes)
+SCHEMA_VERSION = 2
+
+
 def new_id() -> str:
     return uuid.uuid4().hex[:12]
 
@@ -128,20 +132,23 @@ class PlanStore:
         self.path = path
         path.parent.mkdir(parents=True, exist_ok=True)
         if path.exists():
-            with sqlite3.connect(path) as old:
+            with closing(sqlite3.connect(path)) as old:  # „with connect()” tylko zatwierdza, nie zamyka (audyt N7)
                 exists = old.execute("SELECT 1 FROM sqlite_master WHERE name='plan_snapshots'").fetchone()
                 if not exists:
                     backup = path.with_name(path.name + ".before-snapshots.bak")
                     if not backup.exists():
-                        with sqlite3.connect(backup) as target:
+                        with closing(sqlite3.connect(backup)) as target:
                             old.backup(target)
         with self._conn() as c:
             c.executescript(SCHEMA)
+            if int(c.execute("PRAGMA user_version").fetchone()[0]) < SCHEMA_VERSION:
+                c.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
 
     @contextmanager
     def _conn(self) -> Iterator[sqlite3.Connection]:
         conn = sqlite3.connect(self.path, timeout=30)
         conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA foreign_keys = ON")  # np. zapisana dieta tylko dla istniejącego planu
         try:
             with conn:
                 yield conn
@@ -214,6 +221,11 @@ class PlanStore:
         with self._conn() as c:
             rows = c.execute("SELECT * FROM plans WHERE deleted = 0 ORDER BY created_at DESC LIMIT ?", (limit,)).fetchall()
         return [self._record(r) for r in rows]
+
+    def children(self, plan_id: str) -> set[str]:
+        """Identyfikatory wersji utworzonych z tego planu (zamiana, przeliczenie, naprawa)."""
+        with self._conn() as c:
+            return {r[0] for r in c.execute("SELECT id FROM plans WHERE parent_id = ? AND deleted = 0", (plan_id,))}
 
     def family(self, family_id: str) -> list[PlanRecord]:
         with self._conn() as c:

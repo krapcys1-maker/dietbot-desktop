@@ -311,6 +311,7 @@ details[open] summary { margin-bottom: 6px; }
 .sum-table tr.band-row td { color: var(--muted); font-size: 12px; }
 .sum-table td.bad-cell { color: var(--error); }
 .bad-text { color: var(--error); }
+.warn-text { color: var(--warn); font-weight: 600; }
 .sum-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(460px, 1fr)); gap: 16px; }
 @media (max-width: 560px) { .sum-grid { grid-template-columns: 1fr; } }
 

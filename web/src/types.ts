@@ -22,6 +22,9 @@ export interface Nutrition {
   fat: number;
   carbs: number;
   fiber: number;
+  salt?: number;
+  saturated_fat?: number;
+  saturated_fat_pct?: number;
 }
 
 export interface PlanItem {
@@ -74,6 +77,7 @@ export interface Meal {
   description: string | null;
   cuisine: string | null;
   tags: string[];
+  diets?: string[];
   is_treat: boolean;
   is_sweet: boolean;
   prep_minutes: number | null;
@@ -192,7 +196,7 @@ export interface PlanView extends PlanSummary {
   versions: PlanSummary[];
 }
 
-export type JobState = "w_kolejce" | "w_toku" | "gotowe" | "blad";
+export type JobState = "w_kolejce" | "w_toku" | "gotowe" | "blad" | "przerwane";
 
 export interface Job {
   id: string;
@@ -237,6 +241,7 @@ export interface SwapOption {
   description: string | null;
   cuisine: string;
   tags: string[];
+  diets?: string[];
   prep_minutes: number | null;
   profile: DishProfile | null;
   notes: string[];
@@ -263,6 +268,8 @@ export interface ShoppingItem {
   opakowania: number | null;
   opakowania_tekst: string | null;
   na_wynos?: boolean;
+  warianty?: { nazwa: string; gramy: number }[];
+  warianty_rozne?: boolean;
 }
 
 export interface Shopping {
@@ -307,6 +314,7 @@ export interface DishDetail {
   meal_labels: string[];
   cuisine: string;
   tags: string[];
+  diets?: string[];
   status: string;
   prep_minutes: number | null;
   is_treat: boolean;
@@ -376,12 +384,14 @@ export interface MatchResult {
 
 export interface AssumptionsResponse {
   data: AssumptionsData;
+  version: string;
   warnings: string[];
   snack_options: { id: string; name: string; diets: string[] }[];
   products: { id: string; name: string; diets: string[] }[];
   categories: { id: string; name: string }[];
   cuisines: string[];
   tags: string[];
+  diets?: string[];
   meals: { id: string; name: string }[];
 }
 
@@ -399,6 +409,7 @@ export interface PersonData {
   tolerancja_kotwicy_g?: number;
   wyklucza_produkty?: string[];
   maks_masa_posilku_g?: Record<string, number>;
+  plec?: "kobieta" | "mezczyzna";
 }
 
 export interface AssumptionsData {

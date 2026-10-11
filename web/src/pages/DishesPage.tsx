@@ -80,7 +80,7 @@ export default function DishesPage({ dishId }: { dishId?: string }) {
                 </div>
                 <div className="row" style={{ marginTop: 4, gap: 5 }}>
                   {d.invented && <span className="badge ok">wymyślone</span>}
-                  <TagBadges tags={d.tags} />
+                  <TagBadges tags={d.tags} diets={d.diets} />
                 </div>
               </div>
               <div className="stack" style={{ gap: 4, justifyItems: "end" }}>
@@ -132,7 +132,7 @@ function DishDetailCard({ id, onChanged }: { id: string; onChanged: () => void }
         </div>
         <span className={`badge ${d.status === "zatwierdzone" ? "ok" : d.status === "odrzucone" ? "error" : "warn"}`}>{STATUS_NAMES[d.status]}</span>
       </div>
-      <TagBadges tags={d.tags} isTreat={d.is_treat} isSweet={d.is_sweet} />
+      <TagBadges tags={d.tags} isTreat={d.is_treat} isSweet={d.is_sweet} diets={d.diets} />
       <DishRating id={d.id} name={d.name} />
       {d.description && <p className="meal-desc">{d.description}</p>}
       {d.excluded.length > 0 && (

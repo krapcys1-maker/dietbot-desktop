@@ -26,6 +26,8 @@ from ..engine import BlockStatus, EngineRequest, solve_week
 from ..engine.settings import EngineSettings
 from ..food.matcher import ProductMatcher
 from ..llm.client import CostLedger, LLMClient, LLMError, LLMSettings, load_dotenv_file, save_dotenv_value
+from ..llm.scope import check_cancelled
+from ..llm.scope import current as current_scope
 from ..planner.compose import Composition, SlotPlan, validate_composition
 from ..planner.pipeline import LiveLog, WeekPlanner
 from ..planner.pools import Pools, build_pools
@@ -38,7 +40,7 @@ from ..storage.repository import Repository, check_consistency
 from ..storage.yamlio import dump_yaml, load_yaml, to_plain
 from ..textfmt import plural_pl
 from ..textnorm import normalize
-from .jobs import Job, JobManager, UserError
+from .jobs import Job, JobManager, NotFound, UserError
 from .snapshots import capture, matches_current, restore
 from .store import PlanRecord, PlanStore
 from .validation import polish_errors
@@ -87,6 +89,18 @@ def slug(text: str) -> str:
     return "_".join(normalize(text).replace("%", "").split())[:60].strip("_")
 
 
+def unique_id(base: str, taken: set[str], limit: int = 60) -> str:
+    """Identyfikator z ograniczeniem długości, unikalny w `taken` (przy kolizji sufiks _2, _3…). Dwa długie opisy
+    różniące się dopiero po 60. znaku dawały to samo id i blokowały start aplikacji (audyt 09.10.2026, K1)."""
+    base = base[:limit].strip("_") or "produkt"
+    candidate, n = base, 1
+    while candidate in taken:
+        n += 1
+        suffix = f"_{n}"
+        candidate = base[:limit - len(suffix)].rstrip("_") + suffix
+    return candidate
+
+
 def merge_yaml(target, source):
     """Wpisuje nowe wartości do dokumentu YAML, zachowując komentarze i styl list/słowników."""
     if isinstance(target, CommentedMap) and isinstance(source, dict):
@@ -116,6 +130,13 @@ MIN_POOL_AFTER_AVOID = 40  # ale każdy posiłek musi mieć tyle dań do wyboru
 INVENT_ATTEMPTS = 2  # tyle razy zamawiamy u generatora danie z życzeń, którego nie ma w bibliotece
 # reguły z życzeń zapisane razem z układem planu — kolejne wersje (zamiana, przeliczenie, naprawa) je dziedziczą
 COMPOSITION_EXTRAS = ("wykluczone_produkty", "kuchnie_liczby")
+
+
+def task_cost(reported: float) -> float:
+    """Koszt AI zadania do zapisu przy planie: wszystkie wywołania z zakresu zadania, także nieudane próby
+    (wcześniej liczyły się tylko udane — audyt 09.10.2026, W5)."""
+    scope = current_scope()
+    return max(reported, scope.spent_usd) if scope is not None else reported
 
 
 def composition_extras(composition: dict | None) -> dict:
@@ -152,7 +173,7 @@ class DietService:
         """Dane z plików + oceny dań + zasady z notatnika preferencji nałożone na założenia."""
         from .notebook import apply_to_repo, load_rules
 
-        repo = Repository.load(self.paths)
+        repo = Repository.load(self.paths, strict=False)  # wadliwy wpis w pliku użytkownika nie blokuje startu
         repo.dish_ratings = self.store.ratings()
         self.raw_assumptions = repo.assumptions
         try:
@@ -204,7 +225,7 @@ class DietService:
     def _record(self, plan_id: str) -> PlanRecord:
         rec = self.store.get(plan_id)
         if rec is None:
-            raise UserError("Nie ma takiego planu (mógł zostać usunięty).")
+            raise NotFound("Nie ma takiego planu (mógł zostać usunięty).")
         return self.checked_record(rec)
 
     def checked_record(self, rec: PlanRecord) -> PlanRecord:
@@ -223,7 +244,7 @@ class DietService:
     def _ensure_exists(self, plan_id: str) -> None:
         """Zadanie w kolejce mogło przeżyć usunięcie planu — nowa wersja bez rodzica kończyłaby się śladem stosu."""
         if self.store.get(plan_id) is None:
-            raise UserError("Plan, którego dotyczyła ta zmiana, został w międzyczasie usunięty.")
+            raise NotFound("Plan, którego dotyczyła ta zmiana, został w międzyczasie usunięty.")
 
     def status(self) -> dict:
         repo = self.repo
@@ -285,6 +306,7 @@ class DietService:
         result = invent_dishes(self.repo, llm, request, max_total=max_total, log=progress)
         if result.accepted:
             with self._lock:
+                check_cancelled()  # przerwane zadanie niczego nie zapisuje
                 save_generated(result.accepted, self.paths.dishes_dir)
                 self.reload()
             progress(f"Nowe dania w bibliotece ({len(result.accepted)}): " + "; ".join(d.name for d in result.accepted))
@@ -367,6 +389,7 @@ class DietService:
                 progress(f"Nie udało się wymyślić dania „{r.request.opis}” — przekażę życzenie modelowi")
                 continue
             with self._lock:
+                check_cancelled()
                 save_generated(accepted[:1], self.paths.dishes_dir)
                 self.reload()
             r.dish_id, r.invented = accepted[0].id, True
@@ -443,7 +466,10 @@ class DietService:
                     chosen = [r.request.opis for r in (wish_plan.requested if wish_plan else []) if r.dish_id]
                     if chosen:  # dania z życzeń już są w bibliotece — nie wymyślamy ich drugi raz
                         request += "\n(Te dania z prośby są już wybrane, NIE wymyślaj ich: " + "; ".join(chosen) + ")"
-                    fresh = {d.id for d in self._invent(llm_first, request, invent_count, progress)}
+                    try:
+                        fresh = {d.id for d in self._invent(llm_first, request, invent_count, progress)}
+                    except LLMError as exc:  # np. limit kosztu — plan i tak powstaje z biblioteki (audyt S12)
+                        progress(f"Nie udało się wymyślić nowych dań ({exc}) — układam tydzień z biblioteki")
             repo = self.repo
             avoid: set[str] = set()
             if avoid_recent:
@@ -461,11 +487,12 @@ class DietService:
                 raise UserError("Silnik nie znalazł planu. " + "; ".join(msgs[:3]))
             comp = out.composition.fixed_to_chosen(out.chosen())
             composition = {**comp.to_dict(), "wykluczone_produkty": sorted(out.banned_products),
-                           "kuchnie_liczby": out.cuisine_counts, "dania_z_zyczen": out.requested}
+                           "kuchnie_liczby": out.cuisine_counts, "dania_z_zyczen": out.requested, "ziarno": seed}
             rec = PlanRecord(plan=out.plan, title=week_title(start, ds), source=comp.source, ok=out.ok,
                              report=out.report, composition=composition, log=out.log, wishes=wishes,
-                             week_start=start, llm_cost_usd=out.llm_cost_usd, seconds=out.seconds,
+                             week_start=start, llm_cost_usd=task_cost(out.llm_cost_usd), seconds=out.seconds,
                              assumptions_hash=assumptions_hash(repo), snapshot=capture(repo, out.plan))
+            check_cancelled()
             self.store.save(rec)
             self.store.set_setting("active_plan", rec.id)
             progress(f"Gotowe: {rec.title} ({'plan poprawny' if rec.ok else 'plan z uwagami'})")
@@ -514,7 +541,7 @@ class DietService:
 
     def rate_dish(self, dish_id: str, rating: int) -> dict:
         if dish_id not in self.repo.dishes:
-            raise UserError("Nie ma takiego dania.")
+            raise NotFound("Nie ma takiego dania.")
         if rating not in (-1, 0, 1):
             raise UserError("Nieznana ocena dania.")
         with self._lock:
@@ -551,7 +578,7 @@ class DietService:
         comp = composition_from_plan(rec.plan, rec.plan.comment, rec.source)
         slot = next((s for s in comp.slots if s.key == slot_key), None)
         if slot is None:
-            raise UserError("Nie ma takiego posiłku w planie.")
+            raise NotFound("Nie ma takiego posiłku w planie.")
         return comp, slot
 
     def _slot_pool(self, slot: SlotPlan) -> list[str]:
@@ -583,7 +610,8 @@ class DietService:
                 notes.append("dodaje słodką kolację" if d.is_sweet else "zabiera słodką kolację")
             view = dish_view(d, self.repo.products, pools.profiles.get(did))
             options.append({"id": did, "name": d.name, "description": d.description, "cuisine": cuisine_label(d.cuisine),
-                            "tags": d.tags, "prep_minutes": d.prep_minutes, "profile": view["profile"], "notes": notes})
+                            "tags": d.tags, "diets": view["diets"], "prep_minutes": d.prep_minutes,
+                            "profile": view["profile"], "notes": notes})
         options.sort(key=lambda o: (len(o["notes"]), self.repo.dish_ratings.get(o["id"], 0) != 1, normalize(o["name"])))
         return {"slot_key": slot_key, "meal": slot.meal.value, "meal_label": MEAL_LABELS_PL[slot.meal],
                 "days": [DAY_LABELS_PL[d] for d in slot.days],
@@ -593,7 +621,7 @@ class DietService:
     def _resolve_block(self, rec: PlanRecord, comp: Composition, slot: SlotPlan,
                        progress: Callable[[str], None]) -> tuple[WeekPlan, object, BlockStatus]:
         """Przelicza tylko dni powiązane ze zmienionym posiłkiem — reszta tygodnia zostaje co do grama."""
-        repo = self.repo.for_planning()
+        repo = self.repo.for_planning(composition_extras(rec.composition).get("wykluczone_produkty", []))
         block_days = {int(d) for d in slot.days}
         changed = True
         while changed:  # dni połączone daniami na zapas tworzą jeden blok
@@ -638,15 +666,17 @@ class DietService:
         comp, slot = self._slot(rec, slot_key)
         dish = self.repo.dishes.get(dish_id)
         if dish is None:
-            raise UserError("Nie ma takiego dania w bibliotece.")
+            raise NotFound("Nie ma takiego dania w bibliotece.")
         if dish_id not in self._slot_pool(slot):
             reasons = self.pools().excluded.get(dish_id) or ["danie nie pasuje do tego posiłku"]
             raise UserError(f"„{dish.name}” nie może trafić do tego posiłku: {'; '.join(reasons)}.")
         old = self.repo.dishes.get(slot.dish_id)
         note = (f"{', '.join(DAY_LABELS_PL[d] for d in slot.days)}, {MEAL_LABELS_PL[slot.meal].lower()}: "
                 f"{old.name if old else slot.dish_id} → {dish.name}")
+        children_before = self.store.children(rec.id)
 
         def run(progress: Callable[[str], None]) -> dict:
+            self._refuse_if_changed(rec, children_before)
             log = LiveLog(progress)
             log.append(f"Zamiana: {note}")
             new_comp = apply_swaps(comp, {slot_key: dish_id})
@@ -667,6 +697,7 @@ class DietService:
                              # wymaga przeliczenia (dziedziczymy znacznik założeń rodzica)
                              assumptions_hash=rec.assumptions_hash or assumptions_hash(self.repo),
                              snapshot=capture(self.repo, plan))
+            check_cancelled()
             self.store.save(new)
             if self.store.active() is None or self.store.get_setting("active_plan") in (None, rec.id):
                 self.store.set_setting("active_plan", new.id)
@@ -674,11 +705,20 @@ class DietService:
 
         return self.jobs.submit("zamiana", note, run)
 
+    def _refuse_if_changed(self, rec: PlanRecord, children_before: set[str]) -> None:
+        """Dwie zmiany zlecone na tę samą wersję (np. okno i czat) tworzyły dwie siostrzane wersje, z których każda
+        miała tylko jedną zmianę (audyt S1). Druga zmiana zostaje odrzucona z jasnym komunikatem."""
+        if self.store.children(rec.id) - children_before:
+            raise UserError("Ten plan zmienił się w międzyczasie (powstała nowsza wersja). Otwórz najnowszą wersję "
+                            "i powtórz zmianę — nic nie zostało nadpisane.")
+
     def recompute(self, plan_id: str, repair: bool = False) -> Job:
         """Przelicza plan po zmianie założeń (te same dania); z naprawą — może wymienić dania, które nie pasują."""
         rec = self._record(plan_id)
+        children_before = self.store.children(rec.id)
 
         def run(progress: Callable[[str], None]) -> dict:
+            self._refuse_if_changed(rec, children_before)
             repo = self.repo
             log = LiveLog(progress)
             comp = composition_from_plan(rec.plan, rec.plan.comment, rec.source)
@@ -696,8 +736,10 @@ class DietService:
                              ok=out.ok, report=out.report, composition={**extras, **new_comp.to_dict()}, log=out.log,
                              wishes=rec.wishes, week_start=rec.week_start, parent_id=rec.id,
                              change_note="przeliczone według aktualnych założeń" + (" z naprawą" if repair else ""),
-                             llm_cost_usd=out.llm_cost_usd, seconds=out.seconds, assumptions_hash=assumptions_hash(repo),
+                             llm_cost_usd=task_cost(out.llm_cost_usd), seconds=out.seconds,
+                             assumptions_hash=assumptions_hash(repo),
                              snapshot=capture(repo, out.plan))
+            check_cancelled()
             self.store.save(new)
             if self.store.get_setting("active_plan") in (None, rec.id):
                 self.store.set_setting("active_plan", new.id)
@@ -725,7 +767,7 @@ class DietService:
         shop_md = render_shopping_list(rec.plan, repo.assumptions, repo.products, repo.store_products)
         out = self.paths.out
         out.mkdir(parents=True, exist_ok=True)
-        stem = slug(rec.title) or "plan"
+        stem = f"{slug(rec.title) or 'plan'}_{(rec.family_id or rec.id)[:6]}"
         plan_path = out / f"jadlospis_{stem}_v{rec.version}.md"
         shop_path = out / f"zakupy_{stem}_v{rec.version}.md"
         plan_path.write_text(plan_md, encoding="utf-8-sig")
@@ -757,6 +799,7 @@ class DietService:
         snack_ids = [d.id for d in repo.dishes.values() if MealType.SNACK in d.meal_types]
         return {
             "data": raw,
+            "version": self.assumptions_version(),
             "warnings": repo.assumptions.consistency_warnings(),
             "snack_options": [{"id": i, "name": repo.dishes[i].name,
                                "diets": [d for d in ("tradycyjna", "wege", "wegan") if dish_compatible(repo.dishes[i], repo.products, d)]}
@@ -779,18 +822,35 @@ class DietService:
         rep = check_consistency(self.repo.products, self.repo.dishes, a)
         return a, rep.errors, rep.warnings
 
-    def save_assumptions(self, data: dict) -> dict:
+    def assumptions_version(self) -> str:
+        """Wersja pliku założeń (skrót treści) — zapis formularza sprzed zmiany w czacie nie cofnie tej zmiany."""
+        import hashlib
+
+        return hashlib.sha256(self.paths.assumptions.read_bytes()).hexdigest()[:16]
+
+    def save_assumptions(self, data: dict, *, expected_version: str | None = None,
+                         confirm_low_kcal: bool = False) -> dict:
         a, errors, warnings = self.validate_assumptions(data)
         if errors or a is None:
             return {"ok": False, "errors": errors, "warnings": warnings}
+        low = [p for p in a.persons if p.below_safe_kcal]
+        if low and not confirm_low_kcal:
+            names = ", ".join(f"{p.name} ({p.targets.kcal.min:.0f} kcal, minimum ok. {p.safe_min_kcal:.0f})" for p in low)
+            return {"ok": False, "errors": [], "warnings": warnings, "needs_confirmation": (
+                f"Cele energii poniżej ostrożnego minimum: {names}. Tak niskie kalorie ustal ze specjalistą. "
+                "Czy na pewno zapisać?")}
         with self._lock:
             if self.jobs.busy():
                 raise UserError("Poczekaj na zakończenie obliczeń przed zmianą celów.")
+            if expected_version is not None and expected_version != self.assumptions_version():
+                raise UserError("Założenia zmieniły się w międzyczasie (np. w czacie). Odśwież stronę i wprowadź "
+                                "zmiany jeszcze raz — nic nie zostało nadpisane.")
             doc = load_yaml(self.paths.assumptions)
             doc = merge_yaml(doc, data)
             dump_yaml(doc, self.paths.assumptions)
             self.reload()
-        return {"ok": True, "errors": [], "warnings": warnings + self.repo.assumptions.consistency_warnings()}
+        return {"ok": True, "errors": [], "warnings": warnings + self.repo.assumptions.consistency_warnings(),
+                "version": self.assumptions_version()}
 
     # ------------------------------------------------------------------ dania
     def dishes(self, meal: str | None = None, q: str | None = None, status: str | None = None) -> list[dict]:
@@ -827,7 +887,7 @@ class DietService:
     def dish(self, dish_id: str) -> dict:
         d = self.repo.dishes.get(dish_id)
         if d is None:
-            raise UserError("Nie ma takiego dania.")
+            raise NotFound("Nie ma takiego dania.")
         pools = self.pools()
         view = dish_view(d, self.repo.products, pools.profiles.get(dish_id))
         view["excluded"] = pools.excluded.get(dish_id, [])
@@ -840,6 +900,8 @@ class DietService:
         except ValueError:
             raise UserError("Nieznany status dania (dozwolone: szkic, zatwierdzone, odrzucone).") from None
         with self._lock:
+            if self.jobs.busy():  # zadanie liczy na tych danych — zmiana w połowie dałaby niespójny plan (audyt S3)
+                raise UserError("Poczekaj na koniec układania lub zmiany planu, a potem zmień status dania.")
             for path in sorted(self.paths.dishes_dir.glob("*.yaml")):
                 doc = load_yaml(path) or []
                 for entry in doc:
@@ -867,7 +929,7 @@ class DietService:
     def product(self, product_id: str) -> dict:
         p = self.repo.products.get(product_id)
         if p is None:
-            raise UserError("Nie ma takiego produktu.")
+            raise NotFound("Nie ma takiego produktu.")
         view = product_view(p)
         view["used_in"] = [{"id": d.id, "name": d.name} for d in self.repo.dishes.values()
                            if any(i.product_id == product_id for i in d.ingredients)]
@@ -922,34 +984,57 @@ class DietService:
             raise UserError(f"Kalorie z etykiety ({product.per_100g.kcal:.0f} kcal) nie zgadzają się z makro "
                             f"(wychodzi {computed:.0f} kcal, różnica {mismatch:.0%}). Sprawdź przepisanie albo zaznacz "
                             "„wartości są zgodne z etykietą”.")
-        products = {**self.repo.products, pid: product}
-        rep = check_consistency(products, self.repo.dishes, self.repo.assumptions)
-        alias_errors = [e for e in rep.errors if pid in e]
-        if alias_errors:
-            raise UserError("; ".join(alias_errors))
-        store_entry = None
-        if store_name:
-            package = payload.get("package_g")
-            store_entry = {"id": slug(f"{store_name} {brand} {name}")[:60], "produkt": pid, "sklep": store_name,
-                           "nazwa_w_sklepie": str(payload.get("store_name_local") or name), "preferowany": True,
-                           "sprawdzono": date.today().isoformat()}
-            if brand:
-                store_entry["marka"] = brand
-            if ean:
-                store_entry["ean"] = ean
-            if package not in (None, ""):
-                store_entry["opakowanie_g"] = package
-            try:
-                StoreProduct.model_validate(store_entry)
-            except ValidationError as exc:
-                raise UserError("Popraw dane sklepu: " + "; ".join(polish_errors(exc))) from None
         with self._lock:
-            self._append_yaml(self.paths.products_dir / OWN_PRODUCTS_FILE, product.to_data())
+            # sprawdzenie i zapis pod jedną blokadą: dwa równoczesne zapisy nie dostaną tego samego id
+            if self.jobs.busy():
+                raise UserError("Poczekaj na koniec układania lub zmiany planu, a potem dodaj produkt.")
+            if pid in self.repo.products:
+                raise UserError(f"Produkt o takiej nazwie już jest w bazie ({self.repo.products[pid].name}).")
+            products = {**self.repo.products, pid: product}
+            rep = check_consistency(products, self.repo.dishes, self.repo.assumptions)
+            alias_errors = [e for e in rep.errors if pid in e]
+            if alias_errors:
+                raise UserError("; ".join(alias_errors))
+            store_entry = None
+            if store_name:
+                package = payload.get("package_g")
+                taken = {sp.id for sp in self.repo.store_products}
+                store_entry = {"id": unique_id(slug(f"{store_name} {brand} {name}"), taken, 60), "produkt": pid,
+                               "sklep": store_name, "nazwa_w_sklepie": str(payload.get("store_name_local") or name),
+                               "preferowany": not any(sp.product_id == pid and sp.preferred
+                                                      for sp in self.repo.store_products),
+                               "sprawdzono": date.today().isoformat()}
+                if brand:
+                    store_entry["marka"] = brand
+                if ean:
+                    store_entry["ean"] = ean
+                if package not in (None, ""):
+                    store_entry["opakowanie_g"] = package
+                try:
+                    StoreProduct.model_validate(store_entry)
+                except ValidationError as exc:
+                    raise UserError("Popraw dane sklepu: " + "; ".join(polish_errors(exc))) from None
+            writes = [(self.paths.products_dir / OWN_PRODUCTS_FILE, product.to_data())]
             if store_entry:
-                for s in self.repo.store_products:  # nowy produkt z półki staje się preferowanym
-                    if s.product_id == pid and s.preferred:
-                        store_entry["preferowany"] = False
-                self._append_yaml(self.paths.stores_dir / OWN_PRODUCTS_FILE, store_entry)
+                writes.append((self.paths.stores_dir / OWN_PRODUCTS_FILE, store_entry))
+            backups = {path: (path.read_bytes() if path.exists() else None) for path, _ in writes}
+            try:
+                for path, entry in writes:
+                    self._append_yaml(path, entry)
+                # kontrola całego nowego stanu: zapis nie może dodać żadnego wpisu, który przy starcie zostałby pominięty
+                fresh = Repository.load(self.paths, strict=False)
+                added = set(fresh.load_problems) - set(self.repo.load_problems)
+                if pid not in fresh.products or any("pominięto" in x for x in added):
+                    raise UserError("Produkt nie zapisał się poprawnie: " + "; ".join(sorted(added)[:3]))
+            except Exception as exc:
+                for path, data in backups.items():  # wycofanie: pliki wracają do stanu sprzed zapisu
+                    if data is None:
+                        path.unlink(missing_ok=True)
+                    else:
+                        path.write_bytes(data)
+                if isinstance(exc, UserError):
+                    raise
+                raise UserError(f"Nie udało się zapisać produktu — zmiany wycofano ({exc}).") from None
             self.reload()
         return self.product(pid)
 

@@ -4,7 +4,7 @@
 
 ## Instalacja i aktualizacja
 
-Pobierz `Porcja-Setup-0.4.0.exe` z [najnowszego wydania](https://github.com/krapcys1-maker/dietbot-desktop/releases/latest). Zamknij aplikację, uruchom instalator i otwórz **Porcję** w menu Start. Opcjonalnie zaznacz utworzenie skrótu na pulpicie.
+Pobierz `Porcja-Setup-0.5.0.exe` z [najnowszego wydania](https://github.com/krapcys1-maker/dietbot-desktop/releases/latest). Zamknij aplikację, uruchom instalator i otwórz **Porcję** w menu Start. Opcjonalnie zaznacz utworzenie skrótu na pulpicie.
 
 Instalator zawiera program oraz jego zależności. **Nie kopiuj samego `DietBot.exe`** z katalogu kompilacji: potrzebuje również folderu `_internal`. Do przekazania aplikacji innej osobie służy instalator, nie Twój folder danych.
 
@@ -105,7 +105,9 @@ W **Cele i preferencje**, przy osobie, rozwiń **Nie znasz swoich celów?**. Wpi
 
 Obliczenia są lokalne, bez AI. Surowe pomiary nie są zapisywane; zapisujesz dopiero zaakceptowane cele. Metoda: [Mifflin–St Jeor](https://pubmed.ncbi.nlm.nih.gov/2305711/) × przybliżony współczynnik aktywności 1,2 / 1,375 / 1,55 / 1,725. Opcjonalny deficyt wynosi 10% lub 15%, nie więcej niż 500 kcal. Propozycja makro to 20% energii z białka, 30% z tłuszczu i 50% z węglowodanów. To założenia funkcji, a nie pomiar indywidualnego zapotrzebowania lub gwarancja tempa chudnięcia.
 
-Ograniczenia funkcji: wiek 18–75 lat, wzrost 130–220 cm, masa 40–200 kg, BMI wejściowe od 18,5 do poniżej 40, docelowe co najmniej 18,5; dolna granica proponowanej energii co najmniej 1500 kcal, środek do 4000 kcal. Są to granice produktu, nie uniwersalne normy kliniczne. Funkcja nie jest przeznaczona dla dzieci, osób w ciąży, karmiących, z zaburzeniami odżywiania lub chorobami wymagającymi indywidualnej diety. Poza zakresem skorzystaj z indywidualnie ustalonych celów.
+Ograniczenia funkcji: wiek 18–75 lat, wzrost 130–220 cm, masa 40–200 kg, BMI wejściowe od 18,5 do poniżej 40, docelowe co najmniej 18,5; dolna granica proponowanej energii co najmniej 1200 kcal dla kobiet i 1500 kcal dla mężczyzn (od 0.5.0), środek do 4000 kcal. Są to granice produktu, nie uniwersalne normy kliniczne. Funkcja nie jest przeznaczona dla dzieci, osób w ciąży, karmiących, z zaburzeniami odżywiania lub chorobami wymagającymi indywidualnej diety. Poza zakresem skorzystaj z indywidualnie ustalonych celów.
+
+Cele wpisane ręcznie poniżej tych progów (ok. 1200 kcal dla kobiety, 1500 kcal dla mężczyzny) można zapisać dopiero po potwierdzeniu, a plan pokazuje przy nich uwagę. Pole **Płeć** przy osobie służy tylko do tych progów. Tak niskie kalorie ustal ze specjalistą.
 
 Kalkulator nie zmienia automatycznie limitów wielkości talerza. Jeżeli pojawia się ostrzeżenie o porcji, sprawdź ustawienia zaawansowane. Aplikacja nie bilansuje kompletu witamin, minerałów ani alergenów.
 
@@ -115,9 +117,12 @@ W **Ustawienia → Twój pomocnik AI** wklej klucz z [panelu DeepSeek](https://p
 
 Klucz zapisuje się lokalnie jako jawny tekst w `.env`. Nie wklejaj go do GitHuba, zgłoszeń, czatu z innymi osobami ani filmów. AI otrzymuje kontekst zadania; bez klucza planowanie nadal działa algorytmicznie, ale czat, interpretacja swobodnych życzeń i generowanie nowych przepisów przez model są niedostępne. Porcja nie pobiera abonamentu; koszty API rozlicza DeepSeek.
 
+Kontrola kosztów (od 0.5.0): czat i Telegram pytają **„Uruchomić?”**, zanim ułożą nowy plan albo wymyślą dania. Jedno polecenie nie wyda więcej niż 0,50 $ (`limit_na_polecenie_usd` w `konfiguracja/llm.yaml`), a łączny budżet to `budzet_usd`. Gdy usługa AI nie odpowiada, aplikacja przez 5 minut pracuje bez AI, zamiast czekać. Trwające układanie przerwiesz przyciskiem **Przerwij** w oknie postępu; zamknięcie okna w trakcie liczenia też pyta o przerwanie.
+
 ## Gdy coś nie działa
 
-- **Nie widzisz nowych przycisków?** Zamknij wszystkie stare okna i uruchom Porcję z menu Start. Sprawdź wersję 0.3.0 w tytule okna i Ustawieniach.
+- **Nie widzisz nowych przycisków?** Zamknij wszystkie stare okna i uruchom Porcję z menu Start. Sprawdź wersję w tytule okna i Ustawieniach.
+- **„Brak dostępu do Porcji” w przeglądarce?** Od 0.5.0 aplikacja wymaga tokenu sesji, który dostaje tylko jej własne okno. Otwieraj Porcję ze skrótu albo menu Start.
 - **Puste okno?** Sprawdź obecność Microsoft Edge WebView2 Runtime i czy instalacja zawiera folder `_internal`.
 - **Plan ma uwagi?** Otwórz raport weryfikatora. Nie każda kombinacja zakazów, dań, limitów porcji i makro ma rozwiązanie.
 - **Brak AI?** Sprawdź klucz, dostępność usługi, środki i budżet. Podstawowe planowanie nie wymaga AI.

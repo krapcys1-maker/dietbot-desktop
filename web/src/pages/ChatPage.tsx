@@ -109,7 +109,7 @@ export default function ChatPage() {
                   ) : (
                     <>
                       <button className="btn primary small" onClick={() => confirm(m.data!.proposal_id!, true)}>
-                        Zatwierdź zmiany
+                        {m.data.kind === "potwierdz_akcje" ? "Tak, uruchom" : "Zatwierdź zmiany"}
                       </button>
                       <button className="btn small" onClick={() => confirm(m.data!.proposal_id!, false)}>
                         Odrzuć

@@ -30,7 +30,7 @@ from ..engine.settings import EngineSettings
 from ..food.matcher import MatchStatus, ProductMatcher
 from ..planner.pools import build_pools
 from ..textnorm import normalize
-from .client import LLMClient
+from .client import BudgetExceeded, LLMClient
 
 
 class GenIngredient(BaseModel):
@@ -61,7 +61,7 @@ class GenBatch(BaseModel):
 
 
 GEN_SYSTEM = """Jesteś doświadczonym kucharzem i dietetykiem. Tworzysz przepisy do polskiej aplikacji z jadłospisami
-dla dwóch osób mieszkających w Rumunii (zakupy w zwykłych sklepach, np. Lidl). Gramatury dokładne policzy program —
+dla domowników mieszkających w Rumunii (zakupy w zwykłych sklepach, np. Lidl). Gramatury dokładne policzy program —
 Ty podajesz TYPOWE porcje składników dla jednej osoby jedzącej 2000 kcal dziennie, jak w dobrej książce kucharskiej.
 
 Role składników:
@@ -611,6 +611,8 @@ def run_generation_plan(repo, client: LLMClient, plan=DEFAULT_PLAN, workers: int
     """
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
+    from .scope import in_context
+
     orders = [as_order(x) for x in plan]
     settings = EngineSettings()
     matcher = ProductMatcher(repo.products)
@@ -665,10 +667,12 @@ def run_generation_plan(repo, client: LLMClient, plan=DEFAULT_PLAN, workers: int
 
     def parallel(jobs, handle) -> None:
         with ThreadPoolExecutor(max_workers=max(1, workers)) as ex:
-            futures = {ex.submit(fn): key for key, fn in jobs}
+            futures = {ex.submit(in_context(fn)): key for key, fn in jobs}
             for fut in as_completed(futures):
                 try:
                     res = fut.result()
+                except BudgetExceeded:
+                    raise  # limit kosztu to nie „nieudana partia” — wynik nie może udawać, że dania odpadły w kontroli
                 except Exception as exc:  # pojedyncza partia nie może zatrzymać całości
                     log(f"partia nieudana: {exc}")
                     continue

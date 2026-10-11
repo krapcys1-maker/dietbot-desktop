@@ -28,6 +28,10 @@ def fmt_amount(product: Product, grams: float) -> str:
     return f"{g} g (≈ {hint})" if hint else f"{g} g"
 
 
+def _everyone(persons) -> str:
+    return "obie osoby" if len(persons) == 2 else "wszyscy domownicy" if len(persons) > 2 else "domownik"
+
+
 def _status_icon(ok: bool) -> str:
     return "✅" if ok else "⚠️"
 
@@ -149,7 +153,7 @@ def render_plan(plan: WeekPlan, a: Assumptions, products: Mapping[str, Product],
                                   for i in s.items)
                 lines.append(f"- **{person_names.get(s.person_id, s.person_id)}:** {items}. {s.reason or ''}")
             lines.append("")
-        lines += [f"_Stałe pozycje (obie osoby): {fixed}._", "", f"**Suma dnia — {DAY_LABELS_PL[day].lower()}**", ""]
+        lines += [f"_Stałe pozycje ({_everyone(persons)}): {fixed}._", "", f"**Suma dnia — {DAY_LABELS_PL[day].lower()}**", ""]
         mine = [summaries.get((int(day), p.id)) for p in persons]
         if all(s is not None for s in mine):
             lines += ["| Co | " + " | ".join(p.name for p in persons) + " |", "|---|" + "---:|" * len(persons)]
@@ -174,6 +178,15 @@ def render_plan(plan: WeekPlan, a: Assumptions, products: Mapping[str, Product],
             lines.append("| **Razem dzień** | " + " | ".join(
                 f"**{_macro_text(s.total)}** {_status_icon(s.ok)}" for s in mine) + " |")
             lines.append("| _Widełki_ | " + " | ".join(_bands_text(p) for p in persons) + " |")
+            extra = []
+            for p in persons:
+                t = totals.get((int(day), p.id))
+                if t is not None and t.kcal:
+                    extra.append(f"{p.name}: sól {fmt_num(t.salt)} g, kwasy nasycone "
+                                 f"{fmt_num(t.saturated_fat * 9 / t.kcal * 100)}% energii")
+            if extra:
+                lines += ["", "_" + "; ".join(extra) + " (zalecenia: sól poniżej 5 g, kwasy nasycone poniżej 10% "
+                          "energii)._"]
         else:  # plan liczony dla innych osób niż w założeniach — same sumy z weryfikatora
             lines += ["| Osoba | " + " | ".join(m[1] for m in METRICS) + " |", "|---|" + "---:|" * len(METRICS)]
             for person in persons:
@@ -255,7 +268,7 @@ def week_facts(plan: WeekPlan, a: Assumptions, dishes: Mapping[str, DishTemplate
         lines.append(f"- Gotowanie na zapas: {name} — {where(meals)}")
     lines.append(f"- Przekąski bilansujące: {len(plan.snacks)}")
     if egg and egg.measure("szt") and eggs > 0:  # to samo zaokrąglenie co w widoku aplikacji
-        lines.append(f"- Jajka w tygodniu (obie osoby): ok. {math.ceil(eggs / egg.measure('szt').grams - 0.05)} szt.")
+        lines.append(f"- Jajka w tygodniu ({_everyone(a.persons)}): ok. {math.ceil(eggs / egg.measure('szt').grams - 0.05)} szt.")
     lines.append("")
     return lines
 
@@ -277,6 +290,7 @@ def render_shopping_list(plan: WeekPlan, a: Assumptions, products: Mapping[str, 
                 lines.append("")
             lines += [f"## {row.group_label}", ""]
             current = row.group
-        lines.append(f"{'- ' if bullets else ''}{row.name} — {row.amount_text}")
+        variants = f" (w tym: {row.variants_text})" if row.variants_differ else ""
+        lines.append(f"{'- ' if bullets else ''}{row.name} — {row.amount_text}{variants}")
     lines.append("")
     return "\n".join(lines) + "\n"

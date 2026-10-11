@@ -5716,7 +5716,7 @@
   kuchnia: wloska
   tagi: [szybkie]
   skladniki:
-  - {produkt: tortellini_z_miesem, rola: weglowodany, porcjowanie: osobno, typowo_g: 150.0, opcjonalny: false, 
+  - {produkt: tortellini_z_miesem, rola: weglowodany, porcjowanie: osobno, typowo_g: 100.0, opcjonalny: false, 
       skaluje_sie: true}
   - {produkt: piers_z_kurczaka, rola: bialko, porcjowanie: osobno, typowo_g: 120.0, opcjonalny: false, skaluje_sie: true}
   - {produkt: pomidory_z_puszki, rola: sos, porcjowanie: z_garnka, typowo_g: 200.0, opcjonalny: false, skaluje_sie: true}

@@ -36,7 +36,7 @@ class InventionPlan(BaseModel):
     zamowienia: list[InventItem] = Field(min_length=1, max_length=8)
 
 
-INVENT_SYSTEM = """Jesteś szefem kuchni w polskiej aplikacji z jadłospisami dla dwóch osób. Domownicy proszą o NOWE dania.
+INVENT_SYSTEM = """Jesteś szefem kuchni w polskiej aplikacji z jadłospisami dla domowników. Domownicy proszą o NOWE dania.
 Zamień prośbę na listę zamówień dla kucharza: posiłek (sniadanie / obiad / kolacja), kuchnia, ile dań, szczegóły.
 Zasady:
 - Łącznie wszystkich dań najwyżej {max_total}.

@@ -6,6 +6,7 @@ export interface GoalEstimate {
   resting_kcal: number; maintenance_kcal: number; deficit_kcal: number; loss_kg: number;
   targets: PersonData["cele_dzienne"]; protein_anchor: PersonData["kotwica_bialka_na_posilek"];
   method: string; warnings: string[]; sources: { label: string; url: string }[];
+  sex?: "kobieta" | "mezczyzna";
 }
 
 export default function GoalCalculator({ meals, onApply }: { meals: number; onApply: (r: GoalEstimate) => void }) {

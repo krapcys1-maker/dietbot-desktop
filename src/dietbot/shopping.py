@@ -30,6 +30,7 @@ SHOPPING_FAMILIES = {
     "smietana": ("Śmietana", {"smietana_10", "smietana_20"}),
     "kefir": ("Kefir", {"kefir"}),
 }
+VARIANT_KCAL_SPREAD = 0.15
 SHOPPING_FAMILY_BY_PRODUCT = {pid: (key, name) for key, (name, ids) in SHOPPING_FAMILIES.items() for pid in ids}
 SHOPPING_NOTE = "Warianty produktów są połączone, ilości zsumowane. Bez przypraw, ziół i podpowiedzi sklepów."
 SHOPPING_NUTRITION_NOTE = (
@@ -56,6 +57,13 @@ class ShoppingRow:
     pack_text: str | None = None  # "2 × 180 g", "1 × 750 ml"
     takeaway: bool = False
     source_product_ids: tuple[str, ...] = ()
+    # połączone warianty (nazwa, gramy) i czy różnią się kalorycznością na tyle, że zakup ma znaczenie dla planu
+    variants: tuple[tuple[str, float], ...] = ()
+    variants_differ: bool = False
+
+    @property
+    def variants_text(self) -> str:
+        return ", ".join(f"{name.lower()} {fmt_num(math.ceil(g / 10) * 10, 0)} g" for name, g in self.variants)
 
     @property
     def group(self) -> str:
@@ -73,7 +81,9 @@ class ShoppingRow:
         return {"produkt": self.product_id, "nazwa": self.name, "kategoria": self.category.value,
                 "kategoria_nazwa": self.category_label, "gramy": round(self.grams, 1), "ilosc": self.amount_text,
                 "pomijalny": self.negligible, "sklep": store, "opakowania": self.packs, "opakowania_tekst": self.pack_text,
-                "na_wynos": self.takeaway, "produkty_zrodlowe": list(self.source_product_ids or (self.product_id,))}
+                "na_wynos": self.takeaway, "produkty_zrodlowe": list(self.source_product_ids or (self.product_id,)),
+                "warianty": [{"nazwa": n, "gramy": round(g, 1)} for n, g in self.variants],
+                "warianty_rozne": self.variants_differ}
 
 
 def totals_grams(plan: WeekPlan, a: Assumptions) -> dict[str, float]:
@@ -92,9 +102,10 @@ def totals_grams(plan: WeekPlan, a: Assumptions) -> dict[str, float]:
 
 
 def _volume_text(ml: float) -> str:
-    if ml >= 995:  # 999 ml zaokrąglone w górę to litr, nie „1000 ml”
-        return f"{fmt_num(math.ceil(ml / 100) / 10, 1)} l"
-    return f"{fmt_num(max(math.ceil(ml / 10) * 10, 10), 0)} ml"
+    rounded = max(math.ceil(round(ml, 6) / 10) * 10, 10)
+    if rounded >= 1000:  # 991 ml zaokrąglone w górę to litr, nie „1000 ml” (audyt N15)
+        return f"{fmt_num(math.ceil(round(ml, 6) / 100) / 10, 1)} l"
+    return f"{fmt_num(rounded, 0)} ml"
 
 
 def _preferred(store_products: Sequence[StoreProduct], product_id: str) -> StoreProduct | None:
@@ -173,8 +184,16 @@ def build_shopping_list(plan: WeekPlan, a: Assumptions, products: Mapping[str, P
                 amount = _volume_text(math.fsum(row.grams / products[row.product_id].density_g_per_ml for row in members))
             else:
                 amount = f"{fmt_num(math.ceil(round(grams / 10, 9)) * 10, 0)} g"
+        variants: tuple[tuple[str, float], ...] = ()
+        differ = False
+        if family and len(members) > 1:
+            variants = tuple((products[r.product_id].name, r.grams) for r in sorted(members, key=lambda r: -r.grams))
+            kcal = [products[r.product_id].per_100g.kcal for r in members]
+            # np. jogurt naturalny 62 kcal i owocowy 96 kcal: kupno samego naturalnego zmienia plan (audyt S14)
+            differ = max(kcal) > 0 and (max(kcal) - min(kcal)) / max(kcal) > VARIANT_KCAL_SPREAD
         rows.append(replace(first, product_id=key, name=family[1] if family else first.name,
                             grams=grams, amount_text=amount, store=None, packs=None, pack_text=None,
-                            source_product_ids=tuple(sorted(row.product_id for row in members))))
+                            source_product_ids=tuple(sorted(row.product_id for row in members)),
+                            variants=variants, variants_differ=differ))
     order = {c: i for i, c in enumerate(Category)}
     return sorted(rows, key=lambda row: (row.takeaway, order[row.category], normalize(row.name)))

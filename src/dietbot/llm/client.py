@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import threading
 import time
@@ -18,6 +19,12 @@ from pydantic import BaseModel, Field, ValidationError
 
 from ..storage.paths import Paths
 from ..storage.yamlio import load_yaml, to_plain
+from .scope import BREAKER_COOLDOWN_S, breaker_reason, check_cancelled, current, open_breaker
+
+# Ostrożny cennik, gdy w llm.yaml zmieniono model, a ceny dotyczą innego (nie zaniżamy kosztów nieznanego modelu).
+FALLBACK_PRICES = {"wejscie": 5.0, "wejscie_z_cache": 5.0, "wyjscie": 20.0}
+DEFAULT_TASK_LIMIT_USD = 0.5  # jedno polecenie (plan, wymyślanie dań, wiadomość) nie wyda więcej
+RETRY_PAUSE_S = 2.0
 
 
 class LLMError(RuntimeError):
@@ -29,9 +36,9 @@ class BudgetExceeded(LLMError):
 
 
 class Prices(BaseModel):
-    input: float = Field(alias="wejscie")
-    input_cached: float = Field(alias="wejscie_z_cache")
-    output: float = Field(alias="wyjscie")
+    input: float = Field(alias="wejscie", ge=0)
+    input_cached: float = Field(alias="wejscie_z_cache", ge=0)
+    output: float = Field(alias="wyjscie", ge=0)
 
 
 class LLMSettings(BaseModel):
@@ -43,13 +50,22 @@ class LLMSettings(BaseModel):
     max_tokens: int = Field(default=6000, alias="max_tokenow_odpowiedzi")
     timeout_s: float = Field(default=180, alias="limit_czasu_s")
     attempts: int = Field(default=3, alias="proby")
-    budget_usd: float = Field(alias="budzet_usd")
+    budget_usd: float = Field(alias="budzet_usd", ge=0)
+    task_limit_usd: float = Field(default=DEFAULT_TASK_LIMIT_USD, alias="limit_na_polecenie_usd", gt=0)
     prices: Prices = Field(alias="ceny_usd_za_milion_tokenow")
+    prices_model: str | None = Field(default=None, alias="ceny_dla_modelu")  # brak = ceny są dla `model`
 
     @classmethod
     def load(cls, paths: Paths | None = None) -> LLMSettings:
         paths = paths or Paths.discover()
         return cls.model_validate(to_plain(load_yaml(paths.config / "llm.yaml")))
+
+    @property
+    def prices_match(self) -> bool:
+        return self.prices_model is None or self.prices_model == self.model
+
+    def effective_prices(self) -> Prices:
+        return self.prices if self.prices_match else Prices.model_validate(FALLBACK_PRICES)
 
 
 def load_dotenv_file(paths: Paths) -> None:
@@ -75,13 +91,14 @@ def save_dotenv_value(paths: Paths, key: str, value: str | None) -> None:
     """Zapisuje albo usuwa pojedynczą wartość `.env`, zachowując pozostałe ustawienia."""
     env = paths.root / ".env"
     lines = env.read_text(encoding="utf-8-sig").splitlines() if env.exists() else []
-    prefix = key + "="
     replacement = f"{key}={value}" if value is not None else None
     output: list[str] = []
     replaced = False
     for line in lines:
         stripped = line.strip().removeprefix("export ").lstrip()
-        if stripped.startswith(prefix):
+        # nazwa porównywana jak przy odczycie (spacje przy „=”) — inaczej „Usuń klucz” zostawiał ręcznie wpisaną linię
+        # i stary klucz wracał po restarcie (audyt N3)
+        if "=" in stripped and stripped.split("=", 1)[0].strip() == key:
             if replacement is not None and not replaced:
                 output.append(replacement)
                 replaced = True
@@ -93,43 +110,86 @@ def save_dotenv_value(paths: Paths, key: str, value: str | None) -> None:
         output.append(replacement)
     text = "\n".join(output).rstrip() + ("\n" if output else "")
     env.parent.mkdir(parents=True, exist_ok=True)
-    temporary = env.with_name(".env.tmp")
-    temporary.write_text(text, encoding="utf-8")
-    temporary.replace(env)
+    import tempfile
+
+    fd, tmp = tempfile.mkstemp(prefix=".env.", suffix=".tmp", dir=env.parent)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as f:
+            f.write(text)
+            f.flush()
+            os.fsync(f.fileno())
+        if os.name != "nt":
+            os.chmod(tmp, 0o600)  # klucz tylko dla właściciela
+        os.replace(tmp, env)
+    except BaseException:
+        if os.path.exists(tmp):
+            os.remove(tmp)
+        raise
+
+
+_LEDGER_LOCKS: dict[str, threading.Lock] = {}
+_LEDGER_RESERVED: dict[str, float] = {}
+_LEDGER_GUARD = threading.Lock()
+
+
+def _entry_cost(raw: str) -> float:
+    """Koszt z linii rejestru; linia uszkodzona (NaN, null, tekst, ujemna liczba) nie wyłącza limitu."""
+    try:
+        value = float(json.loads(raw).get("koszt_usd", 0.0) or 0.0)
+    except (ValueError, TypeError, AttributeError, json.JSONDecodeError, RecursionError):
+        return 0.0
+    return value if math.isfinite(value) and value > 0 else 0.0
 
 
 class CostLedger:
-    """Rejestr kosztów w JSONL — przeżywa restart aplikacji, więc limit budżetu jest globalny."""
+    """Rejestr kosztów w JSONL — przeżywa restart aplikacji, więc limit budżetu jest globalny.
+
+    Przed każdym wywołaniem rezerwujemy szacowany koszt pod blokadą wspólną dla wszystkich wątków procesu, a po
+    odpowiedzi zastępujemy go kosztem faktycznym — równoległe wywołania generatora nie przekroczą budżetu."""
 
     def __init__(self, path: Path, settings: LLMSettings):
         self.path = path
         self.settings = settings
-        self._lock = threading.Lock()
+        key = str(path.resolve())
+        with _LEDGER_GUARD:
+            self._lock = _LEDGER_LOCKS.setdefault(key, threading.Lock())
+            _LEDGER_RESERVED.setdefault(key, 0.0)
+        self._key = key
 
     def spent_usd(self) -> float:
         if not self.path.exists():
             return 0.0
-        total = 0.0
-        for line in self.path.read_text(encoding="utf-8").splitlines():
-            try:
-                total += float(json.loads(line).get("koszt_usd", 0.0))
-            except (ValueError, json.JSONDecodeError):
-                continue
-        return total
+        return sum(_entry_cost(line) for line in self.path.read_text(encoding="utf-8").splitlines())
 
     def cost(self, prompt_tokens: int, cached_tokens: int, completion_tokens: int) -> float:
-        p = self.settings.prices
+        p = self.settings.effective_prices()
         miss = max(prompt_tokens - cached_tokens, 0)
         return (miss * p.input + cached_tokens * p.input_cached + completion_tokens * p.output) / 1_000_000
 
+    def estimate(self, prompt_chars: int, max_tokens: int) -> float:
+        """Górny szacunek kosztu wywołania (ok. 3 znaki na token wejścia, pełna długość odpowiedzi)."""
+        return self.cost(prompt_chars // 3 + 1, 0, max_tokens)
+
+    def reserve(self, estimate: float) -> None:
+        with self._lock:
+            spent = self.spent_usd()
+            reserved = _LEDGER_RESERVED[self._key]
+            if spent + reserved + estimate > self.settings.budget_usd:
+                raise BudgetExceeded(
+                    f"Budżet AI {self.settings.budget_usd:.2f} $ zostałby przekroczony (wydano {spent:.4f} $, "
+                    f"w toku {reserved:.4f} $, to wywołanie do {estimate:.4f} $). Zwiększ budżet w konfiguracji "
+                    "albo korzystaj z aplikacji bez AI.")
+            _LEDGER_RESERVED[self._key] = reserved + estimate
+
+    def release(self, estimate: float) -> None:
+        with self._lock:
+            _LEDGER_RESERVED[self._key] = max(_LEDGER_RESERVED[self._key] - estimate, 0.0)
+
     def ensure_budget(self, prompt_chars: int, max_tokens: int) -> None:
-        estimate = self.cost(prompt_chars // 3 + 1, 0, max_tokens)
-        spent = self.spent_usd()
-        if spent + estimate > self.settings.budget_usd:
-            raise BudgetExceeded(
-                f"Budżet LLM {self.settings.budget_usd:.2f} $ zostałby przekroczony "
-                f"(wydano {spent:.4f} $, to wywołanie do {estimate:.4f} $)."
-            )
+        """Sprawdzenie bez rezerwacji (dla zgodności ze starszym kodem)."""
+        estimate = self.estimate(prompt_chars, max_tokens)
+        self.reserve(estimate)
+        self.release(estimate)
 
     def record(self, **entry) -> None:
         entry = {"czas": datetime.now(UTC).isoformat(timespec="seconds"), **entry}
@@ -164,8 +224,30 @@ class LLMClient:
             raise LLMError(f"Brak klucza API: ustaw {self.settings.api_key_env} w pliku .env")
         from openai import OpenAI
 
+        # ponowienia robimy sami (z rozróżnieniem błędów) — SDK nie ponawia, żeby jedno wywołanie nie stało się
+        # dziewięcioma żądaniami po kilka minut każde (audyt 09.10.2026, W5)
         self._client = OpenAI(api_key=key, base_url=self.settings.base_url, timeout=self.settings.timeout_s,
-                              max_retries=2)
+                              max_retries=0)
+
+    def _guard(self, task: str, estimate: float) -> None:
+        """Przed wywołaniem: przerwanie zadania, bezpiecznik awarii, limit na polecenie i rezerwacja budżetu."""
+        check_cancelled()
+        reason = breaker_reason()
+        if reason:
+            raise LLMError(f"Model językowy jest chwilowo niedostępny ({reason}) — pomijam AI w tym kroku.")
+        scope = current()
+        if scope is not None:
+            limit = scope.limit_usd if scope.limit_usd is not None else self.settings.task_limit_usd
+            if scope.spent_usd + estimate > limit:
+                raise BudgetExceeded(
+                    f"Limit kosztu jednego polecenia {limit:.2f} $ zostałby przekroczony "
+                    f"(wydano w tym poleceniu {scope.spent_usd:.4f} $) — kończę bez dalszych wywołań AI.")
+        self.ledger.reserve(estimate)
+
+    def _charge(self, usd: float) -> None:
+        scope = current()
+        if scope is not None:
+            scope.add_cost(usd)
 
     def complete_json[T: BaseModel](self, task: str, system: str, user: str, schema: type[T], *,
                                    temperature: float | None = None, max_tokens: int | None = None) -> LLMResult[T]:
@@ -181,27 +263,52 @@ class LLMClient:
         prompt_tok = completion_tok = 0
         t0 = time.perf_counter()
         last_error = ""
-        for attempt in range(1, s.attempts + 1):
-            self.ledger.ensure_budget(sum(len(m["content"]) for m in messages), max_tokens)
+        transient_retry_used = False
+        attempt = 0
+        while attempt < s.attempts:
+            attempt += 1
+            prompt_chars = sum(len(m["content"]) for m in messages)
+            estimate = self.ledger.estimate(prompt_chars, max_tokens)
+            self._guard(task, estimate)
             try:
                 resp = self._client.chat.completions.create(
                     model=s.model, messages=messages, response_format={"type": "json_object"},
                     temperature=s.temperature if temperature is None else temperature, max_tokens=max_tokens,
                     extra_body=extra_body,
                 )
-            except Exception as exc:  # sieć, 429, 5xx — SDK już ponawiał; zapisujemy i próbujemy dalej
+            except Exception as exc:  # noqa: BLE001 — każdy błąd wywołania kończy się zapisem w rejestrze
+                self.ledger.release(estimate)
+                kind, status = _classify(exc)
                 last_error = f"{type(exc).__name__}: {exc}"
+                # dostawca mógł naliczyć tokeny wejścia także przy przekroczonym czasie — liczymy je ostrożnie
+                charged = self.ledger.cost(prompt_chars // 3 + 1, 0, 0) if kind == "czas" else 0.0
+                total_cost += charged
+                self._charge(charged)
                 self.ledger.record(zadanie=task, model=s.model, proba=attempt, ok=False, blad=last_error[:300],
-                                   koszt_usd=0.0)
-                continue
+                                   koszt_usd=charged, szacunek=kind == "czas")
+                if kind in ("czas", "polaczenie"):
+                    open_breaker("przekroczony czas odpowiedzi" if kind == "czas" else "brak połączenia z API")
+                    raise LLMError(f"Model językowy nie odpowiada ({last_error[:160]}). Przez "
+                                   f"{BREAKER_COOLDOWN_S / 60:.0f} min aplikacja pracuje bez AI.") from None
+                if kind == "chwilowy" and not transient_retry_used:
+                    transient_retry_used = True  # 429 / 5xx: jedna ponowna próba po krótkiej przerwie
+                    attempt -= 1
+                    check_cancelled()
+                    time.sleep(RETRY_PAUSE_S)
+                    continue
+                raise LLMError(_status_message(status, last_error)) from None
+            self.ledger.release(estimate)
             usage = resp.usage
             p_tok = usage.prompt_tokens if usage else 0
             c_tok = usage.completion_tokens if usage else 0
             cached = 0
             if usage and usage.prompt_tokens_details and usage.prompt_tokens_details.cached_tokens:
                 cached = usage.prompt_tokens_details.cached_tokens
+            if usage is None:  # brak danych o zużyciu — liczymy górny szacunek zamiast zera
+                p_tok, c_tok = prompt_chars // 3 + 1, max_tokens
             cost = self.ledger.cost(p_tok, cached, c_tok)
             total_cost += cost
+            self._charge(cost)
             prompt_tok += p_tok
             completion_tok += c_tok
             content = (resp.choices[0].message.content or "").strip() if resp.choices else ""
@@ -210,7 +317,7 @@ class LLMClient:
                 if not content:
                     raise ValueError("pusta odpowiedź modelu")
                 value = schema.model_validate(json.loads(content))
-            except (json.JSONDecodeError, ValidationError, ValueError) as exc:
+            except (json.JSONDecodeError, ValidationError, ValueError, RecursionError) as exc:
                 last_error = str(exc)[:1500]
                 self.ledger.record(zadanie=task, model=s.model, proba=attempt, ok=False, blad=last_error[:300],
                                    tokeny_wejscie=p_tok, tokeny_cache=cached, tokeny_wyjscie=c_tok, koszt_usd=cost,
@@ -230,3 +337,31 @@ class LLMClient:
             return LLMResult(value=value, attempts=attempt, cost_usd=total_cost, prompt_tokens=prompt_tok,
                              completion_tokens=completion_tok, seconds=time.perf_counter() - t0)
         raise LLMError(f"Model nie zwrócił poprawnej odpowiedzi po {s.attempts} próbach ({task}): {last_error}")
+
+
+def _classify(exc: Exception) -> tuple[str, int | None]:
+    """Rodzaj błędu wywołania: czas | polaczenie | chwilowy (429, 5xx) | trwaly (pozostałe 4xx i reszta)."""
+    try:
+        import openai
+    except ImportError:  # pragma: no cover
+        return "trwaly", None
+    if isinstance(exc, openai.APITimeoutError):
+        return "czas", None
+    if isinstance(exc, openai.APIConnectionError):
+        return "polaczenie", None
+    if isinstance(exc, openai.APIStatusError):
+        code = exc.status_code
+        return ("chwilowy" if code == 429 or code >= 500 else "trwaly"), code
+    return "trwaly", None
+
+
+def _status_message(status: int | None, detail: str) -> str:
+    if status == 401:
+        return "Klucz API został odrzucony (401) — sprawdź klucz w Ustawieniach."
+    if status == 402:
+        return "Brak środków na koncie dostawcy AI (402) — doładuj konto albo korzystaj bez AI."
+    if status == 429:
+        return "Dostawca AI ogranicza liczbę zapytań (429) — spróbuj za chwilę."
+    if status is not None and status >= 500:
+        return f"Usługa AI ma chwilowy problem ({status}) — spróbuj później."
+    return f"Wywołanie modelu nie powiodło się: {detail[:300]}"
