@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/krapcys1-maker/dietbot-desktop/releases/download/v0.5.0/Porcja-Setup-0.5.0.exe"><b>Pobierz Porcję 0.5.0 dla Windows</b></a>
+  <a href="https://github.com/krapcys1-maker/dietbot-desktop/releases/download/v0.5.1/Porcja-Setup-0.5.1.exe"><b>Pobierz Porcję 0.5.1 dla Windows</b></a>
   · <a href="docs/INSTRUKCJA.md">Instrukcja</a>
   · <a href="CHANGELOG.md">Co nowego</a>
   · <a href="https://github.com/krapcys1-maker/dietbot-desktop/issues">Zgłoś problem</a>
@@ -65,7 +65,7 @@
 
 ## Od instalacji do pierwszego tygodnia
 
-1. Pobierz **Porcja-Setup-0.5.0.exe** z [najnowszego wydania](https://github.com/krapcys1-maker/dietbot-desktop/releases/latest), uruchom instalator i otwórz **Porcję** z menu Start.
+1. Pobierz **Porcja-Setup-0.5.1.exe** z [najnowszego wydania](https://github.com/krapcys1-maker/dietbot-desktop/releases/latest), uruchom instalator i otwórz **Porcję** z menu Start.
 2. W **Cele i preferencje** sprawdź osoby, cele oraz rodzaj diety. Domyślne ustawienia są przykładem, nie indywidualnym zaleceniem.
 3. W **Nowy plan** wybierz tydzień i kliknij **Ułóż mój plan** — zwykle 20–60 sekund, bez klucza AI.
 4. Otwórz **Plan tygodnia**: przejrzyj posiłki, porcje i ewentualne uwagi. Danie możesz zamienić albo ocenić.

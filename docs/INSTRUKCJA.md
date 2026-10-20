@@ -72,7 +72,7 @@ W **Dopasuj do siebie → Notatnik preferencji** napisz uwagę zwykłym językie
 |---|---|
 | **Zakaz produktu** | Produkt (albo cała kategoria) nie trafia do nowych planów; dania, w których jest obowiązkowy, odpadają. |
 | **Limit porcji** | Największa porcja produktu lub kategorii na posiłek, osobno dla każdej osoby (np. ryż suchy 65 g i 105 g na obiad). Silnik nie przekroczy limitu, a weryfikator to sprawdza. |
-| **Mniej węglowodanów, więcej białka** | Przesuwa widełki dzienne bez zmiany kalorii: dolna granica węglowodanów w dół, górna granica białka w górę. Silnik ma więcej swobody i chętniej dokłada mięsa niż ryżu. |
+| **Mniej węglowodanów, więcej białka** | Przesuwa cele dzienne bez zmiany kalorii: cel węglowodanów w dół, a cel białka w górę o całą podaną ilość; widełki są przy tym trochę szersze. Od 0.5.1 cel przesuwa się o pełną ilość (wcześniej o połowę, więc z „+25 g białka” wychodziło ok. +5 g). |
 | **Wskazówka** | Miękka preferencja dla układającego tydzień (np. „mniej dań z jajkami na kolację”). |
 
 Liczby w zasadach pochodzą z Twojej uwagi. Gdy ich nie podasz, liczy je program, np. limit „mniej niż dotąd” na podstawie ostatnich planów. Model językowy tylko rozpoznaje treść uwagi. Bez klucza AI uwaga zapisze się jako notatka, a zasadę dodasz ręcznie w **Dodaj zasadę ręcznie**.
@@ -95,9 +95,13 @@ Baza została rozszerzona o 34 autorskie przepisy roślinne w 0.2.0 (26 wegańsk
 
 Pieczywo i główne nadzienie kanapek są powiązane. Zamknięte tosty z chleba tostowego mają parzystą liczbę kromek i minimum 20 g sera na 50 g pieczywa. Masy wymagające przepisu — np. ciasto naleśnikowe, farsz czy panierka — są skalowane razem, z kontrolą udziałów składników. Silnik nie może złamać tych reguł tylko dlatego, że poprawiłoby to wynik kcal.
 
+**Sos rośnie razem z daniem (od 20.10.2026).** Sos — np. mleczko kokosowe, śmietana, passata, pomidory z puszki, bulion albo jogurt w daniu „z sosem” — nie może być mniejszy niż 85% proporcji przepisu względem ryżu, makaronu, kaszy czy ziemniaków i 80% względem mięsa, ryby, tofu czy strączków. Danie może być w całości mniejsze albo większe, ale silnik nie dopełnia już kalorii samym ryżem ani białka samym tofu kosztem sosu. Zupy i pieczywo podawane obok dania nie są objęte tą regułą. Najwyżej 3 jajka na osobę w jednym posiłku.
+
 W eksporcie znajdziesz **łączną ilość składników masy dla wszystkich osób**. Roztrzep jajko i odważ podaną ilość do wspólnego ciasta; porcje w tabeli opisują podział, nie osobne mieszanie ciasta na każdy talerz. Składniki i miary domowe nadal są przybliżeniem konkretnego produktu.
 
 Zapisana wcześniej dieta nie zmienia się sama. W **Plan tygodnia → Przelicz i napraw** utworzysz nową wersję według aktualnych przepisów. Oryginał pozostaje w historii. Jeśli nowych warunków nie da się spełnić, aplikacja powinna zmienić danie lub pokazać uwagi — nie usuwać potrzebnego sera albo mąki.
+
+**Proporcje jednego dania z czatu (od 20.10.2026).** Napisz w czacie, czego jest za dużo albo za mało, np. „w curry z tofu za mało mleczka, a za dużo tofu i ciecierzycy”, „cztery jajka na miękko na śniadanie to za dużo”, „dla żony za mało kurczaka w poniedziałkowej kolacji”. Danie zostaje, a silnik przelicza tylko te dni: składnika „za dużo” będzie najwyżej 80% tego, co było na talerzu, „za mało” — co najmniej 125%. Nowa wersja planu powstaje tylko wtedy, gdy dni nadal mieszczą się w celach, a weryfikator nie ma zastrzeżeń; inaczej plan zostaje bez zmian, a czat mówi dlaczego. Taka poprawka nie kosztuje nic w AI (poza samym zrozumieniem wiadomości) i obowiązuje też, gdy później zamienisz inne danie tego dnia; **Przelicz** liczy plan od nowa według przepisów. Prośba „zweryfikuj ten plan pod kątem gramatur” pokazuje talerze, w których składnik odbiega od przepisu o ponad połowę, i dania, które mogą wyjść suche — a uwagi dopisane do takiej prośby czat proponuje poprawić po Twoim zatwierdzeniu. Trwałe upodobania („zawsze mniej ryżu”) zapisuj w notatniku preferencji.
 
 ## Kalkulator celów
 

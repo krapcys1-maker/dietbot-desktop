@@ -510,9 +510,9 @@
       {
         "produkt": "tofu",
         "rola": "bialko",
-        "typowo_g": 180,
-        "min_g": 120,
-        "max_g": 280
+        "typowo_g": 130,
+        "min_g": 90,
+        "max_g": 200
       },
       {
         "produkt": "ciecierzyca_konserwowa",
@@ -531,23 +531,23 @@
       {
         "produkt": "pomidory_z_puszki",
         "rola": "warzywa",
-        "typowo_g": 120,
-        "min_g": 72,
-        "max_g": 180
+        "typowo_g": 150,
+        "min_g": 90,
+        "max_g": 220
       },
       {
         "produkt": "mleczko_kokosowe",
         "rola": "sos",
-        "typowo_g": 35,
-        "min_g": 15,
-        "max_g": 60
+        "typowo_g": 90,
+        "min_g": 60,
+        "max_g": 130
       },
       {
         "produkt": "oliwa_z_oliwek",
         "rola": "tluszcz",
-        "typowo_g": 10,
+        "typowo_g": 5,
         "min_g": 3,
-        "max_g": 20
+        "max_g": 12
       },
       {
         "produkt": "curry_przyprawa",
@@ -654,9 +654,9 @@
       {
         "produkt": "tofu",
         "rola": "bialko",
-        "typowo_g": 180,
-        "min_g": 120,
-        "max_g": 280
+        "typowo_g": 120,
+        "min_g": 80,
+        "max_g": 180
       },
       {
         "produkt": "fasola_czerwona_konserwowa",
@@ -675,16 +675,16 @@
       {
         "produkt": "pomidory_z_puszki",
         "rola": "warzywa",
-        "typowo_g": 100,
-        "min_g": 60,
-        "max_g": 150
+        "typowo_g": 200,
+        "min_g": 140,
+        "max_g": 300
       },
       {
         "produkt": "papryka_czerwona",
         "rola": "warzywa",
-        "typowo_g": 60,
-        "min_g": 36,
-        "max_g": 90
+        "typowo_g": 80,
+        "min_g": 50,
+        "max_g": 120
       },
       {
         "produkt": "oliwa_z_oliwek",

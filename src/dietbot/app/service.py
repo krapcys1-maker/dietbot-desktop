@@ -7,7 +7,7 @@ import random
 import re
 import threading
 from collections.abc import Callable
-from dataclasses import replace
+from dataclasses import dataclass, field, replace
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
@@ -18,11 +18,11 @@ from .. import __version__
 from ..checker.verify import verify_plan
 from ..domain.assumptions import DAY_LABELS_PL, Assumptions, Weekday
 from ..domain.diet import compatible, dish_compatible
-from ..domain.dish import MEAL_LABELS_PL, DishStatus, MealType, cuisine_label
-from ..domain.plan import WeekPlan
+from ..domain.dish import MEAL_LABELS_PL, DishStatus, DishTemplate, MealType, cuisine_label
+from ..domain.plan import PlannedMeal, WeekPlan
 from ..domain.preferences import AppliedPreferences
 from ..domain.product import CATEGORY_LABELS_PL, Category, Product, State, StoreProduct
-from ..engine import BlockStatus, EngineRequest, solve_week
+from ..engine import BlockStatus, EngineRequest, EngineResult, solve_week
 from ..engine.settings import EngineSettings
 from ..food.matcher import ProductMatcher
 from ..llm.client import CostLedger, LLMClient, LLMError, LLMSettings, load_dotenv_file, save_dotenv_value
@@ -31,6 +31,16 @@ from ..llm.scope import current as current_scope
 from ..planner.compose import Composition, SlotPlan, validate_composition
 from ..planner.pipeline import LiveLog, WeekPlanner
 from ..planner.pools import Pools, build_pools
+from ..planner.portion_review import (
+    apply_corrections,
+    correction_entry,
+    grams_in_slot,
+    merge_corrections,
+    plate_reference,
+    slot_key,
+    slot_label,
+    tighten,
+)
 from ..planner.repair import apply_swaps
 from ..report.markdown import render_plan, render_shopping_list
 from ..report.text import markdown_to_text
@@ -38,7 +48,7 @@ from ..shopping import build_shopping_list
 from ..storage.paths import Paths
 from ..storage.repository import Repository, check_consistency
 from ..storage.yamlio import dump_yaml, load_yaml, to_plain
-from ..textfmt import plural_pl
+from ..textfmt import fmt_num, plural_pl
 from ..textnorm import normalize
 from .jobs import Job, JobManager, NotFound, UserError
 from .snapshots import capture, matches_current, restore
@@ -143,6 +153,36 @@ def composition_extras(composition: dict | None) -> dict:
     """Wykluczone produkty i liczby kuchni z życzeń zapisane przy planie (puste dla starszych planów)."""
     src = composition or {}
     return {k: src[k] for k in COMPOSITION_EXTRAS if k in src}
+
+
+@dataclass
+class PortionChanges:
+    """Poprawki proporcji gotowe do przeliczenia: zawężone dania i poprawki, których nie da się zrobić."""
+    base: Repository  # dane, według których liczymy (obecne albo kopia zapisana przy planie)
+    current: bool  # czy plan był liczony według obecnych danych
+    stored: list[dict]  # korekty zapisane wcześniej przy planie
+    dishes: dict[str, DishTemplate] = field(default_factory=dict)
+    applied: list[dict] = field(default_factory=list)
+    skipped: list[str] = field(default_factory=list)
+
+    def describe(self, products: dict[str, Product]) -> str:
+        parts = []
+        for key in dict.fromkeys(f["slot"] for f in self.applied):
+            fixes = [f for f in self.applied if f["slot"] == key]
+            sides = [f"{label}: " + ", ".join(products[f["produkt"]].name.lower() for f in fixes if f["kierunek"] == d)
+                     for d, label in (("za_duzo", "mniej"), ("za_malo", "więcej"))
+                     if any(f["kierunek"] == d for f in fixes)]
+            parts.append(f"{slot_label(key)} — " + "; ".join(sides))
+        return " | ".join(parts)
+
+
+def _moved(before: WeekPlan, after: WeekPlan, fix: dict) -> bool:
+    """Czy składnik zmienił się we wskazaną stronę (u wskazanej osoby albo łącznie)."""
+    b = grams_in_slot(before, fix["slot"], fix["produkt"])
+    a = grams_in_slot(after, fix["slot"], fix["produkt"])
+    persons = [fix["osoba"]] if fix.get("osoba") in b else list(b)
+    delta = sum(a.get(p, 0.0) - b.get(p, 0.0) for p in persons)
+    return delta < -0.5 if fix["kierunek"] == "za_duzo" else delta > 0.5
 
 
 class DietService:
@@ -618,45 +658,66 @@ class DietService:
                 "current": {"id": slot.dish_id, "name": current.name if current else slot.dish_id},
                 "options": options}
 
-    def _resolve_block(self, rec: PlanRecord, comp: Composition, slot: SlotPlan,
-                       progress: Callable[[str], None]) -> tuple[WeekPlan, object, BlockStatus]:
-        """Przelicza tylko dni powiązane ze zmienionym posiłkiem — reszta tygodnia zostaje co do grama."""
-        repo = self.repo.for_planning(composition_extras(rec.composition).get("wykluczone_produkty", []))
-        block_days = {int(d) for d in slot.days}
+    @staticmethod
+    def _block_days(comp: Composition, days) -> set[int]:
+        """Wskazane dni razem z dniami połączonymi z nimi daniami na zapas (jeden blok silnika)."""
+        block_days = {int(d) for d in days}
         changed = True
-        while changed:  # dni połączone daniami na zapas tworzą jeden blok
+        while changed:
             changed = False
             for s in comp.slots:
                 ds = {int(d) for d in s.days}
                 if ds & block_days and not ds <= block_days:
                     block_days |= ds
                     changed = True
+        return block_days
+
+    def _solve_days(self, plan: WeekPlan, comp: Composition, block_days: set[int], repo: Repository,
+                    dishes: dict[str, DishTemplate], progress: Callable[[str], None]) -> tuple[WeekPlan, EngineResult]:
+        """Przelicza tylko `block_days` — reszta tygodnia zostaje co do grama."""
         block = [s for s in comp.slots if {int(d) for d in s.days} & block_days]
         req = EngineRequest.model_validate({"slots": [{"days": [int(d) for d in s.days], "meal": s.meal.value,
                                                        "candidates": [s.dish_id]} for s in block]})
-        dishes = {**repo.approved_dishes(), **{s.dish_id: repo.dishes[s.dish_id] for s in comp.slots
-                                               if s.dish_id in repo.dishes}}
         progress("Silnik liczy gramatury: " + ", ".join(DAY_LABELS_PL[Weekday(d)].lower() for d in sorted(block_days)))
         settings = self.settings.model_copy(update={"liked_dishes": {d for d, r in repo.dish_ratings.items() if r > 0}})
         res = solve_week(req, repo.assumptions, repo.products, dishes, settings, cache=self.engine_cache)
         if res.plan is None:
             msgs = [b.message for b in res.blocks if b.message]
             raise UserError("Silnik nie znalazł rozwiązania dla tego dnia. " + "; ".join(msgs[:2]))
-        plan = rec.plan.model_copy(deep=True)
+        new = plan.model_copy(deep=True)
         order = {m: i for i, m in enumerate(repo.assumptions.day.meals)}
         person_order = {p.id: i for i, p in enumerate(repo.assumptions.persons)}
-        plan.meals = sorted([m for m in plan.meals if int(m.day) not in block_days] + res.plan.meals,
-                            key=lambda m: (int(m.day), order.get(m.meal, 9)))
-        plan.snacks = sorted([s for s in plan.snacks if int(s.day) not in block_days] + res.plan.snacks,
-                             key=lambda s: (int(s.day), person_order.get(s.person_id, 9)))
-        plan.created_at, plan.engine, plan.input_hash = res.plan.created_at, res.plan.engine, None
-        plan.comment = rec.plan.comment
+        new.meals = sorted([m for m in new.meals if int(m.day) not in block_days] + res.plan.meals,
+                           key=lambda m: (int(m.day), order.get(m.meal, 9)))
+        new.snacks = sorted([s for s in new.snacks if int(s.day) not in block_days] + res.plan.snacks,
+                            key=lambda s: (int(s.day), person_order.get(s.person_id, 9)))
+        new.created_at, new.engine, new.input_hash = res.plan.created_at, res.plan.engine, None
+        new.comment = plan.comment
+        return new, res
+
+    def _resolve_block(self, rec: PlanRecord, comp: Composition, slot: SlotPlan,
+                       progress: Callable[[str], None]) -> tuple[WeekPlan, object, BlockStatus, list[dict]]:
+        """Przelicza tylko dni powiązane ze zmienionym posiłkiem — reszta tygodnia zostaje co do grama.
+        Zwraca też korekty proporcji z czatu, które nadal obowiązują w nowej wersji."""
+        repo = self.repo.for_planning(composition_extras(rec.composition).get("wykluczone_produkty", []))
+        block_days = self._block_days(comp, slot.days)
+        dishes = {**repo.approved_dishes(), **{s.dish_id: repo.dishes[s.dish_id] for s in comp.slots
+                                               if s.dish_id in repo.dishes}}
+        corrections = merge_corrections((rec.composition or {}).get("korekty_porcji", []), [],
+                                        {s.dish_id for s in comp.slots})
+        in_block = {s.dish_id for s in comp.slots if {int(d) for d in s.days} & block_days}
+        corrected = {k: d for k, d in apply_corrections(dishes, corrections).items() if k in in_block}
+        plan, res = self._solve_days(rec.plan, comp, block_days, repo, {**dishes, **corrected}, progress)
+        if corrected and res.status is not BlockStatus.OK:
+            progress("Korekty proporcji z czatu nie mieszczą się po tej zmianie — te dni liczę według przepisów")
+            plan, res = self._solve_days(rec.plan, comp, block_days, repo, dishes, progress)
+            corrections = [e for e in corrections if e["danie"] not in corrected]
         engine_totals = [t.model_dump(mode="json") for b in res.blocks for t in b.totals]
         # Pozostałe dni mogą zawierać wcześniej ocenione danie/przekąskę. Ocena blokuje nowe
         # propozycje, ale nie unieważnia historycznych porcji, których tutaj nie zmieniamy.
         report = verify_plan(plan, self.repo.assumptions, repo.products, self.repo.dishes, engine_totals,
                              group_tolerance=self.settings.group_ratio_tolerance)
-        return plan, report, res.status
+        return plan, report, res.status, corrections
 
     def swap(self, plan_id: str, slot_key: str, dish_id: str) -> Job:
         rec = self._record(plan_id)
@@ -685,12 +746,15 @@ class DietService:
             for r in rules:
                 log.append(f"Uwaga do zasad tygodnia: {r}")
             new_slot = next(s for s in new_comp.slots if s.key == slot_key)
-            plan, report, status = self._resolve_block(rec, new_comp, new_slot, log.append)
+            plan, report, status, corrections = self._resolve_block(rec, new_comp, new_slot, log.append)
             ok = bool(report.ok and status is BlockStatus.OK)
             log.append("Weryfikator: plan poprawny" if report.ok else f"Weryfikator: błędy ({len(report.errors())})")
             self._ensure_exists(rec.id)
+            composition = {**composition_extras(rec.composition), **new_comp.to_dict()}
+            if corrections:
+                composition["korekty_porcji"] = corrections
             new = PlanRecord(plan=plan, title=rec.title, source="zamiana", ok=ok, report=report,
-                             composition={**composition_extras(rec.composition), **new_comp.to_dict()}, log=list(log),
+                             composition=composition, log=list(log),
                              wishes=rec.wishes,
                              week_start=rec.week_start, change_note=note, parent_id=rec.id,
                              # pozostałe dni pochodzą z poprzedniej wersji — jeśli liczono je według innych założeń, plan dalej
@@ -704,6 +768,130 @@ class DietService:
             return {"plan_id": new.id, "ok": ok, "rule_warnings": rules}
 
         return self.jobs.submit("zamiana", note, run)
+
+    # ------------------------------------------------------------------ korekta proporcji dania (czat)
+    def portion_changes(self, rec: PlanRecord, fixes: list[dict]) -> PortionChanges:
+        """Zawężenia składników dla poprawek {slot, produkt, kierunek, osoba?} — bez liczenia planu.
+
+        Plan liczony według starszych danych (zmienione przepisy lub cele) poprawiamy na jego własnej kopii danych:
+        inaczej poprawiony dzień byłby liczony według innych przepisów niż reszta tygodnia."""
+        snapshot = rec.snapshot or self.store.snapshot(rec.id)
+        current = not snapshot or matches_current(snapshot, self.repo, rec.plan)
+        base = self.repo if current else self.record_repo(rec)
+        stored = list((rec.composition or {}).get("korekty_porcji", []))
+        corrected = apply_corrections(base.dishes, stored)
+        meals: dict[str, PlannedMeal] = {}
+        for m in rec.plan.meals:
+            meals.setdefault(slot_key(m, rec.plan), m)
+        out = PortionChanges(base=base, current=current, stored=stored)
+        for fix in fixes:
+            key, pid, direction = fix["slot"], fix["produkt"], fix["kierunek"]
+            meal = meals.get(key)
+            dish = None if meal is None else (out.dishes.get(meal.dish_id) or corrected.get(meal.dish_id)
+                                              or base.dishes.get(meal.dish_id))
+            product = base.products.get(pid)
+            if dish is None or product is None or all(i.product_id != pid for i in dish.ingredients):
+                out.skipped.append(f"{slot_label(key) if meal else key}: tego składnika nie ma w daniu")
+                continue
+            ref = plate_reference(meal, pid, direction, base.assumptions, self.settings.reference_kcal, fix.get("osoba"))
+            tightened = tighten(dish, pid, direction, ref, beyond_recipe=True)
+            if tightened is None:
+                out.skipped.append(f"{slot_label(key)}: {product.name.lower()} — "
+                                   f"{'mniej' if direction == 'za_duzo' else 'więcej'} się nie da, to już granica "
+                                   "tego dania")
+                continue
+            out.dishes[meal.dish_id] = tightened
+            out.applied.append({"slot": key, "produkt": pid, "kierunek": direction, "osoba": fix.get("osoba"),
+                                "danie": meal.dish_id})
+        return out
+
+    def adjust_portions(self, plan_id: str, fixes: list[dict], children_before: set[str] | None = None) -> Job:
+        """Korekta proporcji w daniu planu: danie zostaje, zakres składnika się zawęża (`portion_review.tighten`),
+        a silnik liczy od nowa tylko dotknięte dni. Blok dni wchodzi do nowej wersji tylko wtedy, gdy silnik mieści
+        się w widełkach, weryfikator nie ma zastrzeżeń do tych dni, a składnik naprawdę zmienił się we wskazaną
+        stronę — inaczej zostaje poprzednia wersja tych dni. Model językowy nie bierze w tym udziału.
+        `children_before` — wersje pochodne znane, gdy użytkownik zobaczył propozycję (zatwierdzenie później)."""
+        rec = self._record(plan_id)
+        if children_before is not None:
+            self._refuse_if_changed(rec, set(children_before))
+        changes = self.portion_changes(rec, fixes)
+        if not changes.applied:
+            raise UserError("Nie ma czego poprawić: " + "; ".join(changes.skipped or ["brak zmian"]) + ".")
+        base = changes.base
+        comp = composition_from_plan(rec.plan, rec.plan.comment, rec.source)
+        note = changes.describe(base.products)
+        children_before = self.store.children(rec.id) if children_before is None else set(children_before)
+        extras = composition_extras(rec.composition)
+
+        def run(progress: Callable[[str], None]) -> dict:
+            self._refuse_if_changed(rec, children_before)
+            log = LiveLog(progress)
+            log.append(f"Korekta proporcji: {note}")
+            if not changes.current:
+                log.append("Plan liczono według wcześniejszych danych — poprawiam go na tej samej kopii przepisów i celów")
+            repo = base.for_planning(extras.get("wykluczone_produkty", []))
+            dishes = {**repo.approved_dishes(), **{s.dish_id: repo.dishes[s.dish_id] for s in comp.slots
+                                                   if s.dish_id in repo.dishes}}
+            dishes.update(apply_corrections(dishes, changes.stored))
+            groups: dict[frozenset[int], list[dict]] = {}
+            for fix in changes.applied:
+                days = self._block_days(comp, [int(d) for d in fix["slot"].partition("_")[0].split("-")])
+                groups.setdefault(frozenset(days), []).append(fix)
+            plan, accepted, refused = rec.plan, [], []
+            names = {p.id: p.name for p in base.assumptions.persons}
+            for days, group in groups.items():
+                block_dishes = {**dishes, **{f["danie"]: changes.dishes[f["danie"]] for f in group}}
+                where = ", ".join(DAY_LABELS_PL[Weekday(d)].lower() for d in sorted(days))
+                try:
+                    candidate, res = self._solve_days(plan, comp, set(days), repo, block_dishes, log.append)
+                except UserError as exc:  # inne dni z poprawkami mogą się udać
+                    log.append(f"    {where}: bez zmian ({exc})")
+                    refused.append(f"{where} ({exc})")
+                    continue
+                totals = [t.model_dump(mode="json") for b in res.blocks for t in b.totals]
+                report = verify_plan(candidate, base.assumptions, base.products, base.dishes, totals,
+                                     group_tolerance=self.settings.group_ratio_tolerance)
+                errors = [i for i in report.errors() if i.day is not None and int(i.day) in days]
+                moved = [f for f in group if _moved(plan, candidate, f)]
+                if res.status is not BlockStatus.OK or errors or not moved:
+                    why = ("silnik nie zmieścił się w widełkach" if res.status is not BlockStatus.OK
+                           else f"weryfikator: {errors[0].message}" if errors
+                           else "silnik nie znalazł innych gramatur w celach dnia")
+                    log.append(f"    {where}: bez zmian ({why})")
+                    refused.append(f"{where} ({why})")
+                    continue
+                for f in group:
+                    before = grams_in_slot(plan, f["slot"], f["produkt"])
+                    after = grams_in_slot(candidate, f["slot"], f["produkt"])
+                    change = ", ".join(f"{names.get(p, p)} {fmt_num(before[p], 0)} → {fmt_num(after.get(p, 0), 0)} g"
+                                       for p in before)
+                    log.append(f"    {slot_label(f['slot'])}: {base.products[f['produkt']].name.lower()} {change}"
+                               + ("" if f in moved else " (bez zmiany)"))
+                plan = candidate
+                accepted.extend(moved)
+            if not accepted:
+                raise UserError("Nie udało się zmienić proporcji — plan zostaje bez zmian: " + "; ".join(refused) + ".")
+            report = verify_plan(plan, base.assumptions, base.products, base.dishes,
+                                 group_tolerance=self.settings.group_ratio_tolerance)
+            log.append("Weryfikator: plan poprawny" if report.ok else f"Weryfikator: błędy ({len(report.errors())})")
+            dish_ids = {m.dish_id for m in plan.meals}
+            composition = {**extras, **comp.to_dict(), "korekty_porcji": merge_corrections(
+                changes.stored, [correction_entry(changes.dishes[f["danie"]], f["produkt"]) for f in accepted],
+                dish_ids)}
+            self._ensure_exists(rec.id)
+            new = PlanRecord(plan=plan, title=rec.title, source="proporcje", ok=report.ok, report=report,
+                             composition=composition, log=list(log), wishes=rec.wishes, week_start=rec.week_start,
+                             change_note=note, parent_id=rec.id,
+                             assumptions_hash=rec.assumptions_hash or assumptions_hash(self.repo),
+                             # kopia danych jak u rodzica, gdy liczono na jego danych
+                             snapshot=capture(base, plan) if changes.current else (rec.snapshot or self.store.snapshot(rec.id)))
+            check_cancelled()
+            self.store.save(new)
+            if self.store.active() is None or self.store.get_setting("active_plan") in (None, rec.id):
+                self.store.set_setting("active_plan", new.id)
+            return {"plan_id": new.id, "ok": new.ok, "changed": len(accepted), "refused": refused}
+
+        return self.jobs.submit("proporcje", f"Proporcje: {note}", run)
 
     def _refuse_if_changed(self, rec: PlanRecord, children_before: set[str]) -> None:
         """Dwie zmiany zlecone na tę samą wersję (np. okno i czat) tworzyły dwie siostrzane wersje, z których każda

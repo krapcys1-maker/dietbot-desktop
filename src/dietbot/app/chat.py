@@ -2,26 +2,34 @@
 
 Model NIE podaje żadnych liczb (walidacja odrzuca cyfry i liczebniki). Pytania o wartości odżywcze obsługuje
 program na podstawie wyników weryfikatora, zamiany dań sprawdza silnik, zmiany założeń wymagają potwierdzenia.
+Uwagi o proporcjach dania („za mało mleczka, za dużo tofu”) model zamienia tylko na posiłek, składnik i kierunek —
+zakres składnika zawęża program, a gramy liczy silnik; „zweryfikuj gramatury” to wnioski programu o talerzach.
 """
 
 from __future__ import annotations
 
+import contextlib
 import copy
 import re
 import uuid
+from collections.abc import Mapping
 from datetime import date, timedelta
 from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
+from rapidfuzz import fuzz
 
 from ..checker.verify import nutrition_of
 from ..domain.assumptions import DAY_KEYS_PL, DAY_LABELS_PL, Weekday, parse_day
-from ..domain.dish import MEAL_LABELS_PL, MealType
-from ..food.matcher import MatchStatus, ProductMatcher
+from ..domain.culinary import SAUCE_LIQUIDS
+from ..domain.dish import MEAL_LABELS_PL, DishTemplate, MealType, Role
+from ..domain.product import Product
+from ..food.matcher import MatchStatus, ProductMatcher, key_of, lemma_of, words
 from ..llm.client import LLMError
 from ..llm.scope import current as current_scope
 from ..llm.scope import task_scope
 from ..measures import household
+from ..planner.portion_review import DEVIATION, grams_in_slot, plate_findings, slot_label
 from ..storage.yamlio import load_yaml, to_plain
 from ..textfmt import fmt_num, plural_pl
 from ..textnorm import normalize
@@ -54,10 +62,24 @@ class FactRequest(BaseModel):
     produkt: str | None = Field(default=None, description="nazwa produktu (dla rodzaju produkt)")
 
 
+class PortionRequest(BaseModel):
+    """Jedna uwaga o proporcjach dania z planu. Model wskazuje tylko miejsce, składnik i kierunek — gramy liczy silnik."""
+    dzien: str | None = Field(default=None, description="poniedzialek…niedziela, dzis albo jutro; brak = program poszuka")
+    posilek: str | None = Field(default=None, description="sniadanie | obiad | kolacja")
+    danie: str | None = Field(default=None, description="nazwa dania z planu, jeśli użytkownik ją podał")
+    produkt: str = Field(description="składnik słowami użytkownika, w mianowniku: tofu, mleczko kokosowe, ryż, jajko; "
+                                     "„danie jest suche” = sos")
+    kierunek: Literal["za_duzo", "za_malo"]
+    osoba: str | None = Field(default=None, description="id osoby, gdy uwaga dotyczy tylko jej talerza")
+
+
 class ChatAction(BaseModel):
-    typ: Literal["odpowiedz", "pokaz", "generuj", "wymysl_dania", "zamien", "zmien_zalozenia", "zapamietaj"]
+    typ: Literal["odpowiedz", "pokaz", "generuj", "wymysl_dania", "zamien", "proporcje", "sprawdz_porcje",
+                 "zmien_zalozenia", "zapamietaj"]
     tekst: str = Field(description="krótka odpowiedź po polsku, BEZ cyfr i liczebników — liczby dopisze program")
     fakty: list[FactRequest] = Field(default_factory=list, max_length=6)
+    porcje: list[PortionRequest] = Field(default_factory=list, max_length=8,
+                                         description="dla proporcje i sprawdz_porcje: które składniki w których daniach")
     zyczenia: str | None = Field(default=None, description="dla generuj i wymysl_dania: życzenia/prośba słowami użytkownika")
     wymysl_nowe: bool = Field(default=False, description="dla generuj: true, gdy użytkownik chce NOWYCH, wymyślonych dań")
     ile_dan: int | None = Field(default=None, ge=1, le=12, description="dla wymysl_dania: ile dań wymyślić")
@@ -90,12 +112,33 @@ INVENT_REQUEST = re.compile(r"\b(wymysl\w*|stworz\w* (przepis|dani\w*)|dodaj\w* 
 NOT_A_REQUEST = re.compile(r"\b(nie|bez|zadn\w*|jak|czy|dlaczego|po co|kiedy|ile)\b")
 PAID_ACTION_NOTE = ("To uruchomi płatne wywołania modelu językowego na Twoim koncie DeepSeek "
                     "(zwykle kilka centów; wymyślanie dań kosztuje więcej).")
+# „zweryfikuj ten plan pod kątem gramatur” — model odpowiadał średnimi z tygodnia; program dokłada wnioski kulinarne
+VERIFY_REQUEST = re.compile(r"\b(z?weryfik\w*|sprawdz\w*|przejrz\w*|ocen\w*)\b.*"
+                            r"\b(gramatur\w*|porcj\w*|proporcj\w*|talerz\w*|ilosc\w*)")
+# model zamieniał danie na prawie identyczne, gdy użytkownik prosił o inne proporcje tego samego dania
+SWAP_WORDS = re.compile(r"\b(zamien\w*|wymien\w*|zamiast|inne\w* dani\w*|cos innego|na inne|nie chce\w* tego dania)\b")
+# tylko wyraźne uwagi o ilości — „coś mniej tłustego” to dalej prośba o inne danie
+PROPORTION_WORDS = re.compile(r"\b(za (malo|duzo)|such\w*|sucho|dodaj\w*|ujmij\w*|proporcj\w*)\b")
+SAUCE_WORDS = {"sos", "sosu", "sosem", "sosie", "sosik", "sosiku", "sosow", "suche", "sucho", "suchy"}
+QUANTITY = re.compile(r"\d+(?:[.,]\d+)?\s*(?:g|gram\w*|kg|ml|szt\w*|kost\w*)?\b")
+PORTION_SLOTS_MAX = 3  # bez wskazanego dnia: najwyżej tyle posiłków z tym składnikiem naraz
+REPORT_ROWS_MAX = 12
+FREE_ACTION_NOTE = "Liczy tylko silnik — bez kosztów AI."
+OUTDATED_PLAN_NOTE = ("Ten plan liczono według wcześniejszych przepisów lub celów, więc poprawiam go na tych samych "
+                      "danych. Przycisk Przelicz w zakładce Tydzień zastosuje nowe proporcje przepisów.")
 
 SYSTEM = """Jesteś asystentem w polskiej aplikacji do planowania tygodniowego jadłospisu dla domowników (osoby podaje kontekst).
 Liczby (kalorie, makroskładniki, gramatury) liczy deterministyczny program — Ty ich NIGDY nie podajesz ani nie liczysz.
 Twoje zadanie: zrozumieć wiadomość i wybrać jedną akcję:
 - "pokaz" — pytanie o wartości, sumy, gramatury, gdzie jest produkt: wypełnij "fakty", a program dopisze liczby.
-- "zamien" — prośba o zmianę dania w konkretnym posiłku: podaj dzien, posilek i opis_dania (czego szuka użytkownik).
+- "proporcje" — danie w planie ZOSTAJE, ale któregoś składnika ma być więcej albo mniej: „za mało mleczka w curry”,
+  „za dużo tofu i ciecierzycy”, „cztery jajka na śniadanie to za dużo”, „dla żony za mało kurczaka”, „danie jest suche”
+  (= za mało sosu). W "porcje" podaj każdy składnik osobno: dzien i posilek (albo danie — nazwa z planu), produkt
+  w mianowniku, kierunek za_duzo / za_malo i osoba, gdy chodzi o talerz jednej osoby. Nie wybieraj wtedy "zamien".
+- "sprawdz_porcje" — prośba o sprawdzenie lub weryfikację gramatur, porcji czy proporcji planu: program porówna każdy
+  talerz z przepisem. Jeśli użytkownik przy okazji narzeka na konkretne składniki, wypełnij też "porcje" — program
+  zaproponuje poprawki do zatwierdzenia.
+- "zamien" — prośba o INNE danie w konkretnym posiłku: podaj dzien, posilek i opis_dania (czego szuka użytkownik).
 - "generuj" — prośba o nowy plan tygodnia: w "zyczenia" przepisz życzenia (np. więcej ryb, bez jajek w piątek).
   Jeśli użytkownik chce, żeby dania zostały WYMYŚLONE (np. „resztę wymyśl”, „coś nowego”), ustaw wymysl_nowe: true.
 - "wymysl_dania" — prośba o NOWE danie albo dania do biblioteki, bez planu: „wymyśl trzy kolacje z krewetkami”,
@@ -106,9 +149,10 @@ Twoje zadanie: zrozumieć wiadomość i wybrać jedną akcję:
   DOZWOLONE ZMIANY; przy liczbach wybierz "ustaw" (nowa wartość) albo "zwieksz"/"zmniejsz" (o ile). Prośba typu
   „zmniejsz kalorie o sto” dotyczy CAŁYCH widełek (ścieżka bez .min/.cel/.max). Program pokaże różnice i poprosi
   użytkownika o potwierdzenie.
-- "zapamietaj" — trwała preferencja albo uwaga do przyszłych planów, bez liczbowych zmian celów: „za dużo ryżu na
-  obiad, wolę więcej mięsa”, „nie dawaj białek jaj”, „nie lubimy tego dania”, „lista zakupów jest niewygodna”. Program
-  zapisze ją w notatniku preferencji; w "zyczenia" przepisz całą uwagę słowami użytkownika.
+- "zapamietaj" — trwała preferencja albo uwaga do przyszłych planów, bez liczbowych zmian celów: „zawsze dawaj mniej
+  ryżu na obiad, wolę więcej mięsa”, „nie dawaj białek jaj”, „nie lubimy tego dania”, „lista zakupów jest niewygodna”.
+  Program zapisze ją w notatniku preferencji; w "zyczenia" przepisz całą uwagę słowami użytkownika. Uwaga o konkretnym
+  daniu z aktualnego planu to "proporcje".
 - "odpowiedz" — rozmowa, porady kulinarne i wyjaśnienia działania aplikacji, gdy użytkownik o nic nie prosi
   (nie wymyśla dań, nie zmienia planu ani założeń).
 Pole "tekst": krótko i życzliwie po polsku, bez cyfr i liczebników. Nie obiecuj, że coś już zrobiłeś — program wykona akcję."""
@@ -127,6 +171,42 @@ def _person_ids(service: DietService) -> dict[str, str]:
         for w in ("maz", "meza", "mezowi", "ja", "mnie", "on"):
             out.setdefault(w, "mezczyzna")
     return out
+
+
+def ingredient_ids(text: str, dish: DishTemplate, products: Mapping[str, Product]) -> list[str]:
+    """Składnik z prośby (słowa użytkownika albo id) → produkty z przepisu dania; „sos”/„suche” to wszystkie
+    składniki sosu. Szukamy tylko wśród składników tego dania, więc odmiana („mleczka”, „ciecierzycy”) wystarcza."""
+    cands = {i.product_id: products[i.product_id] for i in dish.ingredients if i.product_id in products
+             and i.role is not Role.SPICE and not products[i.product_id].negligible and i.typical_g > 0}
+    raw = QUANTITY.sub(" ", (text or "").strip()).strip()
+    if raw in cands:
+        return [raw]
+    ws = words(raw)
+    if not ws:
+        return []
+    if normalize(ws[0]) in SAUCE_WORDS:
+        sauce = [i.product_id for i in dish.ingredients if i.product_id in cands
+                 and (i.role is Role.SAUCE or i.product_id in SAUCE_LIQUIDS)]
+        if sauce:
+            return sauce
+    match = ProductMatcher(cands).match(raw)
+    if match.product_id:
+        return [match.product_id]
+    query = set(lemma_of(ws).split()) | set(key_of(ws).split())
+    stems = {w[:5] for w in query if len(w) >= 5}
+    hits = []
+    for pid, p in cands.items():
+        tokens = set()
+        for name in (p.name, *p.aliases):
+            tokens |= set(lemma_of(words(name)).split()) | set(key_of(words(name)).split())
+        if query & tokens or any(t.startswith(s) for t in tokens for s in stems):
+            hits.append(pid)
+    return hits if len(hits) == 1 else []
+
+
+def dish_matches(text: str, dish: DishTemplate) -> bool:
+    q, name = normalize(text), normalize(dish.name)
+    return bool(q) and (q in name or fuzz.token_set_ratio(q, name) >= 85)
 
 
 def allowed_paths(service: DietService) -> list[tuple[str, str]]:
@@ -185,6 +265,13 @@ class ChatAssistant:
         if action.typ == "odpowiedz" and INVENT_REQUEST.search(norm) and not NOT_A_REQUEST.search(norm):
             # model czasem opowiada przepis zamiast go wymyślić do biblioteki — nie zgadujemy: pytamy o zgodę
             action = action.model_copy(update={"typ": "wymysl_dania", "zyczenia": text, "ile_dan": action.ile_dan or 2})
+        if (action.typ == "pokaz" and action.porcje) or (VERIFY_REQUEST.search(norm) and (action.typ == "odpowiedz" or (
+                action.typ == "pokaz" and all(f.rodzaj == "tydzien" for f in action.fakty)))):
+            # same średnie z tygodnia nie odpowiadają na „zweryfikuj gramatury” — program dokłada wnioski kulinarne
+            action = action.model_copy(update={"typ": "sprawdz_porcje"})
+        if action.typ == "zamien" and (action.porcje or (PROPORTION_WORDS.search(norm) and not SWAP_WORDS.search(norm))):
+            # „za mało mleczka, za dużo tofu” to nie prośba o inne danie — zamiana dawała prawie to samo danie
+            action = action.model_copy(update={"typ": "proporcje"})
         try:
             if action.typ == "pokaz":
                 return self._show(action, rec)
@@ -192,6 +279,10 @@ class ChatAssistant:
                 return self._propose_action(action, text, rec)
             if action.typ == "zamien":
                 return self._swap(action, rec, text)
+            if action.typ == "proporcje":
+                return self._portions(action, rec)
+            if action.typ == "sprawdz_porcje":
+                return self._check_portions(action, rec)
             if action.typ == "zmien_zalozenia":
                 return self._propose(action, rec)
             if action.typ == "zapamietaj":
@@ -279,6 +370,13 @@ class ChatAssistant:
     def _show(self, action: ChatAction, rec: PlanRecord | None) -> dict:
         if rec is None:
             raise UserError("Nie ma jeszcze planu — najpierw go wygeneruj.")
+        blocks = self._fact_blocks(action, rec)
+        text = action.tekst.strip()
+        if blocks:
+            text = (text + "\n\n" if text else "") + "\n\n".join(blocks) + "\n\n_Liczby: weryfikator planu._"
+        return self._reply(text, rec)
+
+    def _fact_blocks(self, action: ChatAction, rec: PlanRecord) -> list[str]:
         s = self.s
         repo = s.record_repo(rec)
         a = repo.assumptions
@@ -353,10 +451,183 @@ class ChatAssistant:
                     blocks.append(f"**{name}** nie występuje w posiłkach tego planu.")
                 else:
                     blocks.append(f"**{name}**: {fmt_num(total, 0)} g w tygodniu (obie osoby) — " + ", ".join(uses))
-        text = action.tekst.strip()
-        if blocks:
-            text = (text + "\n\n" if text else "") + "\n\n".join(blocks) + "\n\n_Liczby: weryfikator planu._"
-        return self._reply(text, rec)
+        return blocks
+
+    # ------------------------------------------------------------------ proporcje dania (bez zamiany dania)
+    def _portions(self, action: ChatAction, rec: PlanRecord | None) -> dict:
+        """„Za mało mleczka, za dużo tofu” — danie zostaje, silnik przelicza gramatury z zawężonym składnikiem.
+        Bez dodatkowych wywołań modelu (koszt tylko rozpoznania wiadomości), więc działa od razu — jak zamiana."""
+        if rec is None:
+            raise UserError("Nie ma jeszcze planu — najpierw go wygeneruj.")
+        fixes, notes = self._portion_fixes(action, rec)
+        if not fixes:
+            raise UserError(" ".join(notes) or "Napisz, w którym daniu i którego składnika ma być więcej, a którego "
+                            "mniej — danie zostanie, zmienię tylko gramatury.")
+        changes = self.s.portion_changes(rec, fixes)
+        if not changes.applied:
+            raise UserError("Nie zmienię tego: " + "; ".join(notes + changes.skipped) + ".")
+        job = self.s.adjust_portions(rec.id, fixes)
+        text = (action.tekst.strip() + "\n\n" if action.tekst.strip() else "") + \
+            "Poprawiam proporcje — danie zostaje, silnik przeliczy te dni:\n" + self._fix_lines(changes, rec)
+        if notes or changes.skipped:
+            text += "\n\nUwagi: " + "; ".join(notes + changes.skipped) + "."
+        if not changes.current:
+            text += "\n\n" + OUTDATED_PLAN_NOTE
+        text += f"\n\n{FREE_ACTION_NOTE} Nowa wersja planu powstanie tylko wtedy, gdy dni zmieszczą się w celach."
+        return self._reply(text, rec, {"job_id": job.id, "kind": "proporcje"})
+
+    def _check_portions(self, action: ChatAction, rec: PlanRecord | None) -> dict:
+        """„Zweryfikuj gramatury” — wnioski kulinarne z policzonego planu; poprawki z uwag użytkownika czekają na
+        zatwierdzenie (użytkownik prosił o sprawdzenie, nie o zmianę)."""
+        if rec is None:
+            raise UserError("Nie ma jeszcze planu — najpierw go wygeneruj.")
+        parts = [action.tekst.strip()] if action.tekst.strip() else []
+        parts.append(self._portion_report(rec))
+        with contextlib.suppress(UserError):  # niejasny fakt (np. dzień) nie może zabrać wniosków z weryfikacji
+            parts += [b for b in self._fact_blocks(action, rec) if not b.startswith("**Średnio")]
+        data = None
+        if action.porcje:
+            try:
+                fixes, notes = self._portion_fixes(action, rec)
+            except UserError as exc:
+                fixes, notes = [], [str(exc).rstrip(".")]
+            changes = self.s.portion_changes(rec, fixes) if fixes else None
+            notes += changes.skipped if changes else []
+            if changes and changes.applied:
+                pid = self._pending({"akcja": "proporcje", "plan_id": rec.id,
+                                     "poprawki": [{k: f[k] for k in ("slot", "produkt", "kierunek", "osoba")}
+                                                  for f in changes.applied],
+                                     "wersje": sorted(self.s.store.children(rec.id))})
+                text = "**Mogę poprawić** (danie zostaje, silnik przeliczy te dni):\n" + self._fix_lines(changes, rec)
+                if notes:
+                    text += "\n\nUwagi: " + "; ".join(notes) + "."
+                if not changes.current:
+                    text += "\n\n" + OUTDATED_PLAN_NOTE
+                parts.append(text + f"\n\n{FREE_ACTION_NOTE} Poprawić?")
+                data = {"proposal_id": pid, "kind": "potwierdz_akcje"}
+            elif notes:
+                parts.append("Uwagi: " + "; ".join(notes) + ".")
+        return self._reply("\n\n".join(parts), rec, data)
+
+    def _portion_report(self, rec: PlanRecord) -> str:
+        repo = self.s.record_repo(rec)
+        products = repo.products
+        deviations, dry = plate_findings(rec.plan, repo.dishes, products, repo.assumptions,
+                                         self.s.settings.reference_kcal)
+        names = {p.id: p.name for p in repo.assumptions.persons}
+
+        def where(key: str, dish_id: str) -> str:
+            dish = repo.dishes.get(dish_id)
+            return f"{slot_label(key)}, {dish.name if dish else dish_id}"
+
+        def grouped(findings, fmt) -> list[str]:
+            rows: dict[str, list[str]] = {}
+            for f in findings:
+                rows.setdefault(where(f.slot, f.dish_id), []).append(f"{names.get(f.person_id, f.person_id)}: {fmt(f)}")
+            lines = [f"- {k}: " + "; ".join(v) for k, v in rows.items()]
+            if len(lines) > REPORT_ROWS_MAX:
+                lines = [*lines[:REPORT_ROWS_MAX], f"- …i jeszcze {len(lines) - REPORT_ROWS_MAX}"]
+            return lines
+
+        def pct(ratio: float) -> str:
+            return ("+" if ratio >= 1 else "−") + fmt_num(abs(ratio - 1) * 100, 0) + "%"
+
+        out = ["**Proporcje talerzy względem przepisów** (porcja przepisu przeliczona na kalorie osoby)"]
+        if deviations:
+            out.append(f"Składniki, które odbiegają od przepisu o ponad {fmt_num(DEVIATION * 100, 0)}%:")
+            out += grouped(deviations, lambda f: f"{products[f.product_ids[0]].name.lower()} {fmt_num(f.grams, 0)} g "
+                                                 f"(przepis ≈ {fmt_num(f.recipe_g, 0)} g, {pct(f.ratio)})")
+        else:
+            out.append(f"Żaden składnik nie odbiega od przepisu o ponad {fmt_num(DEVIATION * 100, 0)}%.")
+        if dry:
+            out.append("Talerze, które mogą wyjść suche (sosu mniej względem ryżu, makaronu czy białka niż w przepisie):")
+            out += grouped(dry, lambda f: f"sos ({', '.join(products[p].name.lower() for p in f.product_ids)}) "
+                                          f"{fmt_num(f.grams, 0)} g, a przepis do tych dodatków daje "
+                                          f"≈ {fmt_num(f.recipe_g, 0)} g")
+        else:
+            out.append("Dania z sosem mają go w proporcji podobnej do przepisu.")
+        warnings = [i.message for i in (rec.report.issues if rec.report else [])
+                    if i.code in ("duza_porcja", "uwaga_kucharza", "proporcje_przepisu")]
+        if warnings:
+            out.append("Uwagi weryfikatora:")
+            out += [f"- {self.s.humanize(m)}" for m in warnings[:REPORT_ROWS_MAX]]
+        out.append("Napisz, czego ma być więcej, a czego mniej (np. „w środowym obiedzie mniej ryżu”) — danie zostanie, "
+                   "a silnik przeliczy gramatury.\n\n_Liczby: weryfikator planu._")
+        return "\n".join(out)
+
+    def _fix_lines(self, changes, rec: PlanRecord) -> str:
+        repo = changes.base
+        names = {p.id: p.name for p in repo.assumptions.persons}
+        rows = []
+        for f in changes.applied:
+            dish = repo.dishes.get(f["danie"])
+            now = grams_in_slot(rec.plan, f["slot"], f["produkt"])
+            persons = [f["osoba"]] if f.get("osoba") in now else list(now)
+            grams = ", ".join(f"{names.get(p, p)} {fmt_num(now[p], 0)} g" for p in persons)
+            rows.append(f"- {slot_label(f['slot'])}, {dish.name if dish else f['danie']}: "
+                        f"{'mniej' if f['kierunek'] == 'za_duzo' else 'więcej'} — "
+                        f"{repo.products[f['produkt']].name.lower()} (teraz: {grams})")
+        return "\n".join(rows)
+
+    def _portion_fixes(self, action: ChatAction, rec: PlanRecord) -> tuple[list[dict], list[str]]:
+        """Uwagi modelu → poprawki {slot, produkt, kierunek, osoba}. Składnik szukamy w przepisie dania z planu
+        (słowa użytkownika → id produktu); bez dnia — w posiłkach z tym składnikiem, które najbardziej odbiegają od
+        przepisu we wskazaną stronę."""
+        repo = self.s.record_repo(rec)
+        comp = composition_from_plan(rec.plan)
+        fixes: list[dict] = []
+        notes: list[str] = []
+        for req in action.porcje:
+            day = self._day(req.dzien or (action.dzien if not req.danie else None), rec)
+            meal_text = req.posilek or (action.posilek if not req.danie else None)
+            meal = None
+            if meal_text:
+                try:
+                    meal = MealType(normalize(meal_text))
+                except ValueError:
+                    raise UserError(f"Nie rozpoznałem posiłku „{meal_text}”.") from None
+            slots = [s for s in comp.slots if (day is None or day in s.days) and (meal is None or s.meal == meal)]
+            if req.danie:
+                named = [s for s in slots if s.dish_id in repo.dishes and dish_matches(req.danie, repo.dishes[s.dish_id])]
+                slots = named or slots
+            found = [(s, ids) for s in slots if s.dish_id in repo.dishes
+                     and (ids := ingredient_ids(req.produkt, repo.dishes[s.dish_id], repo.products))]
+            if not found:
+                place = f" w daniu „{req.danie}”" if req.danie else ""
+                notes.append(f"nie znalazłem składnika „{without_numbers(req.produkt) or req.produkt}”{place} "
+                             "w tym planie")
+                continue
+            if len(found) > 1:
+                found = self._most_off(found, req.kierunek, rec, repo)
+            osoba = _person_ids(self.s).get(normalize(req.osoba)) if req.osoba else None
+            for s, ids in found:
+                for pid in ids:
+                    fix = {"slot": s.key, "produkt": pid, "kierunek": req.kierunek, "osoba": osoba}
+                    if not any(f["slot"] == fix["slot"] and f["produkt"] == pid for f in fixes):
+                        fixes.append(fix)
+        return fixes, notes
+
+    def _most_off(self, found: list, direction: str, rec: PlanRecord, repo) -> list:
+        """Bez dokładnego miejsca: posiłek, w którym składnik najbardziej odbiega od przepisu we wskazaną stronę, oraz
+        inne wyraźnie odbiegające (najwyżej PORTION_SLOTS_MAX)."""
+        ref = self.s.settings.reference_kcal
+        scored = []
+        for s, ids in found:
+            dish = repo.dishes[s.dish_id]
+            ratios = []
+            for person in repo.assumptions.persons:
+                plate = sum(grams_in_slot(rec.plan, s.key, pid).get(person.id, 0.0) for pid in ids)
+                recipe = sum(i.typical_g * (person.energy_center / ref if i.scales else 1.0)
+                             for i in dish.ingredients if i.product_id in ids)
+                if recipe > 0:
+                    ratios.append(plate / recipe)
+            if ratios:
+                scored.append((max(ratios) if direction == "za_duzo" else min(ratios), s, ids))
+        scored.sort(key=lambda x: -x[0] if direction == "za_duzo" else x[0])
+        if not scored:
+            return found[:1]
+        off = [x for x in scored[1:] if (x[0] > 1.25 if direction == "za_duzo" else x[0] < 0.8)]
+        return [(s, ids) for _, s, ids in [scored[0], *off][:PORTION_SLOTS_MAX]]
 
     # ------------------------------------------------------------------ zamiana dania
     def _swap(self, action: ChatAction, rec: PlanRecord | None, original: str) -> dict:
@@ -400,7 +671,6 @@ class ChatAssistant:
     def _propose_action(self, action: ChatAction, text: str, rec: PlanRecord | None) -> dict:
         """Płatne i trwałe akcje (nowy plan, wymyślanie dań do biblioteki) czekają na „Tak, uruchom” — jak zmiany
         założeń. Model mógł źle zrozumieć wiadomość, a wymyślone dania trafiają do biblioteki."""
-        s = self.s
         wishes = (action.zyczenia or text).strip()[:1000]
         if action.typ == "generuj":
             what = "Ułożę nowy plan tygodnia" + (f" z życzeniami: „{wishes}”" if wishes else "")
@@ -412,16 +682,27 @@ class ChatAssistant:
             what = (f"Wymyślę {count} {plural_pl(count, 'danie', 'dania', 'dań')} do biblioteki: „{wishes}”. "
                     "Nowe dania będą oznaczone jako nowe — możesz je odrzucić")
             params = {"akcja": "wymysl_dania", "zyczenia": wishes, "ile_dan": count}
-        pid = uuid.uuid4().hex[:10]
-        s.pending_changes[pid] = params
-        while len(s.pending_changes) > MAX_PENDING_PROPOSALS:
-            s.pending_changes.pop(next(iter(s.pending_changes)))
+        pid = self._pending(params)
         intro = (action.tekst.strip() + "\n\n") if action.tekst else ""
         return self._reply(f"{intro}{what}.\n\n{PAID_ACTION_NOTE} Uruchomić?", rec,
                            {"proposal_id": pid, "kind": "potwierdz_akcje"})
 
+    def _pending(self, params: dict) -> str:
+        """Propozycja czekająca na „Tak, uruchom” / „Zatwierdź” (najstarsze wygasają)."""
+        s = self.s
+        pid = uuid.uuid4().hex[:10]
+        s.pending_changes[pid] = params
+        while len(s.pending_changes) > MAX_PENDING_PROPOSALS:
+            s.pending_changes.pop(next(iter(s.pending_changes)))
+        return pid
+
     def _run_action(self, prop: dict, rec: PlanRecord | None) -> dict:
         s = self.s
+        if prop["akcja"] == "proporcje":
+            # plan mógł w międzyczasie dostać nowszą wersję (np. zamiana w oknie) — wtedy odmowa, nie siostrzana wersja
+            job = s.adjust_portions(prop["plan_id"], prop["poprawki"], children_before=set(prop.get("wersje", [])))
+            return self._reply("Poprawiam proporcje — silnik przeliczy te dni.", rec,
+                               {"job_id": job.id, "kind": "proporcje"})
         if prop["akcja"] == "generuj":
             job = s.generate(wishes=prop.get("zyczenia") or None, channel=self.channel, invent=bool(prop.get("wymysl_nowe")))
             return self._reply("Układam nowy plan tygodnia.", rec, {"job_id": job.id, "kind": "generowanie"})
@@ -454,15 +735,11 @@ class ChatAssistant:
         return self._reply("\n\n".join(parts), rec, {"kind": "notatnik", "note_id": out.get("note_id")})
 
     def _propose(self, action: ChatAction, rec: PlanRecord | None) -> dict:
-        s = self.s
         if not action.zmiany:
             raise UserError("Nie zrozumiałem, co zmienić w założeniach.")
         _, diff, warnings = self._apply_changes(action.zmiany)
-        pid = uuid.uuid4().hex[:10]
         # zapisujemy operacje, nie zrzut założeń — przy potwierdzeniu stosujemy je na aktualnym pliku
-        s.pending_changes[pid] = {"zmiany": [c.model_dump(mode="json") for c in action.zmiany], "diff": diff}
-        while len(s.pending_changes) > MAX_PENDING_PROPOSALS:
-            s.pending_changes.pop(next(iter(s.pending_changes)))
+        pid = self._pending({"zmiany": [c.model_dump(mode="json") for c in action.zmiany], "diff": diff})
         text = (action.tekst.strip() + "\n\n" if action.tekst else "") + "Proponowane zmiany:\n" + \
             "\n".join(f"- {d}" for d in diff)
         if warnings:

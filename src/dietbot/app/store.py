@@ -101,7 +101,7 @@ def new_id() -> str:
 class PlanRecord:
     plan: WeekPlan
     title: str
-    source: str  # llm / algorytm / zamiana / przeliczenie / naprawa
+    source: str  # llm / algorytm / zamiana / przeliczenie / naprawa / proporcje
     ok: bool
     snapshot: dict | None = None
     report: VerificationReport | None = None

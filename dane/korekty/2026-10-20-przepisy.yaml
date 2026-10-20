@@ -1,0 +1,29 @@
+# Korekty z testu proporcji (20.10.2026): przepisy za suche już w danych i limit jajek. Działają przy wczytywaniu,
+# także w starszych instalacjach — zmiana wchodzi tylko wtedy, gdy wpis nadal ma dokładnie stare wartości z „bylo”.
+- danie: roslinne_020_curry
+  powod: curry miało 35 g mleczka kokosowego na 180 g tofu i 80 g ryżu — więcej sosu, mniej tofu
+  bylo: {tofu: 180, pomidory_z_puszki: 120, mleczko_kokosowe: 35, oliwa_z_oliwek: 10}
+  zmiana:
+    tofu: {typowo_g: 130, min_g: 90, max_g: 200}
+    pomidory_z_puszki: {typowo_g: 150, min_g: 90, max_g: 220}
+    mleczko_kokosowe: {typowo_g: 90, min_g: 60, max_g: 130}
+    oliwa_z_oliwek: {typowo_g: 5, min_g: 3, max_g: 12}
+- danie: roslinne_020_chili
+  powod: chili miało 100 g pomidorów na 310 g tofu i fasoli — więcej pomidorów i papryki, mniej tofu
+  bylo: {tofu: 180, pomidory_z_puszki: 100, papryka_czerwona: 60}
+  zmiana:
+    tofu: {typowo_g: 120, min_g: 80, max_g: 180}
+    pomidory_z_puszki: {typowo_g: 200, min_g: 140, max_g: 300}
+    papryka_czerwona: {typowo_g: 80, min_g: 50, max_g: 120}
+- danie: makaron_z_kurczakiem_i_szpinakiem
+  powod: sos śmietanowy z 50 g śmietany na 85 g makaronu był za suchy
+  bylo: {smietana_10: 50, szpinak: 80}
+  zmiana: {smietana_10: 90, szpinak: 100}
+- danie: curry_z_ciecierzycy_i_tofu_z_ryzem
+  powod: 300 g tofu i ciecierzycy na 100 g mleczka — mniej tofu, żeby sos pokrył danie
+  bylo: {tofu: 150}
+  zmiana: {tofu: 110}
+- produkt: jajko_kurze
+  powod: najwyżej 3 jajka na osobę w jednym posiłku (wcześniej limit 6 jajek pozwalał na 4 jajka na miękko)
+  bylo: {max_porcja_g: 300}
+  zmiana: {max_porcja_g: 150}

@@ -211,6 +211,16 @@ do proporcji). Składniki o stałej ilości (rola `przyprawa`, produkty pomijaln
 potem diagnostyka i weryfikator. **Grupy proporcji:** dla każdej osoby i każdego składnika grupy
 g_i ∈ [(1−tol)·u_i·G − krok_i, (1+tol)·u_i·G + krok_i], gdzie G to masa grupy, a u_i udział z przepisu
 (dokładność współczynników 0,01%); składniki grup mają krok 1 g.
+**Spójność dania** (`domain/culinary.py`, wersja 2): każdy składnik sosu o typowej ilości ≥ 40 g (rola `sos`,
+płyny z listy `SAUCE_LIQUIDS`, a w daniach „z sosem/tzatziki” także jogurt w roli `nabial`) dostaje proporcje
+sos/skrobia (ryż, makaron, kasza, ziemniaki — bez pieczywa podawanego obok) ≥ 0,85 i sos/białko ≥ 0,8 proporcji przepisu, dla każdej osoby. Bez nich silnik dopełniał widełki jednym
+składnikiem (ryż na węglowodany, tofu na białko) i obcinał mleczko czy śmietanę dla tłuszczu — w teście 12 tygodni
+na trzech poziomach kalorii 28 ze 102 porcji dań z sosem (bez zup) miało go mniej niż 85% przepisu, a 13 mniej
+niż 70%; po zmianie poniżej 70% nie ma żadnej. Proporcji
+białko/skrobia celowo nie ma: przy białku ograniczonym widełkami wyższe kalorie wymagają więcej ziemniaków do tego
+samego mięsa. Przekąski bilansujące nie dostają tych proporcji (model przekąsek pomija dania z proporcjami), zupy
+też nie — były celowo zagęszczone pod limit masy talerza, a wymóg „bulion rośnie z mięsem” podwajał czas planowania
+(zupa na zapas przestawała mieścić się w kotwicy białka i planer szukał zamienników).
 
 **Ograniczenia i cel (piętra kar):**
 1. widełki dzienne kcal/B/T/W — elastyczne, kara 1 000 000 za gram (250 000 za kcal): wynik zawsze jest,
@@ -322,6 +332,16 @@ ograniczeń (model ścisły z założeniami) i powód każdej przekąski po pols
   Program: fakty liczbowe bierze z weryfikatora, zamianę sprawdza silnikiem (LLM wybiera danie wyłącznie z listy
   pasujących), zmiany założeń stosuje na kopii, waliduje i pokazuje różnice do potwierdzenia
   (np. „energia: 2350–2400, cel 2375 → 2300–2350, cel 2325”).
+  `proporcje` (od 20.10.2026): LLM podaje tylko posiłek/danie, składnik słowami użytkownika i kierunek
+  `za_duzo`/`za_malo`; program dopasowuje składnik w przepisie dania, zawęża jego zakres (`portion_review.tighten`,
+  z `beyond_recipe` — prośba domownika może zejść poniżej minimum przepisu, najwyżej do połowy typowej porcji) i
+  `DietService.adjust_portions` przelicza silnikiem tylko dotknięte bloki dni. Blok wchodzi do nowej wersji tylko
+  przy statusie OK silnika, braku błędów weryfikatora w tych dniach i zmianie składnika we wskazaną stronę.
+  Zawężenia zapisują się przy planie (`korekty_porcji` w układzie) i obowiązują przy zamianie innego dania w tych
+  dniach. Plan liczony według starszych danych poprawiamy na jego kopii danych (bez mieszania przepisów).
+  `sprawdz_porcje`: wnioski bez LLM z `plate_findings` (składnik ±50% od przepisu przeliczonego na kcal osoby, sos
+  poniżej 70% proporcji przepisu względem dodatków); uwagi dopisane do prośby czekają na zatwierdzenie.
+  Gdy model wybierze `zamien` dla wiadomości o proporcjach („za mało…, za dużo…”), program nie zamienia dania.
 - Nie wysyłamy danych osobowych — tylko nazwy dań, produktów i cele.
 
 ## 11. Dane o żywności

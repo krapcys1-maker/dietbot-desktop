@@ -64,10 +64,12 @@ def test_overlay_keeps_original_assumptions(repo):
     for p in eff.persons:
         raw = a.person(p.id).targets
         shift = default_macro_grams(a, "weglowodany")[p.id]
-        assert p.targets.carbs.min == raw.carbs.min - shift and p.targets.carbs.max == raw.carbs.max
-        assert p.targets.protein.max == raw.protein.max + shift and p.targets.protein.min == raw.protein.min
+        assert p.targets.carbs.min == raw.carbs.min - shift and p.targets.carbs.max == raw.carbs.max - shift / 2
+        assert p.targets.protein.max == raw.protein.max + shift and p.targets.protein.min == raw.protein.min + shift / 2
         assert p.targets.kcal == raw.kcal  # energia bez zmian — zamiana gram za gram (4 kcal/g)
-        assert p.targets.carbs.center < raw.carbs.center and p.targets.protein.center > raw.protein.center
+        # cel przesuwa się o całą zamianę — o tyle, ile obiecuje opis zasady
+        assert p.targets.carbs.center == raw.carbs.center - shift
+        assert p.targets.protein.center == raw.protein.center + shift
     assert out.hints == ["mniej dań z jajkami na kolację"]
     assert len(out.effects) == 3 and not out.problems  # wskazówki są osobno (hints)
 
@@ -162,7 +164,9 @@ def test_user_note_becomes_rules_numbers_from_text_or_code(env):
     assert any("białka jaj" in r["description"] for r in a["rules_added"])
     assert any("pominąłem liczby" in p for p in a["problems"])
     pasta = next(r for r in Notebook(service).rules() if r.category and r.category.value == "makaron")
-    assert pasta.grams["kobieta"] != 70 and set(pasta.grams) == {"kobieta", "mezczyzna"}
+    # limit policzył kod (największa porcja z ostatnich planów × 0,85) — może przypadkiem wyjść też 70 g
+    expected = Notebook(service)._default_cap(None, "makaron", "kobieta", [MealType.LUNCH])  # noqa: SLF001
+    assert pasta.grams["kobieta"] == expected and set(pasta.grams) == {"kobieta", "mezczyzna"}
     assert out["program_notes"][0]["text"].startswith("Lista zakupów")
     # zasady działają od razu w danych aplikacji, a plik założeń jest nietknięty
     eff = service.repo.assumptions
