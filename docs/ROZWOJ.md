@@ -42,7 +42,7 @@ Zainstaluj Inno Setup 6, potem:
 powershell -ExecutionPolicy Bypass -File packaging\zbuduj_instalator.ps1
 ```
 
-Wyniki: `release\Porcja-Setup-0.5.0.exe` i folder `dist\DietBot`. Do uruchomienia paczki potrzebny jest cały folder, nie sam EXE. Instalator jest niepodpisany. Wersję utrzymuj spójnie w `pyproject.toml`, `src/dietbot/__init__.py`, `web/package.json`, lockfile, skryptach oraz metadanych Windows.
+Wyniki: `release\Porcja-Setup-0.5.1.exe` i folder `dist\DietBot`. Do uruchomienia paczki potrzebny jest cały folder, nie sam EXE. Instalator jest niepodpisany. Wersję utrzymuj spójnie w `pyproject.toml`, `src/dietbot/__init__.py`, `web/package.json`, lockfile, skryptach oraz metadanych Windows.
 
 Nie zmieniaj AppId, technicznej nazwy `DietBot.exe` ani katalogu danych bez migracji: obecna zgodność pozwala aktualizować wcześniejsze instalacje. Nie nadpisuj własnych plików użytkownika przy dodawaniu danych startowych.
 
