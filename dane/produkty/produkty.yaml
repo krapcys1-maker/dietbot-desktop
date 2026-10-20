@@ -458,7 +458,7 @@
   stan: surowy
   zrodlo: {baza: BLS, kod: E111100, wersja: 4.0 (2025), nazwa_oryginalna: Hühnerei roh | Chicken egg raw, pobrano: '2026-09-13'}
   krok_g: 10
-  max_porcja_g: 300
+  max_porcja_g: 150
   miary:
   - {jednostka: szt, gramy: 50, opis: '1 jajko rozmiar M, bez skorupki', zrodlo: 'Rozp. (WE) 589/2008: klasa M 53–63 g w skorupce;
       część jadalna ok. 88% (USDA)'}

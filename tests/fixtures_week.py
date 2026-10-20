@@ -20,5 +20,7 @@ WEEK_SLOTS = [
     {"days": ["sobota"], "meal": "kolacja", "candidates": ["salatka_z_tunczykiem_i_jajkiem"]},
     {"days": ["niedziela"], "meal": "sniadanie", "candidates": ["pasta_jajeczna_na_pieczywie"]},
     {"days": ["niedziela"], "meal": "obiad", "candidates": ["carbonara_z_boczkiem"]},
-    {"days": ["niedziela"], "meal": "kolacja", "candidates": ["szakszuka_z_feta"]},
+    # szakszuka była trzecim daniem z jajek tego dnia: przy limicie 3 jajek na posiłek (20.10.2026) mężczyźnie
+    # brakowało białka i talerz przekraczał limit masy — tydzień ręczny ma być w pełni poprawny
+    {"days": ["niedziela"], "meal": "kolacja", "candidates": ["salatka_z_halloumi_i_ciecierzyca"]},
 ]

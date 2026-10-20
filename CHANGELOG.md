@@ -1,5 +1,12 @@
 # Historia zmian
 
+## Następna wersja — sos i proporcje dań (20.10.2026)
+
+- **Dania nie wychodzą suche.** Silnik nie może już obciąć sosu (mleczka kokosowego, śmietany, passaty, pomidorów, bulionu, jogurtu w daniu „z sosem”) poniżej 85% proporcji przepisu względem ryżu, makaronu, kaszy czy ziemniaków ani poniżej 80% względem mięsa, ryby, tofu czy strączków. Wcześniej dopełniał kalorie samym ryżem, a białko samym tofu. W teście 12 tygodni na trzech poziomach kalorii (ok. 1400–2600 kcal) 28 ze 102 porcji dań z sosem miało go mniej niż 85% przepisu, 13 — mniej niż 70%, a 16 miało o ponad 30% za dużo białka względem sosu; po zmianie poniżej 70% nie ma żadnej, poniżej 85% zostały pojedyncze wrapy i pity, a porcji z nadmiarem białka nie ma. Zupy i pieczywo podawane obok dania nie są objęte tą regułą. Czas planowania podobny jak wcześniej.
+- **Poprawione przepisy:** curry z tofu i ciecierzycą (90 g mleczka kokosowego zamiast 35 g, mniej tofu), chili z fasolą i tofu (200 g pomidorów zamiast 100 g, mniej tofu), makaron z kurczakiem i szpinakiem w sosie śmietanowym (90 g śmietany zamiast 50 g), curry z ciecierzycy i tofu (mniej tofu).
+- **Najwyżej 3 jajka** na osobę w jednym posiłku (było 6).
+- Poprawki przepisów i limitu jajek trafiają także do starszych instalacji (`dane/korekty`), jeśli nie zmieniałeś tych przepisów ani produktu. Zapisane plany zachowują swoje gramatury; aplikacja zaproponuje ich przeliczenie.
+
 ## 0.5.0 — bezpieczniej i pewniej (11.10.2026)
 
 Poprawki z audytu z 09.10.2026 (`docs/AUDYT_2026-10-09.md`, sekcja 9 opisuje stan każdego punktu).

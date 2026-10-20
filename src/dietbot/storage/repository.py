@@ -174,8 +174,8 @@ class Repository:
         cache = paths.cache if use_cache else None
         problems: list[str] | None = None if strict else []
         products = load_products(paths.products_dir, cache, problems)
-        corrections = apply_corrections(products, paths.data / "korekty", cache, problems)
         dishes = load_dishes(paths.dishes_dir, cache, problems)
+        corrections = apply_corrections(products, paths.data / "korekty", cache, problems, dishes)
         return cls(
             paths=paths,
             products=products,

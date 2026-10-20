@@ -162,7 +162,9 @@ def test_user_note_becomes_rules_numbers_from_text_or_code(env):
     assert any("białka jaj" in r["description"] for r in a["rules_added"])
     assert any("pominąłem liczby" in p for p in a["problems"])
     pasta = next(r for r in Notebook(service).rules() if r.category and r.category.value == "makaron")
-    assert pasta.grams["kobieta"] != 70 and set(pasta.grams) == {"kobieta", "mezczyzna"}
+    # limit policzył kod (największa porcja z ostatnich planów × 0,85) — może przypadkiem wyjść też 70 g
+    expected = Notebook(service)._default_cap(None, "makaron", "kobieta", [MealType.LUNCH])  # noqa: SLF001
+    assert pasta.grams["kobieta"] == expected and set(pasta.grams) == {"kobieta", "mezczyzna"}
     assert out["program_notes"][0]["text"].startswith("Lista zakupów")
     # zasady działają od razu w danych aplikacji, a plik założeń jest nietknięty
     eff = service.repo.assumptions

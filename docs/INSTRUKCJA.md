@@ -95,6 +95,8 @@ Baza została rozszerzona o 34 autorskie przepisy roślinne w 0.2.0 (26 wegańsk
 
 Pieczywo i główne nadzienie kanapek są powiązane. Zamknięte tosty z chleba tostowego mają parzystą liczbę kromek i minimum 20 g sera na 50 g pieczywa. Masy wymagające przepisu — np. ciasto naleśnikowe, farsz czy panierka — są skalowane razem, z kontrolą udziałów składników. Silnik nie może złamać tych reguł tylko dlatego, że poprawiłoby to wynik kcal.
 
+**Sos rośnie razem z daniem (od 20.10.2026).** Sos — np. mleczko kokosowe, śmietana, passata, pomidory z puszki, bulion albo jogurt w daniu „z sosem” — nie może być mniejszy niż 85% proporcji przepisu względem ryżu, makaronu, kaszy czy ziemniaków i 80% względem mięsa, ryby, tofu czy strączków. Danie może być w całości mniejsze albo większe, ale silnik nie dopełnia już kalorii samym ryżem ani białka samym tofu kosztem sosu. Zupy i pieczywo podawane obok dania nie są objęte tą regułą. Najwyżej 3 jajka na osobę w jednym posiłku.
+
 W eksporcie znajdziesz **łączną ilość składników masy dla wszystkich osób**. Roztrzep jajko i odważ podaną ilość do wspólnego ciasta; porcje w tabeli opisują podział, nie osobne mieszanie ciasta na każdy talerz. Składniki i miary domowe nadal są przybliżeniem konkretnego produktu.
 
 Zapisana wcześniej dieta nie zmienia się sama. W **Plan tygodnia → Przelicz i napraw** utworzysz nową wersję według aktualnych przepisów. Oryginał pozostaje w historii. Jeśli nowych warunków nie da się spełnić, aplikacja powinna zmienić danie lub pokazać uwagi — nie usuwać potrzebnego sera albo mąki.

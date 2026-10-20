@@ -220,8 +220,8 @@
   skladniki:
     - {produkt: makaron_pszenny, rola: weglowodany, typowo_g: 85}
     - {produkt: piers_z_kurczaka, rola: bialko, typowo_g: 150}
-    - {produkt: szpinak, rola: warzywa, porcjowanie: z_garnka, typowo_g: 80}
-    - {produkt: smietana_10, rola: sos, porcjowanie: z_garnka, typowo_g: 50}
+    - {produkt: szpinak, rola: warzywa, porcjowanie: z_garnka, typowo_g: 100}
+    - {produkt: smietana_10, rola: sos, porcjowanie: z_garnka, typowo_g: 90}
     - {produkt: czosnek, rola: dodatek, porcjowanie: z_garnka, typowo_g: 5}
     - {produkt: oliwa_z_oliwek, rola: tluszcz, porcjowanie: z_garnka, typowo_g: 5}
     - {produkt: parmezan, rola: dodatek, typowo_g: 10}

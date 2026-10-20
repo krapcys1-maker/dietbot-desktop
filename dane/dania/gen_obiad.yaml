@@ -7105,7 +7105,7 @@
   tagi: [wege]
   skladniki:
   - {produkt: ryz_bialy, rola: weglowodany, porcjowanie: osobno, typowo_g: 80.0, opcjonalny: false, skaluje_sie: true}
-  - {produkt: tofu, rola: bialko, porcjowanie: osobno, typowo_g: 150.0, opcjonalny: false, skaluje_sie: true}
+  - {produkt: tofu, rola: bialko, porcjowanie: osobno, typowo_g: 110.0, opcjonalny: false, skaluje_sie: true}
   - {produkt: ciecierzyca_konserwowa, rola: bialko, porcjowanie: osobno, typowo_g: 150.0, opcjonalny: false, skaluje_sie: 
       true}
   - {produkt: mleczko_kokosowe, rola: sos, porcjowanie: osobno, typowo_g: 100.0, opcjonalny: false, skaluje_sie: true}

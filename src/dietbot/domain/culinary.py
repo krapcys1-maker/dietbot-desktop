@@ -9,13 +9,28 @@ import re
 from collections.abc import Mapping
 
 from ..textnorm import normalize
-from .dish import DishTemplate, IngredientGroup, Portioning, Ratio, Role
+from .dish import DishTag, DishTemplate, IngredientGroup, MealType, Portioning, Ratio, Role
 from .product import Category, Product
 
-VERSION = 1
+VERSION = 2
 BREAD_DISH = re.compile(r"^(kanapk|tost|grzank|bagiet|bulka |bulecz|wrap|tortill|pita |burger|cheeseburger)")
 DELICATE = re.compile(r"ciasto|panier|masa|klops|kotlet|farsz")
 NEEDS_STRUCTURE = re.compile(r"nalesnik|krokiet|plack|placus|racuch|gofr|pierog|kopytk|klusk|panier|katsu|schabow")
+
+# Dish coherence (version 2). Each component used to move on its own, so the solver filled a macro gap with one
+# product: rice for carbs, tofu for protein, and cut coconut milk or cream for fat — a dry plate. Measured on
+# 12 weeks at three calorie levels (20.10.2026): 28 of 102 sauce-dish portions had < 85% of the recipe's sauce,
+# 13 < 70%; afterwards none < 70%.
+# Liquids form the sauce whatever role the recipe gives them (canned tomatoes are often "warzywa").
+SAUCE_LIQUIDS = frozenset({"passata", "pomidory_z_puszki", "mleczko_kokosowe", "bulion_drobiowy", "bulion_warzywny",
+                           "smietana_10", "smietana_20", "smietanka_30", "sos_slodko_kwasny"})
+SAUCE_DISH = re.compile(r"\bsos|tzatziki|\bdip\b|dressing")  # yogurt or cream in role "nabial" is the sauce here
+SAUCE_MIN_G = 40  # a sauce item this large (2000 kcal recipe) is a real sauce, not a splash of soy sauce
+MAIN_MIN_G = 30  # starch or protein smaller than this is a garnish, not a component to keep in proportion
+SAUCE_PER_STARCH = .85  # sauce vs rice/pasta/groats/potatoes: at most 15% less than in the recipe
+SAUCE_PER_PROTEIN = .8  # sauce vs meat/fish/tofu/legumes: at most 20% less
+# No protein-vs-starch bound: with protein capped by the daily band, a higher-calorie person needs more potatoes
+# for the same meat, and such a bound left the 2375 kcal test week short of carbs.
 
 # Reviewed gaps in the bundled recipes. Only named members are linked; potato,
 # rice, salad etc. remain separate. No guessed ingredient assignments for AI.
@@ -119,6 +134,11 @@ def protect_recipe(original: DishTemplate, products: Mapping[str, Product]) -> D
                                         description="Nadzienie względem pieczywa — proporcja przepisu ±25%"))
         dish.culinary_notes.append("Pieczywo i główne nadzienie rosną razem; dodatki nie są wymieniane na puste kromki.")
 
+    # Balancing snacks skip dishes with ratios. Soups were densified on purpose (the man's plate cap filled up
+    # with broth alone), so their broth does not have to grow with the meat or potatoes.
+    if MealType.SNACK not in dish.meal_types and not dish.has_tag(DishTag.SOUP):
+        _keep_dish_coherent(dish, products, dairy_sauce=bool(SAUCE_DISH.search(name)))
+
     # Missing declarations in future/custom recipes fail closed instead of
     # allowing an optimizer (or an LLM) to invent a batter solely to fit macros.
     flours = {i.product_id for i in dish.ingredients if i.product_id.startswith("maka_") and not i.optional}
@@ -151,3 +171,46 @@ def protect_recipe(original: DishTemplate, products: Mapping[str, Product]) -> D
                 dish.culinary_errors.append("Niepełne proporcje masy — przypisz jajka i płyn do odpowiedniej grupy: "
                                            + ", ".join(sorted(missing)))
     return dish
+
+
+def _keep_dish_coherent(dish: DishTemplate, products: Mapping[str, Product], dairy_sauce: bool) -> None:
+    """Sauce grows with the starch and the protein. Lower bounds only, relative to the recipe: the whole dish
+    may still be smaller or larger, and the sauce may be more generous."""
+    def movable(i):  # the same grams for everyone or a fixed amount would make the ratio differ per person
+        p = products[i.product_id]
+        return (not i.optional and i.scales and i.typical_g > 0 and i.role is not Role.SPICE and not p.negligible
+                and i.portioning is not Portioning.EQUAL)
+
+    sauce = [i for i in dish.ingredients if movable(i) and i.typical_g >= SAUCE_MIN_G
+             and (i.role is Role.SAUCE or i.product_id in SAUCE_LIQUIDS
+                  or (dairy_sauce and i.role is Role.DAIRY and products[i.product_id].category is Category.DAIRY))]
+    in_sauce = {i.product_id for i in sauce}
+    # bread on the side (shakshuka, soup) is not soaked in the sauce; more bread does not need more sauce
+    starch = [i for i in dish.ingredients if movable(i) and i.role is Role.CARBS and i.product_id not in in_sauce
+              and products[i.product_id].category is not Category.BREAD]
+    protein = [i for i in dish.ingredients if movable(i) and i.role is Role.PROTEIN and i.product_id not in in_sauce]
+    groups = {"starch": starch if sum(i.typical_g for i in starch) >= MAIN_MIN_G else [],
+              "protein": protein if sum(i.typical_g for i in protein) >= MAIN_MIN_G else []}
+
+    def names(items) -> str:
+        return ", ".join(products[i.product_id].name.lower() for i in items)
+
+    def add(num, den, share: float, why: str) -> None:
+        recipe = sum(i.typical_g for i in num) / sum(i.typical_g for i in den)
+        dish.ratios.append(Ratio(numerator=[i.product_id for i in num], denominator=[i.product_id for i in den],
+                                 min=round(recipe * share, 4),
+                                 description=f"{(products[num[0].product_id].name if len(num) == 1 else names(num)).capitalize()} "
+                                             f"względem: {names(den)} — co najmniej {share:.0%} proporcji przepisu "
+                                             f"({why})"))
+
+    added = 0
+    for item in sauce:
+        if groups["starch"]:
+            add([item], groups["starch"], SAUCE_PER_STARCH, "danie nie może wyjść suche")
+            added += 1
+        if groups["protein"]:
+            add([item], groups["protein"], SAUCE_PER_PROTEIN, "sos do mięsa, ryby lub tofu")
+            added += 1
+    if added:
+        dish.culinary_notes.append("Spójność dania: sos rośnie razem z ryżem, makaronem, kaszą czy ziemniakami "
+                                   "i razem z mięsem, rybą lub tofu.")
