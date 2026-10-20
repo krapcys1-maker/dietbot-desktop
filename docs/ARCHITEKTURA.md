@@ -332,6 +332,16 @@ ograniczeń (model ścisły z założeniami) i powód każdej przekąski po pols
   Program: fakty liczbowe bierze z weryfikatora, zamianę sprawdza silnikiem (LLM wybiera danie wyłącznie z listy
   pasujących), zmiany założeń stosuje na kopii, waliduje i pokazuje różnice do potwierdzenia
   (np. „energia: 2350–2400, cel 2375 → 2300–2350, cel 2325”).
+  `proporcje` (od 20.10.2026): LLM podaje tylko posiłek/danie, składnik słowami użytkownika i kierunek
+  `za_duzo`/`za_malo`; program dopasowuje składnik w przepisie dania, zawęża jego zakres (`portion_review.tighten`,
+  z `beyond_recipe` — prośba domownika może zejść poniżej minimum przepisu, najwyżej do połowy typowej porcji) i
+  `DietService.adjust_portions` przelicza silnikiem tylko dotknięte bloki dni. Blok wchodzi do nowej wersji tylko
+  przy statusie OK silnika, braku błędów weryfikatora w tych dniach i zmianie składnika we wskazaną stronę.
+  Zawężenia zapisują się przy planie (`korekty_porcji` w układzie) i obowiązują przy zamianie innego dania w tych
+  dniach. Plan liczony według starszych danych poprawiamy na jego kopii danych (bez mieszania przepisów).
+  `sprawdz_porcje`: wnioski bez LLM z `plate_findings` (składnik ±50% od przepisu przeliczonego na kcal osoby, sos
+  poniżej 70% proporcji przepisu względem dodatków); uwagi dopisane do prośby czekają na zatwierdzenie.
+  Gdy model wybierze `zamien` dla wiadomości o proporcjach („za mało…, za dużo…”), program nie zamienia dania.
 - Nie wysyłamy danych osobowych — tylko nazwy dań, produktów i cele.
 
 ## 11. Dane o żywności

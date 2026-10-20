@@ -7,6 +7,8 @@
 - **Najwyżej 3 jajka** na osobę w jednym posiłku (było 6).
 - **Zasada „mniej węglowodanów, więcej białka” z notatnika działa w pełni.** Cel białka rośnie, a cel węglowodanów spada o całą podaną ilość (wcześniej o połowę, a silnik trzymał się dolnej granicy — z „+25 g białka dziennie” wychodziło ok. +5 g). Na profilu 1650/2200 kcal: białko średnio 154 → 168 g (mężczyzna) i 107 → 112 g (kobieta), ryż i makaron na obiad nieco mniejsze.
 - Poprawki przepisów i limitu jajek trafiają także do starszych instalacji (`dane/korekty`), jeśli nie zmieniałeś tych przepisów ani produktu. Zapisane plany zachowują swoje gramatury; aplikacja zaproponuje ich przeliczenie.
+- **Czat poprawia proporcje dania zamiast je zamieniać.** „Za mało mleczka, za dużo tofu i ciecierzycy” w curry, „cztery jajka na miękko to za dużo”, „dla żony za mało kurczaka” — danie zostaje, model wskazuje tylko posiłek, składnik i kierunek, a silnik przelicza te dni (składnik „za dużo” najwyżej 80% talerza, „za mało” co najmniej 125%). Nowa wersja powstaje tylko, gdy dni mieszczą się w celach i weryfikator nie ma zastrzeżeń; poprawka zostaje przy planie także po zamianie innego dania tego dnia. Wcześniej czat zamieniał curry na prawie identyczne, a gramatury się nie zmieniały. Bez kosztów AI poza rozpoznaniem wiadomości.
+- **„Zweryfikuj gramatury” daje wnioski kulinarne**, nie same średnie z tygodnia: talerze, w których składnik odbiega od przepisu o ponad 50%, dania, które mogą wyjść suche, i uwagi weryfikatora. Uwagi dopisane do takiej prośby („za dużo tofu”) czat proponuje poprawić po zatwierdzeniu.
 
 ## 0.5.0 — bezpieczniej i pewniej (11.10.2026)
 
