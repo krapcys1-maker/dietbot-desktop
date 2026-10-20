@@ -23,7 +23,8 @@ from .store import PlanRecord
 METRICS = ("kcal", "protein", "fat", "carbs")
 METRIC_LABELS = {"kcal": "Energia", "protein": "Białko", "fat": "Tłuszcz", "carbs": "Węglowodany", "fiber": "Błonnik"}
 SOURCE_LABELS = {"llm": "ułożony przez model językowy", "algorytm": "ułożony algorytmem", "zamiana": "zamiana dania",
-                 "przeliczenie": "przeliczony po zmianie założeń", "naprawa": "naprawiony automatycznie"}
+                 "przeliczenie": "przeliczony po zmianie założeń", "naprawa": "naprawiony automatycznie",
+                 "proporcje": "poprawione proporcje dania"}
 
 
 def _r(v: float, nd: int = 1) -> float:

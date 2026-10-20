@@ -101,6 +101,8 @@ W eksporcie znajdziesz **łączną ilość składników masy dla wszystkich osó
 
 Zapisana wcześniej dieta nie zmienia się sama. W **Plan tygodnia → Przelicz i napraw** utworzysz nową wersję według aktualnych przepisów. Oryginał pozostaje w historii. Jeśli nowych warunków nie da się spełnić, aplikacja powinna zmienić danie lub pokazać uwagi — nie usuwać potrzebnego sera albo mąki.
 
+**Proporcje jednego dania z czatu (od 20.10.2026).** Napisz w czacie, czego jest za dużo albo za mało, np. „w curry z tofu za mało mleczka, a za dużo tofu i ciecierzycy”, „cztery jajka na miękko na śniadanie to za dużo”, „dla żony za mało kurczaka w poniedziałkowej kolacji”. Danie zostaje, a silnik przelicza tylko te dni: składnika „za dużo” będzie najwyżej 80% tego, co było na talerzu, „za mało” — co najmniej 125%. Nowa wersja planu powstaje tylko wtedy, gdy dni nadal mieszczą się w celach, a weryfikator nie ma zastrzeżeń; inaczej plan zostaje bez zmian, a czat mówi dlaczego. Taka poprawka nie kosztuje nic w AI (poza samym zrozumieniem wiadomości) i obowiązuje też, gdy później zamienisz inne danie tego dnia; **Przelicz** liczy plan od nowa według przepisów. Prośba „zweryfikuj ten plan pod kątem gramatur” pokazuje talerze, w których składnik odbiega od przepisu o ponad połowę, i dania, które mogą wyjść suche — a uwagi dopisane do takiej prośby czat proponuje poprawić po Twoim zatwierdzeniu. Trwałe upodobania („zawsze mniej ryżu”) zapisuj w notatniku preferencji.
+
 ## Kalkulator celów
 
 W **Cele i preferencje**, przy osobie, rozwiń **Nie znasz swoich celów?**. Wpisz dane, kliknij **Oblicz propozycję**, następnie **Wstaw propozycję do formularza** i **Zapisz**. Samo obliczenie nie zmienia celów. Możesz nadal wpisywać cele ręcznie.

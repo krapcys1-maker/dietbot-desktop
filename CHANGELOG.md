@@ -6,6 +6,8 @@
 - **Poprawione przepisy:** curry z tofu i ciecierzycą (90 g mleczka kokosowego zamiast 35 g, mniej tofu), chili z fasolą i tofu (200 g pomidorów zamiast 100 g, mniej tofu), makaron z kurczakiem i szpinakiem w sosie śmietanowym (90 g śmietany zamiast 50 g), curry z ciecierzycy i tofu (mniej tofu).
 - **Najwyżej 3 jajka** na osobę w jednym posiłku (było 6).
 - Poprawki przepisów i limitu jajek trafiają także do starszych instalacji (`dane/korekty`), jeśli nie zmieniałeś tych przepisów ani produktu. Zapisane plany zachowują swoje gramatury; aplikacja zaproponuje ich przeliczenie.
+- **Czat poprawia proporcje dania zamiast je zamieniać.** „Za mało mleczka, za dużo tofu i ciecierzycy” w curry, „cztery jajka na miękko to za dużo”, „dla żony za mało kurczaka” — danie zostaje, model wskazuje tylko posiłek, składnik i kierunek, a silnik przelicza te dni (składnik „za dużo” najwyżej 80% talerza, „za mało” co najmniej 125%). Nowa wersja powstaje tylko, gdy dni mieszczą się w celach i weryfikator nie ma zastrzeżeń; poprawka zostaje przy planie także po zamianie innego dania tego dnia. Wcześniej czat zamieniał curry na prawie identyczne, a gramatury się nie zmieniały. Bez kosztów AI poza rozpoznaniem wiadomości.
+- **„Zweryfikuj gramatury” daje wnioski kulinarne**, nie same średnie z tygodnia: talerze, w których składnik odbiega od przepisu o ponad 50%, dania, które mogą wyjść suche, i uwagi weryfikatora. Uwagi dopisane do takiej prośby („za dużo tofu”) czat proponuje poprawić po zatwierdzeniu.
 
 ## 0.5.0 — bezpieczniej i pewniej (11.10.2026)
 
