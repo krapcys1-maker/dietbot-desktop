@@ -72,7 +72,7 @@ W **Dopasuj do siebie → Notatnik preferencji** napisz uwagę zwykłym językie
 |---|---|
 | **Zakaz produktu** | Produkt (albo cała kategoria) nie trafia do nowych planów; dania, w których jest obowiązkowy, odpadają. |
 | **Limit porcji** | Największa porcja produktu lub kategorii na posiłek, osobno dla każdej osoby (np. ryż suchy 65 g i 105 g na obiad). Silnik nie przekroczy limitu, a weryfikator to sprawdza. |
-| **Mniej węglowodanów, więcej białka** | Przesuwa widełki dzienne bez zmiany kalorii: dolna granica węglowodanów w dół, górna granica białka w górę. Silnik ma więcej swobody i chętniej dokłada mięsa niż ryżu. |
+| **Mniej węglowodanów, więcej białka** | Przesuwa cele dzienne bez zmiany kalorii: cel węglowodanów w dół, a cel białka w górę o całą podaną ilość; widełki są przy tym trochę szersze. Od 0.5.1 cel przesuwa się o pełną ilość (wcześniej o połowę, więc z „+25 g białka” wychodziło ok. +5 g). |
 | **Wskazówka** | Miękka preferencja dla układającego tydzień (np. „mniej dań z jajkami na kolację”). |
 
 Liczby w zasadach pochodzą z Twojej uwagi. Gdy ich nie podasz, liczy je program, np. limit „mniej niż dotąd” na podstawie ostatnich planów. Model językowy tylko rozpoznaje treść uwagi. Bez klucza AI uwaga zapisze się jako notatka, a zasadę dodasz ręcznie w **Dodaj zasadę ręcznie**.

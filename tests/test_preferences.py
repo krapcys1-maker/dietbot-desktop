@@ -64,10 +64,12 @@ def test_overlay_keeps_original_assumptions(repo):
     for p in eff.persons:
         raw = a.person(p.id).targets
         shift = default_macro_grams(a, "weglowodany")[p.id]
-        assert p.targets.carbs.min == raw.carbs.min - shift and p.targets.carbs.max == raw.carbs.max
-        assert p.targets.protein.max == raw.protein.max + shift and p.targets.protein.min == raw.protein.min
+        assert p.targets.carbs.min == raw.carbs.min - shift and p.targets.carbs.max == raw.carbs.max - shift / 2
+        assert p.targets.protein.max == raw.protein.max + shift and p.targets.protein.min == raw.protein.min + shift / 2
         assert p.targets.kcal == raw.kcal  # energia bez zmian — zamiana gram za gram (4 kcal/g)
-        assert p.targets.carbs.center < raw.carbs.center and p.targets.protein.center > raw.protein.center
+        # cel przesuwa się o całą zamianę — o tyle, ile obiecuje opis zasady
+        assert p.targets.carbs.center == raw.carbs.center - shift
+        assert p.targets.protein.center == raw.protein.center + shift
     assert out.hints == ["mniej dań z jajkami na kolację"]
     assert len(out.effects) == 3 and not out.problems  # wskazówki są osobno (hints)
 

@@ -156,13 +156,15 @@ def default_macro_grams(a: Assumptions, shift_from: str, persons: list[str] | No
 
 
 def _shift_band(band: Band, delta: float, *, lower: bool) -> Band:
-    """Przesuwa cel o połowę `delta` i poszerza widełki w tę stronę o całe `delta` (druga granica bez zmian)."""
+    """Przesuwa cel o całe `delta`: granica w tę stronę idzie o `delta`, druga o połowę (widełki szersze o połowę
+    `delta`, nie sztywne). Wcześniej cel szedł o połowę, a druga granica stała — silnik trzymał się dolnego skraju
+    strefy bez kary i z „+25 g białka dziennie” wychodziło ok. +5 g (test na profilu użytkownika, 20.10.2026)."""
     center = band.center
     if lower:
         new_min = max(0.0, band.min - delta)
-        return Band(min=round(new_min, 1), max=band.max, cel=round(max(new_min, center - delta / 2), 1))
+        return Band(min=round(new_min, 1), max=round(band.max - delta / 2, 1), cel=round(max(new_min, center - delta), 1))
     new_max = band.max + delta
-    return Band(min=band.min, max=round(new_max, 1), cel=round(min(new_max, center + delta / 2), 1))
+    return Band(min=round(band.min + delta / 2, 1), max=round(new_max, 1), cel=round(min(new_max, center + delta), 1))
 
 
 def apply_preferences(a: Assumptions, rules: list[PreferenceRule], products: Mapping[str, Product]) -> AppliedPreferences:
