@@ -50,3 +50,23 @@ def test_store_sections(repo):
         assert shop_group(pid, p[pid].category) == "inne", pid
     assert shop_group("ryz_bialy", Category.RICE) == "inne"
     assert shop_group("makaron_pszenny", Category.PASTA) == "inne"
+
+
+def test_no_list_markers_in_anything_you_copy(repo):
+    """Notatki w telefonie same dodają pola do odhaczania — żaden kopiowany tekst nie może mieć własnych znaczków
+    (Telegram miał kwadraciki „▫️”, które po „utwórz listę” dublowały pola)."""
+    import re
+
+    from dietbot.app.telegram_bot import format_shopping
+
+    rows = _rows(repo)
+    data = {"title": "Tydzień", "groups": []}
+    for r in rows:
+        if not data["groups"] or data["groups"][-1]["category"] != r.group:
+            data["groups"].append({"category": r.group, "label": r.group_label, "items": []})
+        data["groups"][-1]["items"].append(r.to_dict())
+    telegram = re.sub(r"<[^>]+>", "", format_shopping(data))
+    for text in (render_shopping_text(rows, "Tydzień"), telegram):
+        for line in text.splitlines():
+            assert line.strip(), "pusta linia"
+            assert not re.match(r"^\s*([-*•▫▪☐✓✔]|\[ ?\]|\d+[.)])", line), line

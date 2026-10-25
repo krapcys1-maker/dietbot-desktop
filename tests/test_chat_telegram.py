@@ -143,7 +143,7 @@ def test_telegram_formatting(env):
     week = format_week(view)
     assert week.count("\n<b>") >= 7 - 1
     shop = format_shopping(service.shopping(rec.id))
-    assert shop.startswith("🛒 <b>Lista zakupów</b>")
+    assert shop.startswith("<b>Lista zakupów — ")
     parts = chunks(shop * 5, limit=500)
     assert all(len(p) <= 500 for p in parts) and "".join(parts).count("Lista zakupów") == 5
     assert md_to_html("**Środa** & <b>x</b> _uwaga_") == "<b>Środa</b> &amp; &lt;b&gt;x&lt;/b&gt; <i>uwaga</i>"

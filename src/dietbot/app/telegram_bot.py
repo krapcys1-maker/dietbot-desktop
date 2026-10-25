@@ -184,12 +184,14 @@ def format_week(view: dict) -> str:
 
 
 def format_shopping(data: dict) -> str:
-    lines = [f"🛒 <b>Lista zakupów</b> — {html.escape(data['title'])}"]
+    """Sam tekst, jak plik TXT: bez znaczków przed pozycjami i pustych linii — po wklejeniu do notatek w telefonie
+    „utwórz listę” dodaje własne pola do odhaczania, a kwadraciki „▫️” dublowały je (25.10.2026)."""
+    lines = [f"<b>Lista zakupów — {html.escape(data['title'])}</b>"]
     for g in data["groups"]:
         lines.append(f"<b>{html.escape(g['label'].upper())}</b>")
         for it in g["items"]:
             amount = "" if it["pomijalny"] else f" — {it['ilosc']}"
-            lines.append(f"▫️ {html.escape(it['nazwa'])}{amount}")
+            lines.append(f"{html.escape(it['nazwa'])}{amount}")
     return "\n".join(lines)
 
 

@@ -99,7 +99,7 @@ def test_help_week_today_and_shopping(service):
     today = run(service, ALLOWED, "/dzis").texts()
     assert today and "kcal" in today[0] and "Śniadanie" in today[0]
     shop = run(service, ALLOWED, "/zakupy").texts()
-    assert shop and shop[0].startswith("🛒 <b>Lista zakupów</b>")
+    assert shop and shop[0].startswith("<b>Lista zakupów — ")
     assert all(len(t) <= 4096 for t in shop)
 
 
