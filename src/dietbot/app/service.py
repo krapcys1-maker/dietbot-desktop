@@ -549,7 +549,8 @@ class DietService:
                 progress("Nie zmieściły się w tym tygodniu (zostają na następny): "
                          + "; ".join(self.repo.dishes[d].name for d in missed if d in self.repo.dishes))
             progress(f"Gotowe: {rec.title} ({'plan poprawny' if rec.ok else 'plan z uwagami'})")
-            return {"plan_id": rec.id, "ok": rec.ok, "new_dishes": sorted(fresh)}
+            # tylko dania wymyślone w tym zadaniu — wybrane z propozycji już były w bibliotece
+            return {"plan_id": rec.id, "ok": rec.ok, "new_dishes": sorted(fresh - set(chosen))}
 
         return self.jobs.submit("generowanie", "Nowy plan tygodnia", run)
 

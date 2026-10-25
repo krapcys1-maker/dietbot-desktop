@@ -52,6 +52,8 @@ Plany ze starszych wersji bez takich kopii zabezpieczane są danymi dostępnymi 
 
 Lista sumuje produkty ze wszystkich dni, osób, przekąsek i stałych pozycji. Łączy warianty np. mozzarelli, jogurtu, fety, mleka i twarogu; nie pokazuje marek, sklepów, przypraw ani ziół. **Skyr pozostaje osobno od jogurtu, a śmietanka od kwaśnej śmietany.** Ilości to gramy produktu, nie liczba opakowań.
 
+Od 0.6.0 lista ma cztery działy jak kartka do sklepu: **Nabiał** (także sery i jajka), **Mięso** (także drób, wędliny i ryby), **Owoce i warzywa** oraz **Inne** (pieczywo, ryż, makaron, puszki, mrożonki, przyprawy w płynie i jedzenie na wynos). Plik TXT i **Kopiuj pozostałe zakupy** nie mają pustych linii ani objaśnień — po wklejeniu do notatek w telefonie każdy wiersz to pozycja do odhaczenia, a nazwy działów są WIELKIMI LITERAMI.
+
 Odhaczanie zapamiętuje kupioną ilość. Jeśli w kolejnej wersji potrzeba więcej, pozycja pojawi się ponownie do dokupienia. W **Więcej** możesz wybrać plan, skopiować pozostałe zakupy i wyczyścić odhaczenia. Eksport zawsze obejmuje całość.
 
 Od 0.4.0 eksport TXT i kopiowanie podają pozycje bez „- [ ]” i „- ” (np. `Jogurt — 410 g`). Po wklejeniu do notatek w telefonie każdą linię zamienisz w punkt do odhaczania.
@@ -80,6 +82,8 @@ Liczby w zasadach pochodzą z Twojej uwagi. Gdy ich nie podasz, liczy je program
 Zasady obowiązują w nowych planach i zamianach. Zapisany wcześniej tydzień pokaże informację o zmianie ustawień. **Przelicz i napraw** utworzy nową wersję: najpierw wymieni dania, które przestały pasować (np. z białkami jaj), potem przeliczy gramatury. Plik założeń się nie zmienia — zasady można wyłączyć albo usunąć.
 
 Uwagi o samej aplikacji (np. „lista zakupów ma niewygodny format”) trafiają na listę **Do poprawy w programie**. Program ich sam nie wprowadza; skopiuj je albo zapisz notatnik do TXT i przekaż twórcy. **Przeanalizuj nawyki** opisuje wzorce z ocen, zamian dań i uwag oraz proponuje zasady — dodajesz tylko te, które chcesz. W czacie i Telegramie wystarczy napisać „zapamiętaj, że…”.
+
+**Propozycje dla Was (od 0.6.0).** Na górze notatnika kliknij **Zaproponuj dania**. Porcja zbiera oceny 👍/👎, zamiany dań w planach, uwagi, życzenia, prośby z czatu i odrzucone wcześniej propozycje, a model językowy opisuje, co lubicie, i wybiera dania z biblioteki, których jeszcze nie jedliście (zgodne z dietą i zasadami). Podsuwa też pomysły na nowe dania — pomysł, który okazuje się znanym daniem, program zamienia na zwykłą propozycję. **Chcę w następnym planie** wstawia danie do najbliższego układania tygodnia, **Nie teraz** chowa propozycję i też uczy, a **Wymyśl to danie** tworzy przepis, który przechodzi kontrolę programu, silnika i kucharza, i trafia do biblioteki oraz do następnego planu. Odświeżenie kosztuje zwykle mniej niż cent, wymyślenie dania — kilka centów. W czacie wystarczy napisać np. „zaproponuj coś, co nam zasmakuje” (aplikacja zapyta o zgodę).
 
 To zapamiętywanie konkretnych ocen i zasad, nie automatyczne rozpoznawanie alergii. Podczas układania planu zmiana ocen jest zablokowana. Biblioteka pozwala filtrować dietę, ocenę i czas przygotowania; filtr **do 15 minut** sprawdza rzeczywisty czas w przepisie.
 

@@ -23,6 +23,7 @@ from pydantic import BaseModel, Field, field_validator
 from ..domain.dish import MEAL_LABELS_PL, DishTemplate, MealType, Role, cuisine_label
 from ..llm.client import LLMError
 from ..llm.scope import check_cancelled
+from ..textnorm import normalize
 from ..textnumbers import has_digits, without_numbers
 from .jobs import Job, UserError
 
@@ -36,6 +37,7 @@ MAX_PROPOSALS = 6
 MAX_IDEAS = 3
 MAIN_MIN_G = 30  # składnik, po którym rozpoznaje się danie (nie przyprawa ani łyżka oleju)
 CHAT_MESSAGES = 25
+SAME_DISH_SHARE = 0.85  # pomysł = danie z biblioteki, gdy tyle rdzeni słów jednej nazwy jest w drugiej
 
 SYSTEM = """Jesteś doradcą kulinarnym w polskiej aplikacji Porcja, która układa tygodniowy jadłospis dla domowników.
 Program podaje sygnały o ich gustach (oceny dań, zamiany w planach — co odrzucili, co wybrali — uwagi, życzenia,
@@ -50,7 +52,8 @@ Odpowiedz w JSON:
   do ich gustu (odwołaj się do tego, co lubią), bez cyfr.
 - "nowe_pomysly": do trzech konkretnych dań, których NIE ma na liście, w ich guście i różnych od propozycji: posiłek,
   kuchnia (jedna z listy kuchni), "opis" — nazwa dania z najważniejszymi składnikami (np. „makaron z kurczakiem
-  w sosie z suszonych pomidorów”), "powod". Bez produktów, których nie lubią albo których im nie wolno.
+  w sosie z suszonych pomidorów”), "powod". Bez produktów, których nie lubią albo których im nie wolno. Nie
+  powtarzaj tu dań z sygnałów (np. polubionych) ani z listy kandydatów — tylko dania, których jeszcze nie znają.
 Nie podawaj gramatur ani kalorii — liczy je program."""
 
 
@@ -141,6 +144,26 @@ def refresh_hint(service: DietService) -> None:
 
 
 # ---------------------------------------------------------------- kandydaci z biblioteki (bez modelu)
+
+def _stems(text: str) -> set[str]:
+    """Rdzenie słów nazwy (cztery litery) — „pasta z jajek” i „pastą jajeczną” mają te same."""
+    return {w[:4] for w in normalize(text).replace(",", " ").split() if len(w) >= 3}
+
+
+def library_match(opis: str, dishes: dict[str, DishTemplate]) -> str | None:
+    """Danie z biblioteki, które jest tym pomysłem (model nie widzi całej biblioteki i potrafi „wymyślić” znane danie)."""
+    idea = _stems(opis)
+    best, best_share = None, 0.0
+    for dish in dishes.values():
+        name = _stems(dish.name)
+        common = len(idea & name)
+        if common < 3:
+            continue
+        share = max(common / len(idea), common / len(name))
+        if share > best_share:
+            best, best_share = dish.id, share
+    return best if best_share >= SAME_DISH_SHARE else None
+
 
 def main_products(dish: DishTemplate) -> list[str]:
     return [i.product_id for i in dish.ingredients
@@ -330,6 +353,14 @@ class Taste:
         cuisines = s.repo.assumptions.cuisines
         ideas = []
         for i in answer.nowe_pomysly[:MAX_IDEAS]:
+            known = library_match(i.opis, s.repo.dishes)
+            if known is not None:
+                # znane danie: jeśli go jeszcze nie jedli, staje się zwykłą propozycją z biblioteki
+                if known in allowed and known not in seen:
+                    proposals.append({"danie": known, "powod": without_numbers(i.powod).strip(), "status": "nowa",
+                                      "dodano": date.today().isoformat()})
+                    seen.add(known)
+                continue
             cuisine = match_cuisine(i.kuchnia, cuisines) or ("polska" if "polska" in cuisines else cuisines[0])
             ideas.append({"posilek": i.posilek, "kuchnia": cuisine, "opis": i.opis.strip(),
                           "powod": without_numbers(i.powod).strip(), "status": "nowy"})

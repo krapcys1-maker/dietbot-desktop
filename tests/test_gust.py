@@ -144,3 +144,28 @@ def test_chat_asks_before_paid_refresh(env):
     assert done["data"]["kind"] == "gust"
     job = service.jobs.wait(done["data"]["job_id"], timeout=300)
     assert job.status is JobStatus.DONE, job.error
+
+
+def test_idea_that_is_a_library_dish_is_not_invented_again(repo):
+    from dietbot.app.taste import library_match
+
+    # na żywo model „wymyślił” dwa dania, które już były w bibliotece (25.10.2026)
+    assert library_match("Makaron z kurczakiem i szpinakiem w lekkim sosie śmietanowym",
+                         repo.dishes) == "makaron_z_kurczakiem_i_szpinakiem"
+    assert library_match("Kanapki z pastą z jajek i szczypiorku na ciemnym pieczywie",
+                         repo.dishes) == "kanapki_z_pasta_jajeczna_i_szczypiorkiem"
+    assert library_match("Pierogi ruskie z cebulką", repo.dishes) is None
+    assert library_match("Makaron z kurczakiem w sosie z suszonych pomidorów", repo.dishes) is None
+
+
+def test_chosen_dishes_are_not_reported_as_newly_invented(env):
+    service, fake = env
+    taste = Taste(service)
+    fake.queue.append(lambda prompt: {"propozycje": [
+        {"danie": CANDIDATE.findall(prompt.split("KANDYDACI", 1)[1])[0], "powod": "Pasuje."}]})
+    assert service.jobs.wait(taste.refresh().id, timeout=300).status is JobStatus.DONE
+    dish_id = next(p["danie"] for p in taste.view()["propozycje"] if p["status"] == "nowa")
+    taste.set_status(dish_id, "wybrana")
+    job = service.jobs.wait(service.generate(use_llm=False, seed=13).id, timeout=600)
+    assert job.status is JobStatus.DONE, job.error
+    assert job.result["new_dishes"] == []  # okno pisało „Nowe dania w bibliotece” o zwykłym daniu z biblioteki
