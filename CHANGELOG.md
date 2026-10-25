@@ -3,7 +3,7 @@
 ## 0.6.0 — propozycje w Waszym guście i lista zakupów do telefonu (25.10.2026)
 
 - **Propozycje dla Was** (Notatnik preferencji, czat): Porcja uczy się z ocen 👍/👎, zamian dań, uwag, życzeń, próśb z czatu i odrzuconych propozycji. DeepSeek opisuje Wasz gust, wybiera dania z biblioteki, których jeszcze nie jedliście (wyłącznie spośród kandydatów policzonych przez program — zgodnych z dietą i zasadami), i podsuwa pomysły na nowe. **Chcę w następnym planie** wstawia danie do najbliższego układania tygodnia; **Wymyśl to danie** tworzy przepis z kontrolą programu, silnika i kucharza. Opis gustu jest też miękką wskazówką przy układaniu tygodnia. Koszt odświeżenia: zwykle poniżej centa.
-- **Lista zakupów do telefonu:** cztery działy — Nabiał, Mięso, Owoce i warzywa, Inne (puszki, mrożonki i jedzenie na wynos w „Inne”). Plik TXT, „Kopiuj pozostałe zakupy” i Telegram bez pustych linii i akapitów objaśnień.
+- **Lista zakupów do telefonu:** cztery działy — Nabiał, Mięso, Owoce i warzywa, Inne (puszki, mrożonki i jedzenie na wynos w „Inne”). Plik TXT, „Kopiuj pozostałe zakupy” i Telegram bez pustych linii, akapitów objaśnień i znaczków przed pozycjami (Telegram miał kwadraciki „▫️”, które w notatkach telefonu dublowały pola do odhaczania).
 
 ## 0.5.1 — sos w daniach i więcej białka zamiast ryżu (20.10.2026)
 
