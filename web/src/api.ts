@@ -16,6 +16,7 @@ import type {
   Shopping,
   Status,
   SwapOptions,
+  TasteView,
 } from "./types";
 
 export class ApiError extends Error {
@@ -138,6 +139,12 @@ export const api = {
   chatReject: (proposal_id: string) => request<{ ok: boolean }>("POST", "/api/czat/odrzuc", { proposal_id }),
 
   notebook: () => request<NotebookView>("GET", "/api/notatnik"),
+  taste: () => request<TasteView>("GET", "/api/gust"),
+  tasteRefresh: () => request<Job>("POST", "/api/gust/odswiez"),
+  tasteChoose: (dishId: string, status: "nowa" | "wybrana" | "odrzucona") =>
+    request<TasteView>("POST", `/api/gust/propozycje/${encodeURIComponent(dishId)}`, { status }),
+  tasteInvent: (index: number) => request<Job>("POST", `/api/gust/pomysly/${index}/wymysl`),
+  tasteDismissIdea: (index: number) => request<TasteView>("POST", `/api/gust/pomysly/${index}/odrzuc`),
   addNote: (text: string, plan_id?: string) => request<NotebookView>("POST", "/api/notatnik/uwaga", { text, plan_id }),
   addRule: (rule: RuleInput) => request<NotebookView>("POST", "/api/notatnik/zasady", rule),
   setRuleActive: (id: string, active: boolean) => request<NotebookView>("PATCH", `/api/notatnik/zasady/${id}`, { active }),
