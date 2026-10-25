@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import Icon from "../components/Icon";
+import TasteProposals from "../components/TasteProposals";
 import { ErrorBox, Loading, Spinner, useToast } from "../components/ui";
 import type { NoteAnalysis, NotebookView, ProductListItem, RuleInput, RuleKind } from "../types";
 import { dateTime, go, useAsync } from "../util";
@@ -70,6 +71,8 @@ export default function NotebookPage() {
       <div className="sub">Napisz, co Ci nie pasuje albo co lubisz. Zasady trafiają do każdego nowego planu — liczby w nich
         pochodzą z Twojej uwagi albo liczy je program. Uwagi do działania aplikacji zbieramy osobno, dla twórcy.</div>
     </div><button className="btn" onClick={() => void saveFile()}><Icon name="download" />Zapisz notatnik do TXT</button></div>
+
+    <TasteProposals />
 
     <section className="card stack">
       <div className="card-head"><h2>Nowa uwaga</h2>

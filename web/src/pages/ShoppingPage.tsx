@@ -41,9 +41,11 @@ export default function ShoppingPage({ planId }: { planId?: string }) {
     if (!data) return;
     const lines: string[] = [`Lista zakupów — ${data.title}`];
     for (const g of data.groups) {
-      lines.push("", g.label.toUpperCase());
-      for (const it of g.items) {
-        if (done.includes(it.produkt)) continue;
+      const left = g.items.filter((it) => !done.includes(it.produkt));
+      if (!left.length) continue;
+      // bez pustych linii — w notatkach telefonu każda linia to pozycja do odhaczania
+      lines.push(g.label.toUpperCase());
+      for (const it of left) {
         // bez „- ” i „[ ]” — notatki w telefonie same robią z wierszy listę do odhaczania
         const part = bought[it.produkt] ?? 0;
         const remaining = Math.round((it.gramy - part) * 10) / 10;

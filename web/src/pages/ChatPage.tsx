@@ -159,6 +159,9 @@ function ChatJob({ jobId }: { jobId: string }) {
     <div style={{ marginTop: 8, whiteSpace: "normal" }}>
       {open && <JobProgress jobId={jobId} onDone={setJob} />}
       <div className="row" style={{ marginTop: 6 }}>
+        {job?.status === "gotowe" && job.kind === "gust" && (
+          <button className="btn small primary" onClick={() => go("notatnik")}>Zobacz propozycje →</button>
+        )}
         {job?.status === "gotowe" && job.result?.plan_id && (
           <button className="btn small primary" onClick={() => go("tydzien", job.result!.plan_id!)}>
             Zobacz plan →

@@ -44,7 +44,7 @@ from ..planner.portion_review import (
 from ..planner.repair import apply_swaps
 from ..report.markdown import render_plan, render_shopping_list
 from ..report.text import markdown_to_text
-from ..shopping import build_shopping_list
+from ..shopping import build_shopping_list, render_shopping_text
 from ..storage.paths import Paths
 from ..storage.repository import Repository, check_consistency
 from ..storage.yamlio import dump_yaml, load_yaml, to_plain
@@ -53,6 +53,7 @@ from ..textnorm import normalize
 from .jobs import Job, JobManager, NotFound, UserError
 from .snapshots import capture, matches_current, restore
 from .store import PlanRecord, PlanStore
+from .taste import mark_planned, pending_dishes, taste_hint
 from .validation import polish_errors
 from .views import assumptions_hash, dish_view, persons_view, plan_view, product_view
 
@@ -222,6 +223,9 @@ class DietService:
             repo.assumptions = self.raw_assumptions
             self.preferences = AppliedPreferences(assumptions=repo.assumptions,
                                                   problems=[f"Zasady z notatnika nie pasują do założeń: {exc}"])
+        hint = taste_hint(self.store)  # gust z propozycji (lubią / nie lubią) — miękko, dla modelu układającego tydzień
+        if hint:
+            repo.preference_hints = [*repo.preference_hints, hint]
         return repo
 
     def reload(self) -> None:
@@ -495,6 +499,10 @@ class DietService:
         def run(progress: Callable[[str], None]) -> dict:
             fresh: set[str] = set()
             wish_plan = None
+            chosen = [d for d in pending_dishes(self.store) if d in self.repo.dishes]
+            if chosen:  # „Chcę w następnym planie” z propozycji w guście domowników
+                fresh |= set(chosen)
+                progress("Dania wybrane z propozycji: " + "; ".join(self.repo.dishes[d].name for d in chosen))
             llm_first = self.llm() if use_llm else None
             if wishes and llm_first is not None:
                 wish_plan = self._resolve_wishes(llm_first, wishes, progress)
@@ -507,7 +515,7 @@ class DietService:
                     if chosen:  # dania z życzeń już są w bibliotece — nie wymyślamy ich drugi raz
                         request += "\n(Te dania z prośby są już wybrane, NIE wymyślaj ich: " + "; ".join(chosen) + ")"
                     try:
-                        fresh = {d.id for d in self._invent(llm_first, request, invent_count, progress)}
+                        fresh |= {d.id for d in self._invent(llm_first, request, invent_count, progress)}
                     except LLMError as exc:  # np. limit kosztu — plan i tak powstaje z biblioteki (audyt S12)
                         progress(f"Nie udało się wymyślić nowych dań ({exc}) — układam tydzień z biblioteki")
             repo = self.repo
@@ -535,8 +543,14 @@ class DietService:
             check_cancelled()
             self.store.save(rec)
             self.store.set_setting("active_plan", rec.id)
+            planned = mark_planned(self.store, {m.dish_id for m in out.plan.meals})
+            missed = [d for d in chosen if d not in planned]
+            if missed:
+                progress("Nie zmieściły się w tym tygodniu (zostają na następny): "
+                         + "; ".join(self.repo.dishes[d].name for d in missed if d in self.repo.dishes))
             progress(f"Gotowe: {rec.title} ({'plan poprawny' if rec.ok else 'plan z uwagami'})")
-            return {"plan_id": rec.id, "ok": rec.ok, "new_dishes": sorted(fresh)}
+            # tylko dania wymyślone w tym zadaniu — wybrane z propozycji już były w bibliotece
+            return {"plan_id": rec.id, "ok": rec.ok, "new_dishes": sorted(fresh - set(chosen))}
 
         return self.jobs.submit("generowanie", "Nowy plan tygodnia", run)
 
@@ -973,9 +987,9 @@ class DietService:
             content = render_plan(rec.plan, repo.assumptions, repo.products, repo.dishes, report, title=rec.title)
             filename = f"jadlospis_{stem}_v{rec.version}.txt"
         elif kind == "shopping":
-            content = render_shopping_list(rec.plan, repo.assumptions, repo.products, repo.store_products,
-                                           bullets=False)
-            filename = f"lista_zakupow_{stem}_v{rec.version}.txt"
+            rows = build_shopping_list(rec.plan, repo.assumptions, repo.products, repo.store_products)
+            return {"filename": f"lista_zakupow_{stem}_v{rec.version}.txt",
+                    "content": render_shopping_text(rows, rec.title)}
         else:
             raise UserError("Nieznany rodzaj pliku do zapisania.")
         return {"filename": filename, "content": markdown_to_text(content)}

@@ -75,7 +75,7 @@ class PortionRequest(BaseModel):
 
 class ChatAction(BaseModel):
     typ: Literal["odpowiedz", "pokaz", "generuj", "wymysl_dania", "zamien", "proporcje", "sprawdz_porcje",
-                 "zmien_zalozenia", "zapamietaj"]
+                 "zmien_zalozenia", "zapamietaj", "propozycje_gustu"]
     tekst: str = Field(description="krótka odpowiedź po polsku, BEZ cyfr i liczebników — liczby dopisze program")
     fakty: list[FactRequest] = Field(default_factory=list, max_length=6)
     porcje: list[PortionRequest] = Field(default_factory=list, max_length=8,
@@ -153,6 +153,10 @@ Twoje zadanie: zrozumieć wiadomość i wybrać jedną akcję:
   ryżu na obiad, wolę więcej mięsa”, „nie dawaj białek jaj”, „nie lubimy tego dania”, „lista zakupów jest niewygodna”.
   Program zapisze ją w notatniku preferencji; w "zyczenia" przepisz całą uwagę słowami użytkownika. Uwaga o konkretnym
   daniu z aktualnego planu to "proporcje".
+- "propozycje_gustu" — prośba, żeby program sam zaproponował dania w guście domowników: „zaproponuj coś, co nam
+  zasmakuje”, „co byś nam polecił?”, „czego się o nas nauczyłeś?”, „podsuń coś nowego w naszym stylu”. Program przejrzy
+  oceny, zamiany i prośby, wybierze dania z biblioteki i pomysły na nowe (domownicy zdecydują, co trafi do planu).
+  Gdy podają konkretne danie do wymyślenia, to "wymysl_dania".
 - "odpowiedz" — rozmowa, porady kulinarne i wyjaśnienia działania aplikacji, gdy użytkownik o nic nie prosi
   (nie wymyśla dań, nie zmienia planu ani założeń).
 Pole "tekst": krótko i życzliwie po polsku, bez cyfr i liczebników. Nie obiecuj, że coś już zrobiłeś — program wykona akcję."""
@@ -275,7 +279,7 @@ class ChatAssistant:
         try:
             if action.typ == "pokaz":
                 return self._show(action, rec)
-            if action.typ in ("generuj", "wymysl_dania"):
+            if action.typ in ("generuj", "wymysl_dania", "propozycje_gustu"):
                 return self._propose_action(action, text, rec)
             if action.typ == "zamien":
                 return self._swap(action, rec, text)
@@ -672,7 +676,12 @@ class ChatAssistant:
         """Płatne i trwałe akcje (nowy plan, wymyślanie dań do biblioteki) czekają na „Tak, uruchom” — jak zmiany
         założeń. Model mógł źle zrozumieć wiadomość, a wymyślone dania trafiają do biblioteki."""
         wishes = (action.zyczenia or text).strip()[:1000]
-        if action.typ == "generuj":
+        if action.typ == "propozycje_gustu":
+            what = ("Przejrzę Wasze oceny dań, zamiany w planach, uwagi i prośby z czatu, a potem zaproponuję dania "
+                    "z biblioteki, których jeszcze nie jedliście, i pomysły na nowe. Wybierzecie, co ma trafić do "
+                    "następnego planu")
+            params = {"akcja": "propozycje_gustu"}
+        elif action.typ == "generuj":
             what = "Ułożę nowy plan tygodnia" + (f" z życzeniami: „{wishes}”" if wishes else "")
             if action.wymysl_nowe:
                 what += ", najpierw wymyślając nowe dania (kilka minut)"
@@ -703,6 +712,12 @@ class ChatAssistant:
             job = s.adjust_portions(prop["plan_id"], prop["poprawki"], children_before=set(prop.get("wersje", [])))
             return self._reply("Poprawiam proporcje — silnik przeliczy te dni.", rec,
                                {"job_id": job.id, "kind": "proporcje"})
+        if prop["akcja"] == "propozycje_gustu":
+            from .taste import Taste
+
+            job = Taste(s).refresh()
+            return self._reply("Szukam dań w Waszym guście — propozycje pojawią się też w Notatniku preferencji.", rec,
+                               {"job_id": job.id, "kind": "gust"})
         if prop["akcja"] == "generuj":
             job = s.generate(wishes=prop.get("zyczenia") or None, channel=self.channel, invent=bool(prop.get("wymysl_nowe")))
             return self._reply("Układam nowy plan tygodnia.", rec, {"job_id": job.id, "kind": "generowanie"})

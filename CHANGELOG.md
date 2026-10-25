@@ -1,5 +1,10 @@
 # Historia zmian
 
+## 0.6.0 — propozycje w Waszym guście i lista zakupów do telefonu (25.10.2026)
+
+- **Propozycje dla Was** (Notatnik preferencji, czat): Porcja uczy się z ocen 👍/👎, zamian dań, uwag, życzeń, próśb z czatu i odrzuconych propozycji. DeepSeek opisuje Wasz gust, wybiera dania z biblioteki, których jeszcze nie jedliście (wyłącznie spośród kandydatów policzonych przez program — zgodnych z dietą i zasadami), i podsuwa pomysły na nowe. **Chcę w następnym planie** wstawia danie do najbliższego układania tygodnia; **Wymyśl to danie** tworzy przepis z kontrolą programu, silnika i kucharza. Opis gustu jest też miękką wskazówką przy układaniu tygodnia. Koszt odświeżenia: zwykle poniżej centa.
+- **Lista zakupów do telefonu:** cztery działy — Nabiał, Mięso, Owoce i warzywa, Inne (puszki, mrożonki i jedzenie na wynos w „Inne”). Plik TXT, „Kopiuj pozostałe zakupy” i Telegram bez pustych linii, akapitów objaśnień i znaczków przed pozycjami (Telegram miał kwadraciki „▫️”, które w notatkach telefonu dublowały pola do odhaczania).
+
 ## 0.5.1 — sos w daniach i więcej białka zamiast ryżu (20.10.2026)
 
 - **Dania nie wychodzą suche.** Silnik nie może już obciąć sosu (mleczka kokosowego, śmietany, passaty, pomidorów, bulionu, jogurtu w daniu „z sosem”) poniżej 85% proporcji przepisu względem ryżu, makaronu, kaszy czy ziemniaków ani poniżej 80% względem mięsa, ryby, tofu czy strączków. Wcześniej dopełniał kalorie samym ryżem, a białko samym tofu. W teście 12 tygodni na trzech poziomach kalorii (ok. 1400–2600 kcal) 28 ze 102 porcji dań z sosem miało go mniej niż 85% przepisu, 13 — mniej niż 70%, a 16 miało o ponad 30% za dużo białka względem sosu; po zmianie poniżej 70% nie ma żadnej, poniżej 85% zostały pojedyncze wrapy i pity, a porcji z nadmiarem białka nie ma. Zupy i pieczywo podawane obok dania nie są objęte tą regułą. Czas planowania podobny jak wcześniej.

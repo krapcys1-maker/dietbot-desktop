@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import re
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, replace
@@ -42,6 +43,29 @@ TAKEAWAY_TAG = "na_wynos"
 TAKEAWAY_GROUP = "na_wynos"
 TAKEAWAY_LABEL = "Na wynos — do zamówienia"
 
+# Uproszczona lista ma cztery działy jak kartka do sklepu (prośba domowników 25.10.2026: kilkanaście kategorii
+# i puste linie przeszkadzały w notatkach telefonu). Szczegółowa lista do kontroli zostaje przy kategoriach produktów.
+SHOP_GROUPS: tuple[tuple[str, str], ...] = (("nabial", "Nabiał"), ("mieso", "Mięso"),
+                                            ("owoce_warzywa", "Owoce i warzywa"), ("inne", "Inne"))
+SHOP_GROUP_LABELS = dict(SHOP_GROUPS)
+SHOP_GROUP_BY_CATEGORY = {
+    Category.DAIRY: "nabial", Category.CHEESE: "nabial", Category.EGGS: "nabial",
+    Category.MEAT: "mieso", Category.POULTRY: "mieso", Category.COLD_CUTS: "mieso", Category.FISH: "mieso",
+    Category.VEGETABLES: "owoce_warzywa", Category.FRUIT: "owoce_warzywa", Category.POTATOES: "owoce_warzywa",
+}
+# puszki, słoiki, mrożonki i susz stoją w sklepie poza świeżymi warzywami i owocami
+NOT_FRESH = re.compile(r"konserw|puszk|passata|mrozon|suszon|oliwki|frytki|w_oleju|koncentrat")
+
+
+def shop_group(product_id: str, category: Category, takeaway: bool = False) -> str:
+    """Dział uproszczonej listy zakupów: nabiał, mięso, owoce i warzywa albo inne (także jedzenie na wynos)."""
+    if takeaway:
+        return "inne"
+    group = SHOP_GROUP_BY_CATEGORY.get(category, "inne")
+    if group == "owoce_warzywa" and NOT_FRESH.search(product_id):
+        return "inne"
+    return group
+
 
 @dataclass(frozen=True)
 class ShoppingRow:
@@ -60,6 +84,7 @@ class ShoppingRow:
     # połączone warianty (nazwa, gramy) i czy różnią się kalorycznością na tyle, że zakup ma znaczenie dla planu
     variants: tuple[tuple[str, float], ...] = ()
     variants_differ: bool = False
+    shop_group: str | None = None  # dział uproszczonej listy (nabial / mieso / owoce_warzywa / inne)
 
     @property
     def variants_text(self) -> str:
@@ -67,10 +92,14 @@ class ShoppingRow:
 
     @property
     def group(self) -> str:
+        if self.shop_group:
+            return self.shop_group
         return TAKEAWAY_GROUP if self.takeaway else self.category.value
 
     @property
     def group_label(self) -> str:
+        if self.shop_group:
+            return SHOP_GROUP_LABELS[self.shop_group]
         return TAKEAWAY_LABEL if self.takeaway else self.category_label
 
     def to_dict(self) -> dict:
@@ -191,9 +220,30 @@ def build_shopping_list(plan: WeekPlan, a: Assumptions, products: Mapping[str, P
             kcal = [products[r.product_id].per_100g.kcal for r in members]
             # np. jogurt naturalny 62 kcal i owocowy 96 kcal: kupno samego naturalnego zmienia plan (audyt S14)
             differ = max(kcal) > 0 and (max(kcal) - min(kcal)) / max(kcal) > VARIANT_KCAL_SPREAD
-        rows.append(replace(first, product_id=key, name=family[1] if family else first.name,
+        name = family[1] if family else first.name
+        if first.takeaway:
+            name += " (na wynos, do zamówienia)"
+        rows.append(replace(first, product_id=key, name=name,
                             grams=grams, amount_text=amount, store=None, packs=None, pack_text=None,
                             source_product_ids=tuple(sorted(row.product_id for row in members)),
-                            variants=variants, variants_differ=differ))
+                            variants=variants, variants_differ=differ,
+                            shop_group=shop_group(first.product_id, first.category, first.takeaway)))
+    groups = {key: i for i, (key, _) in enumerate(SHOP_GROUPS)}
     order = {c: i for i, c in enumerate(Category)}
-    return sorted(rows, key=lambda row: (row.takeaway, order[row.category], normalize(row.name)))
+    # w dziale podobne produkty obok siebie (pieczywo przy pieczywie), jedzenie na wynos na końcu
+    return sorted(rows, key=lambda row: (groups[row.shop_group or "inne"], row.takeaway, order[row.category],
+                                         normalize(row.name)))
+
+
+def render_shopping_text(rows: Sequence[ShoppingRow], title: str | None = None) -> str:
+    """Lista do wklejenia w notatki telefonu: bez pustych linii, objaśnień i znaczników — każdy wiersz to pozycja,
+    nagłówki działów wielkimi literami (notatki same robią z wierszy listę do odhaczania)."""
+    lines = [f"Lista zakupów — {title}" if title else "Lista zakupów"]
+    current = None
+    for row in rows:
+        if row.group != current:
+            lines.append(row.group_label.upper())
+            current = row.group
+        variants = f" (w tym: {row.variants_text})" if row.variants_differ else ""
+        lines.append(f"{row.name} — {row.amount_text}{variants}" if row.amount_text else row.name)
+    return "\n".join(lines) + "\n"

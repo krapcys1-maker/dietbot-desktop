@@ -22,4 +22,4 @@ if (-not $Compiler) {
 
 & $Compiler (Join-Path $PSScriptRoot "DietBot.iss")
 if ($LASTEXITCODE -ne 0) { throw "Budowanie instalatora nie powiodlo sie." }
-Write-Host "Gotowe: release\Porcja-Setup-0.5.1.exe"
+Write-Host "Gotowe: release\Porcja-Setup-0.6.0.exe"

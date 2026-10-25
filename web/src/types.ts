@@ -211,6 +211,8 @@ export interface Job {
     rule_warnings?: string[];
     new_dishes?: string[];
     dishes?: { id: string; name: string; meal_types: string[] }[];
+    dish_id?: string;
+    name?: string;
   } | null;
   error: string | null;
   created_at: string;
@@ -506,6 +508,43 @@ export interface HabitsAnalysis {
   program_notes: string[];
   problems: string[];
   cost_usd?: number;
+}
+
+export interface TasteProposal {
+  danie: string;
+  powod: string;
+  status: "nowa" | "wybrana" | "odrzucona" | "w_planie";
+  nazwa: string;
+  opis?: string | null;
+  posilki: string[];
+  kuchnia: string;
+  nowe?: boolean;
+  dodano?: string;
+}
+
+export interface TasteIdea {
+  posilek: string;
+  kuchnia: string;
+  opis: string;
+  powod: string;
+  status: "nowy" | "wymyslony" | "odrzucony" | "nieudany";
+  danie?: string;
+  posilek_nazwa: string;
+  kuchnia_nazwa: string;
+  danie_nazwa?: string | null;
+}
+
+export interface TasteView {
+  utworzono: string | null;
+  podsumowanie: string;
+  lubia: string[];
+  nie_lubia: string[];
+  propozycje: TasteProposal[];
+  pomysly: TasteIdea[];
+  sygnaly: Record<string, number> | null;
+  koszt_usd: number | null;
+  llm_available: boolean;
+  do_planu: string[];
 }
 
 export interface NotebookView {

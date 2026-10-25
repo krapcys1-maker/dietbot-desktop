@@ -107,6 +107,10 @@ class ActiveIn(BaseModel):
     active: bool
 
 
+class TasteChoiceIn(BaseModel):
+    status: Literal["nowa", "wybrana", "odrzucona"]
+
+
 class ProgramNoteIn(BaseModel):
     status: Literal["nowa", "zrobione", "usunieta"]
 
@@ -349,8 +353,31 @@ def create_app(service: DietService, session_token: str | None = None, docs: boo
 
     # ---------------------------------------------------------------- notatnik preferencji
     from .notebook import Notebook
+    from .taste import Taste
 
     notebook = Notebook(s)
+    taste = Taste(s)
+
+    # propozycje dań w guście domowników (model wybiera z biblioteki; liczby i przepisy — program)
+    @app.get("/api/gust")
+    def taste_view() -> dict:
+        return taste.view()
+
+    @app.post("/api/gust/odswiez")
+    def taste_refresh() -> dict:
+        return taste.refresh().to_dict()
+
+    @app.post("/api/gust/propozycje/{dish_id}")
+    def taste_choose(dish_id: str, body: TasteChoiceIn) -> dict:
+        return taste.set_status(dish_id, body.status)
+
+    @app.post("/api/gust/pomysly/{index}/wymysl")
+    def taste_invent(index: int) -> dict:
+        return taste.invent_idea(index).to_dict()
+
+    @app.post("/api/gust/pomysly/{index}/odrzuc")
+    def taste_dismiss_idea(index: int) -> dict:
+        return taste.dismiss_idea(index)
 
     @app.get("/api/notatnik")
     def notebook_view() -> dict:
