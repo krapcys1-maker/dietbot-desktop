@@ -186,7 +186,7 @@ def format_week(view: dict) -> str:
 def format_shopping(data: dict) -> str:
     lines = [f"🛒 <b>Lista zakupów</b> — {html.escape(data['title'])}"]
     for g in data["groups"]:
-        lines += ["", f"<b>{html.escape(g['label'])}</b>"]
+        lines.append(f"<b>{html.escape(g['label'].upper())}</b>")
         for it in g["items"]:
             amount = "" if it["pomijalny"] else f" — {it['ilosc']}"
             lines.append(f"▫️ {html.escape(it['nazwa'])}{amount}")

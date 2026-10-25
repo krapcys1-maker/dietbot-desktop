@@ -44,7 +44,7 @@ from ..planner.portion_review import (
 from ..planner.repair import apply_swaps
 from ..report.markdown import render_plan, render_shopping_list
 from ..report.text import markdown_to_text
-from ..shopping import build_shopping_list
+from ..shopping import build_shopping_list, render_shopping_text
 from ..storage.paths import Paths
 from ..storage.repository import Repository, check_consistency
 from ..storage.yamlio import dump_yaml, load_yaml, to_plain
@@ -973,9 +973,9 @@ class DietService:
             content = render_plan(rec.plan, repo.assumptions, repo.products, repo.dishes, report, title=rec.title)
             filename = f"jadlospis_{stem}_v{rec.version}.txt"
         elif kind == "shopping":
-            content = render_shopping_list(rec.plan, repo.assumptions, repo.products, repo.store_products,
-                                           bullets=False)
-            filename = f"lista_zakupow_{stem}_v{rec.version}.txt"
+            rows = build_shopping_list(rec.plan, repo.assumptions, repo.products, repo.store_products)
+            return {"filename": f"lista_zakupow_{stem}_v{rec.version}.txt",
+                    "content": render_shopping_text(rows, rec.title)}
         else:
             raise UserError("Nieznany rodzaj pliku do zapisania.")
         return {"filename": filename, "content": markdown_to_text(content)}

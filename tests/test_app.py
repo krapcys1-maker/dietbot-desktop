@@ -223,6 +223,10 @@ def test_save_entire_week_and_shopping_as_text(service, generated, tmp_path, mon
     ))
     assert "Przygotowanie" in plan_export["content"]
     assert "Lista zakupów" in shopping_export["content"]
+    # do notatek w telefonie: bez pustych linii, tylko cztery działy (25.10.2026)
+    assert all(line.strip() for line in shopping_export["content"].splitlines())
+    groups = [g["label"] for g in service.shopping(plan_id)["groups"]]
+    assert set(groups) <= {"Nabiał", "Mięso", "Owoce i warzywa", "Inne"} and len(groups) == len(set(groups))
 
     saved_paths: list[Path] = []
 

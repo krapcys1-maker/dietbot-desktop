@@ -119,7 +119,7 @@ def test_produce_pieces_and_spoon_cap():
     assert household(cheese, 230) is None  # poza owocami i warzywami zwykła tolerancja
 
 
-def test_takeaway_food_is_a_separate_ordering_group(repo):
+def test_takeaway_food_is_marked_for_ordering_in_other_group(repo):
     from dietbot.engine import EngineRequest, solve_week
     from dietbot.report.markdown import render_shopping_list
     from dietbot.shopping import build_shopping_list
@@ -130,8 +130,10 @@ def test_takeaway_food_is_a_separate_ordering_group(repo):
     res = solve_week(EngineRequest.model_validate({"slots": slots}), repo.assumptions, repo.products, repo.dishes)
     rows = build_shopping_list(res.plan, repo.assumptions, repo.products, repo.store_products)
     pizza = next(r for r in rows if r.product_id == "pizza_margherita_z_pizzerii")
-    assert pizza.takeaway and pizza.group == "na_wynos" and pizza.store is None
+    # uproszczona lista ma tylko cztery działy — jedzenie na wynos stoi na końcu „Inne”, z dopiskiem
+    assert pizza.takeaway and pizza.group == "inne" and pizza.store is None
+    assert pizza.name.endswith("(na wynos, do zamówienia)")
     assert "kawałk" in pizza.amount_text and rows[-1].takeaway
     assert not any(r.takeaway for r in rows if r.product_id != "pizza_margherita_z_pizzerii")
     md = render_shopping_list(res.plan, repo.assumptions, repo.products, repo.store_products)
-    assert "## Na wynos — do zamówienia" in md and md.index("## Na wynos") > md.index("## Pieczywo")
+    assert "## Na wynos" not in md and md.index("Pizza") > md.index("## Inne")
